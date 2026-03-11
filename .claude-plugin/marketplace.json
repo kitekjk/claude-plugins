@@ -1,0 +1,25 @@
+{
+  "name": "claude-plugins",
+  "owner": {
+    "name": "kitekjk"
+  },
+  "metadata": {
+    "description": "개인용 Claude Code 플러그인 모음 — 자주 쓰는 워크플로우 자동화 스킬"
+  },
+  "plugins": [
+    {
+      "name": "md-to-confluence",
+      "source": "./plugins/md-to-confluence",
+      "description": "Markdown 설계문서(HLD, LLD)를 Confluence wiki에 발행. Mermaid 다이어그램을 이미지로 변환하여 포함.",
+      "version": "0.1.0",
+      "author": {
+        "name": "kitekjk"
+      },
+      "category": "documentation",
+      "tags": ["markdown", "confluence", "wiki", "mermaid", "hld", "lld"],
+      "skills": [
+        "skills/md-to-confluence"
+      ]
+    }
+  ]
+}

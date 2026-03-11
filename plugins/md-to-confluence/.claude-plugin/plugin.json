@@ -1,0 +1,11 @@
+{
+  "name": "md-to-confluence",
+  "version": "0.1.0",
+  "description": "Markdown 설계문서(HLD, LLD)를 Confluence wiki에 발행. Mermaid 다이어그램을 이미지로 변환하여 포함.",
+  "author": {
+    "name": "kitekjk"
+  },
+  "skills": [
+    "skills/md-to-confluence"
+  ]
+}

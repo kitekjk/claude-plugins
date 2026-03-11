@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+node_modules/
+.DS_Store
+confluence-output/
+*.confluence.html
+images/
+.confluence-mapping.json
