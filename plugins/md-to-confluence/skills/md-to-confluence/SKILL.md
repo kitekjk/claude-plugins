@@ -5,7 +5,7 @@ description: >
   사용자가 MD 파일을 Confluence에 올려달라고 하거나, 수정된 MD를 wiki에 반영해달라고
   요청할 때 트리거한다. "wiki에 올려줘", "Confluence에 발행해줘", "wiki 반영해줘",
   "이 문서 Confluence에 공유해줘", "MD를 wiki로 변환해줘" 등의 표현에 반응한다.
-  Mermaid 다이어그램이 포함된 문서도 이미지 변환을 포함하여 처리한다.
+  Mermaid 다이어그램이 포함된 문서도 Macro Pack 매크로로 변환하여 처리한다.
 ---
 
 # Markdown → Confluence Publisher
@@ -70,10 +70,24 @@ MCP 도구로 업로드에 필요한 ID를 확인한다:
   ```
   결과에서 해당 space key에 매칭되는 spaceId를 추출
 
-### Step 4: 업로드 (MCP)
+### Step 4: MD → ADF 변환
 
-Atlassian MCP 도구를 사용하여 Markdown 원문을 직접 업로드한다.
-별도 변환 없이 `contentFormat: "markdown"`으로 전달하면 Confluence가 렌더링한다.
+Markdown을 Atlassian Document Format(ADF) JSON으로 변환한다.
+ADF는 Confluence의 네이티브 문서 포맷이며, Mermaid 다이어그램을 Macro Pack 매크로로 직접 렌더링할 수 있다.
+
+변환 결과는 아래 구조의 JSON 문자열이다:
+
+```json
+{
+  "version": 1,
+  "type": "doc",
+  "content": [ /* ADF 노드 배열 */ ]
+}
+```
+
+### Step 5: 업로드 (MCP)
+
+`contentFormat: "adf"`로 ADF JSON을 업로드한다.
 
 #### 새 페이지 생성
 
@@ -82,9 +96,9 @@ mcp__plugin_atlassian_atlassian__createConfluencePage(
   cloudId: "{domain}.atlassian.net",
   spaceId: "{space_id}",
   title: "{문서 제목}",
-  parentId: "{parent_page_id}",   // URL에서 추출한 부모 페이지 ID
-  body: "{MD 파일 원문 전체}",
-  contentFormat: "markdown"
+  parentId: "{parent_page_id}",
+  body: "{ADF JSON 문자열}",
+  contentFormat: "adf"
 )
 ```
 
@@ -95,103 +109,199 @@ mcp__plugin_atlassian_atlassian__updateConfluencePage(
   cloudId: "{domain}.atlassian.net",
   pageId: "{page_id}",
   title: "{문서 제목}",
-  body: "{MD 파일 원문 전체}",
-  contentFormat: "markdown",
+  body: "{ADF JSON 문자열}",
+  contentFormat: "adf",
   versionMessage: "Updated from Markdown"
 )
 ```
 
-### Step 5: 결과 안내
+### Step 6: 결과 안내
 
 업로드 결과에서 page ID를 확인하고 사용자에게 페이지 URL을 안내한다:
 `https://{domain}.atlassian.net/wiki/pages/{page_id}`
 
 ---
 
-## 변환만 요청 시 (패턴 3)
+## MD → ADF 변환 규칙
 
-변환만 요청한 경우 MCP 업로드 없이 로컬 변환만 수행한다:
+### 기본 노드 타입
 
-### 의존성 설치
+#### Heading
 
-```bash
-pip install markdown pymdown-extensions --break-system-packages -q
+```json
+{"type": "heading", "attrs": {"level": 1}, "content": [{"type": "text", "text": "제목"}]}
 ```
 
-Mermaid 다이어그램이 있는 경우 추가로:
-```bash
-npm install -g @mermaid-js/mermaid-cli
-npx puppeteer browsers install chrome
+`# H1` → level 1, `## H2` → level 2, ... `###### H6` → level 6
+
+#### Paragraph
+
+```json
+{"type": "paragraph", "content": [{"type": "text", "text": "본문 텍스트"}]}
 ```
 
-### 변환 스크립트 실행
+#### 줄바꿈 (한 paragraph 내)
 
-스킬 번들의 `scripts/md2confluence.py`를 사용한다:
-
-```bash
-python <skill-path>/scripts/md2confluence.py <input.md> -o /home/claude/confluence-output/
+```json
+{"type": "hardBreak"}
 ```
 
-이 스크립트가 수행하는 작업:
-1. Mermaid 코드블록 추출 → PNG 이미지 렌더링 (`confluence-output/images/`)
-2. Mermaid 블록을 이미지 참조로 교체
-3. Markdown → Confluence Storage Format XHTML 변환
-4. 결과를 `<stem>.confluence.html`로 저장
+### 인라인 서식 (marks)
 
-### 결과물
+텍스트 노드에 `marks` 배열로 적용한다:
 
-- `.confluence.html` — Confluence 페이지 본문 (storage format XHTML)
-- `images/*.png` — Mermaid 다이어그램 이미지 파일들 (있는 경우)
+| Markdown | mark |
+|----------|------|
+| `**bold**` | `{"type": "strong"}` |
+| `*italic*` | `{"type": "em"}` |
+| `~~strike~~` | `{"type": "strike"}` |
+| `` `code` `` | `{"type": "code"}` |
+| `[text](url)` | `{"type": "link", "attrs": {"href": "url"}}` |
 
----
+예시: `**bold** and *italic*` →
+```json
+{"type": "paragraph", "content": [
+  {"type": "text", "text": "bold", "marks": [{"type": "strong"}]},
+  {"type": "text", "text": " and "},
+  {"type": "text", "text": "italic", "marks": [{"type": "em"}]}
+]}
+```
 
-## Mermaid 다이어그램 처리
+### 리스트
 
-MCP 업로드 시 Markdown 원문을 그대로 전달하므로, Mermaid 코드블록은 Confluence 측에서 처리된다.
+#### Bullet List (`- item`)
 
-- **Confluence Mermaid 앱이 설치된 경우**: 자동 렌더링됨
-- **미설치 시**: 코드블록으로 표시됨. 사용자에게 안내한다:
-  - "Mermaid 다이어그램이 코드블록으로 표시됩니다. Confluence의 Mermaid 앱 설치를 권장합니다."
+```json
+{"type": "bulletList", "content": [
+  {"type": "listItem", "content": [
+    {"type": "paragraph", "content": [{"type": "text", "text": "항목"}]}
+  ]}
+]}
+```
 
-이미지 렌더링이 반드시 필요한 경우, 로컬 변환(`md2confluence.py`)을 사용한다.
+#### Ordered List (`1. item`)
 
----
+```json
+{"type": "orderedList", "attrs": {"order": 1}, "content": [
+  {"type": "listItem", "content": [
+    {"type": "paragraph", "content": [{"type": "text", "text": "항목"}]}
+  ]}
+]}
+```
 
-## 변환 상세 (참고)
+#### Task List (`- [x] item`)
 
-Confluence Storage Format 태그 매핑 상세는 `references/confluence-storage-format.md`를 참조한다.
-로컬 변환 스크립트(`md2confluence.py`)에서 사용하는 매핑이다.
+```json
+{"type": "taskList", "content": [
+  {"type": "taskItem", "attrs": {"state": "DONE"}, "content": [
+    {"type": "text", "text": "완료된 항목"}
+  ]},
+  {"type": "taskItem", "attrs": {"state": "TODO"}, "content": [
+    {"type": "text", "text": "미완료 항목"}
+  ]}
+]}
+```
 
-### 주요 변환 매핑
+### Code Block
 
-| Markdown 요소 | Confluence 변환 결과 |
-|--------------|---------------------|
-| `# Heading` | `<h1>Heading</h1>` |
-| ` ```kotlin ... ``` ` | `<ac:structured-macro ac:name="code">` (language=kotlin) |
-| ` ```mermaid ... ``` ` | PNG 이미지 → `<ac:image><ri:attachment>` |
-| `> [!NOTE]` | `<ac:structured-macro ac:name="info">` |
-| `> [!WARNING]` | `<ac:structured-macro ac:name="warning">` |
-| `[TOC]` | `<ac:structured-macro ac:name="toc"/>` |
-| `- [x] task` | ☑ / ☐ 텍스트 |
-| 테이블 | `<table>` with `<thead>/<tbody>` |
-| `![alt](url)` | `<ac:image>` (외부 URL 또는 attachment) |
+````markdown
+```kotlin
+fun main() {}
+```
+````
+
+```json
+{"type": "codeBlock", "attrs": {"language": "kotlin"}, "content": [
+  {"type": "text", "text": "fun main() {}"}
+]}
+```
+
+### Blockquote
+
+```json
+{"type": "blockquote", "content": [
+  {"type": "paragraph", "content": [{"type": "text", "text": "인용문"}]}
+]}
+```
+
+### 수평선 (`---`)
+
+```json
+{"type": "rule"}
+```
+
+### Table
+
+```json
+{"type": "table", "attrs": {"layout": "align-start"}, "content": [
+  {"type": "tableRow", "content": [
+    {"type": "tableHeader", "content": [
+      {"type": "paragraph", "content": [{"type": "text", "text": "헤더1"}]}
+    ]},
+    {"type": "tableHeader", "content": [
+      {"type": "paragraph", "content": [{"type": "text", "text": "헤더2"}]}
+    ]}
+  ]},
+  {"type": "tableRow", "content": [
+    {"type": "tableCell", "content": [
+      {"type": "paragraph", "content": [{"type": "text", "text": "값1"}]}
+    ]},
+    {"type": "tableCell", "content": [
+      {"type": "paragraph", "content": [{"type": "text", "text": "값2"}]}
+    ]}
+  ]}
+]}
+```
+
+### Mermaid → Macro Pack 매크로
+
+````markdown
+```mermaid
+flowchart TD
+    A --> B
+```
+````
+
+Mermaid 코드블록은 Confluence의 Macro Pack `extension` 노드로 변환한다.
+**codeBlock이 아닌 extension 타입을 사용해야 한다.**
+
+```json
+{
+  "type": "extension",
+  "attrs": {
+    "layout": "default",
+    "extensionType": "com.atlassian.confluence.macro.core",
+    "extensionKey": "macro-pack",
+    "parameters": {
+      "macroParams": {
+        "input": {"value": "mermaid"},
+        "mermaid_height": {"value": "600"},
+        "mermaid_enable_custom_height": {"value": "false"},
+        "mermaid_custom_icons": {"value": "false"},
+        "source": {"value": "{\"id\":\"text\",\"type\":\"text\"}"},
+        "text": {"value": "flowchart TD\n    A --> B"},
+        "body": {"value": ""},
+        "mermaid_links_new_tab": {"value": "true"}
+      },
+      "macroMetadata": {
+        "schemaVersion": {"value": "1"},
+        "title": "Macro Pack"
+      }
+    }
+  }
+}
+```
+
+**핵심 필드:**
+- `text.value` — Mermaid 코드 원문 (줄바꿈은 `\n`으로)
+- `input.value` — 항상 `"mermaid"`
+- `source.value` — 항상 `"{\"id\":\"text\",\"type\":\"text\"}"`
 
 ---
 
 ## 사전 요구사항
 
-### MCP 업로드 (기본)
-
 Atlassian MCP 연결만 되어 있으면 추가 설정 불필요.
-환경변수, API 토큰 별도 설정 없음.
-
-### 로컬 변환 (변환만 요청 시)
-
-```bash
-pip install markdown pymdown-extensions
-```
-
-Mermaid 렌더링이 필요한 경우 추가:
-```bash
-npm install -g @mermaid-js/mermaid-cli
-```
+- 환경변수, API 토큰 설정 없음
+- pip/npm 패키지 설치 없음
+- Mermaid 렌더링을 위해 Confluence에 **Macro Pack** 앱이 설치되어 있어야 함
