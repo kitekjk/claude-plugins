@@ -1,4 +1,4 @@
-# Claude Plugins
+# Kay's Plugins
 
 개인용 Claude Code 플러그인 마켓플레이스.
 
@@ -7,13 +7,13 @@
 ### 1. 마켓플레이스 등록
 
 ```bash
-/plugin marketplace add kitekjk/claude-plugins
+/plugin marketplace add kitekjk/kitekjk-plugins
 ```
 
 ### 2. 플러그인 설치
 
 ```bash
-/plugin install md-to-confluence@claude-plugins
+/plugin install md-to-confluence@kitekjk-plugins
 ```
 
 ### 3. 사용
@@ -33,7 +33,7 @@ Claude Code에서 자연어로 요청하면 스킬이 자동 트리거됩니다:
 ## 구조
 
 ```
-claude-plugins/
+kitekjk-plugins/
 ├── .claude-plugin/
 │   └── marketplace.json              # 마켓플레이스 매니페스트
 ├── plugins/

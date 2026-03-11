@@ -1,5 +1,5 @@
 {
-  "name": "claude-plugins",
+  "name": "kitekjk-plugins",
   "owner": {
     "name": "kitekjk"
   },
@@ -16,10 +16,7 @@
         "name": "kitekjk"
       },
       "category": "documentation",
-      "tags": ["markdown", "confluence", "wiki", "mermaid", "hld", "lld"],
-      "skills": [
-        "skills/md-to-confluence"
-      ]
+      "tags": ["markdown", "confluence", "wiki", "mermaid", "hld", "lld"]
     }
   ]
 }
