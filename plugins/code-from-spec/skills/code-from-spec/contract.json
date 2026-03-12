@@ -1,6 +1,27 @@
 {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "name": "code-from-spec",
+
+  "specFormat": {
+    "description": "spec-from-design이 생성하는 Spec 형식. code-from-spec은 이 형식을 소비한다.",
+    "idPattern": "{PREFIX}-{DOMAIN}-{NUMBER} (예: PLM-POCANCEL-001, LMS-USER-001)",
+    "types": ["usecase", "model", "service", "refactoring", "performance"],
+    "typeClassification": "Spec 파일 내 '기본 정보' 섹션의 type 필드로 구분",
+    "tcIdPattern": "TC-{DOMAIN}-{NUMBER}-{SEQ} (예: TC-POCANCEL-001-01)",
+    "foundation": ["service-definition.md", "architecture-rules.md", "naming-guide.md", "infra-config.md"],
+    "foundationLocation": "{doc_root}/ (specs 디렉토리 상위)",
+    "policyLocation": "{doc_root}/policies/",
+    "specLocation": "{doc_root}/specs/",
+    "dependsOn": {
+      "format": "기본 정보 테이블 내 dependsOn 필드 또는 별도 dependsOn 섹션",
+      "schema": {
+        "spec_id": "의존 대상 Spec ID (예: PLM-STYLE-001)",
+        "shared_files": "수정 대상 파일 겹침 목록 (예: [\"Entity.java\"])",
+        "reason": "의존 사유"
+      },
+      "empty": "dependsOn: [] (의존성 없음)"
+    }
+  },
 
   "workflows": {
     "full": {
@@ -36,13 +57,13 @@
       },
       "teammate2": {
         "role": "도메인 모듈",
-        "specSources": ["service-definition"],
+        "specSources": ["service-definition", "model-specs"],
         "outputs": ["domain/**"],
         "dependsOn": ["teammate1"]
       },
       "teammate3": {
         "role": "애플리케이션 + 인터페이스 + 인프라 모듈",
-        "specSources": ["use-case-specs", "api-specs", "policies"],
+        "specSources": ["usecase-specs", "service-specs", "policies"],
         "outputs": ["application/**", "interfaces/**", "infrastructure/**"],
         "dependsOn": ["teammate2"]
       },
@@ -66,11 +87,12 @@
         "id": "V1",
         "name": "기능 구현 완결성",
         "weight": 40,
-        "description": "Spec의 모든 Use Case / API 엔드포인트가 구현되었는지 확인",
-        "measures": ["Use Case 구현 비율", "API 엔드포인트 구현 비율"],
+        "description": "Spec의 기본 흐름과 수정 대상 파일이 모두 구현되었는지 확인",
+        "measures": ["기본 흐름 구현 비율", "수정 대상 파일 구현 비율"],
         "specMapping": {
-          "useCase": "Use Case Spec → Application Service",
-          "api": "API Spec → Controller 엔드포인트"
+          "usecase": "usecase Spec → Application Service / Controller",
+          "model": "model Spec → Entity / Repository",
+          "service": "service Spec → Domain Service"
         }
       },
       {
@@ -117,7 +139,7 @@
     "sources": ["ambiguity-log", "compliance-report"],
     "target": "Spec 파일들",
     "requiresUserApproval": true,
-    "categories": ["policies", "api-spec", "use-case-spec", "service-definition", "architecture-rules", "naming-guide"],
+    "categories": ["policies", "usecase-spec", "model-spec", "service-spec", "service-definition", "architecture-rules", "naming-guide"],
     "ambiguityLog": {
       "file": "{impl_dir}/ambiguity-log.md",
       "format": "AMB-{nn} 형식으로 기록",
@@ -175,6 +197,8 @@
 
   "paths": {
     "specDir": "{spec_project}/{doc_root}/specs/",
+    "policyDir": "{spec_project}/{doc_root}/policies/",
+    "foundationDir": "{spec_project}/{doc_root}/",
     "implDir": "{target_dir}/",
     "reportDir": "reports/",
     "complianceReport": "reports/compliance-{date}.md",

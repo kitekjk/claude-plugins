@@ -37,12 +37,14 @@ Worktree 기본 경로: {worktree_base}  (선택)
 
 ```yaml
 dependsOn:
-  - spec_id: UC-ORDER-001
-    type: data  # data | api | event
-    reason: "주문 엔티티 참조"
+  - spec_id: PLM-STYLE-001
+    shared_files: ["StyleEntity.java", "StyleRepository.java"]
+    reason: "스타일 엔티티를 참조하여 PO 취소 처리"
 ```
 
-- `dependsOn`이 없는 Spec은 독립 Spec으로 간주합니다.
+- `dependsOn: []`이면 독립 Spec으로 간주합니다.
+- Spec ID는 `{PREFIX}-{DOMAIN}-{NUMBER}` 형식입니다 (예: PLM-POCANCEL-001).
+- 기본 정보 테이블의 `dependsOn` 필드 또는 별도 dependsOn 섹션에서 추출합니다.
 
 ### 2단계: 실행 순서 결정
 

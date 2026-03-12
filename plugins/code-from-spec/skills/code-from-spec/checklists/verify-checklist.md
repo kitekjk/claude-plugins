@@ -10,11 +10,11 @@
 ## 영역별 검증
 
 ### V-01: 기능 구현 완결성 (40점)
-- [ ] Use Case Spec에서 UC-ID 목록 추출
-- [ ] 각 UC-ID에 대응하는 Application Service 확인
-- [ ] API Spec에서 엔드포인트 목록 추출
-- [ ] 각 엔드포인트에 대응하는 Controller 메서드 확인
-- [ ] 요청/응답 필드 Spec 일치 확인
+- [ ] 모든 Spec에서 Spec ID와 type 추출 (기본 정보 섹션)
+- [ ] usecase Spec의 기본 흐름에 대응하는 Application Service/Controller 확인
+- [ ] model Spec의 엔티티/리포지토리가 코드에 존재하는지 확인
+- [ ] service Spec의 도메인 서비스 메서드가 구현되었는지 확인
+- [ ] 각 Spec의 "수정 대상 파일"이 모두 생성/수정되었는지 확인
 - [ ] 에러 응답 처리 확인
 - [ ] 누락/불일치 항목별 상세 기록
 

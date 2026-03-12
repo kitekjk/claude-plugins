@@ -23,11 +23,11 @@
 | 카테고리 | 항목 수 | 수정된 Spec |
 |----------|---------|------------|
 | 비즈니스 규칙 모호 | {count} | policies/{file} |
-| API 계약 미명시 | {count} | {api_spec_file} |
-| 도메인 모델 모호 | {count} | service-definition.md |
+| Spec 흐름/조건 미명시 | {count} | {spec_file} |
+| 도메인 모델 모호 | {count} | service-definition.md / {model_spec_file} |
 | 아키텍처 규칙 부족 | {count} | architecture-rules.md |
 | 네이밍 규칙 부족 | {count} | naming-guide.md |
-| 테스트 시나리오 부족 | {count} | {use_case_file} |
+| 테스트 시나리오 부족 | {count} | {spec_file} |
 
 ## 피드백 항목 상세
 

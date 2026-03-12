@@ -17,8 +17,8 @@ Spec 디렉토리에서 검증 대상을 추출한다.
 
 | 추출 대상 | 소스 |
 |-----------|------|
-| Use Case 목록 (UC-ID) | Use Case Spec |
-| API 엔드포인트 목록 | API Spec |
+| Spec 목록 (ID + type) | 기본 정보 섹션의 Spec ID와 type 필드 |
+| 수정 대상 파일 목록 | 각 Spec의 "수정 대상 파일" 섹션 |
 | 비즈니스 규칙 목록 | policies/ |
 | TC-ID 목록 | 테스트 시나리오 |
 | 아키텍처 규칙 목록 | architecture-rules.md |
@@ -29,8 +29,9 @@ Spec 디렉토리에서 검증 대상을 추출한다.
 
 | Spec 항목 | 코드 매핑 대상 |
 |-----------|---------------|
-| Use Case | Application Service 클래스/메서드 |
-| API 엔드포인트 | Controller 엔드포인트 |
+| usecase Spec | Application Service / Controller |
+| model Spec | Entity / Repository |
+| service Spec | Domain Service |
 | 비즈니스 규칙 | Domain/Policy 클래스 |
 | TC-ID | @Tag 테스트 |
 | 아키텍처 규칙 | 패키지 구조, import 분석 |
@@ -40,9 +41,10 @@ Spec 디렉토리에서 검증 대상을 추출한다.
 4개 영역으로 검증을 수행한다.
 
 #### V1: 기능 구현 완결성 (40점)
-- Use Case Spec의 모든 유스케이스가 구현되었는지
-- API Spec의 모든 엔드포인트가 존재하는지
-- 요청/응답 필드가 Spec과 일치하는지
+- usecase Spec의 기본 흐름이 구현되었는지
+- model Spec의 엔티티/리포지토리가 존재하는지
+- service Spec의 도메인 서비스가 구현되었는지
+- 수정 대상 파일이 모두 생성/수정되었는지
 - 에러 응답이 정의된 대로 처리되는지
 
 #### V2: 비즈니스 규칙 준수 (30점)

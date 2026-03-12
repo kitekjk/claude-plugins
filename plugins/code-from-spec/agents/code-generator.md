@@ -44,12 +44,12 @@ cp {claude_md_path} ./CLAUDE.md
 - **의존**: Teammate 1 완료 후
 
 #### Teammate 3: 애플리케이션 + 인터페이스 + 인프라 모듈
-- **기반 Spec**: Use Case Spec, API Spec, policies/
+- **기반 Spec**: usecase/service Spec, policies/
 - **담당**: application/**, interfaces/**, infrastructure/**
 - **의존**: Teammate 2 완료 후
 
 #### Teammate 4: 테스트 코드
-- **기반 Spec**: 각 Use Case의 "## 테스트 시나리오" (TC-ID, @Tag 필수)
+- **기반 Spec**: 각 Spec의 "## 테스트 시나리오" (TC-ID, @Tag 필수)
 - **담당**: src/test/** 만
 - **의존**: Teammate 1, 2, 3 완료 후
 - **완료 조건**: 전체 테스트 통과
@@ -76,14 +76,14 @@ cp {claude_md_path} ./CLAUDE.md
 
 **Teammate 1 (인프라):**
 - 읽기: architecture-rules.md, infra-config.md, naming-guide.md
-- 읽지 않기: Use Case Spec, API Spec
+- 읽지 않기: usecase/model/service Spec
 
 **Teammate 2 (도메인):**
-- 읽기: service-definition.md, naming-guide.md, policies/ (모델 검증 규칙)
-- 읽지 않기: infra-config.md, API Spec
+- 읽기: service-definition.md, naming-guide.md, model Spec, policies/ (모델 검증 규칙)
+- 읽지 않기: infra-config.md
 
 **Teammate 3 (애플리케이션):**
-- 읽기: Use Case Spec, API Spec, policies/, naming-guide.md
+- 읽기: usecase/service Spec, policies/, naming-guide.md
 - 읽지 않기: infra-config.md
 
 **Teammate 4 (테스트):**
