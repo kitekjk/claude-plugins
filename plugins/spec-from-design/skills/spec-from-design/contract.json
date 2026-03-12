@@ -1,7 +1,7 @@
 {
   "version": "1.1.0",
   "plugin": "spec-from-design",
-  "description": "HLD/LLD → Spec 변환의 단일 계약. 모드, 스코어링, 저장, 프리셋 설정.",
+  "description": "HLD/LLD → Spec 변환. Use Case 단위 단일 파일 출력. 대규모 UC는 model/service/usecase로 분해 가능. 코드 없이 흐름/조건/시나리오만 정의.",
   "modes": {
     "existing-project": {
       "description": "기존 코드가 있는 프로젝트. 아키텍처/네이밍/스택을 코드에서 추출.",
@@ -25,26 +25,25 @@
     }
   },
   "storage": {
-    "outputRoot": "{doc_root}/specs",
-    "defaultDocRoot": "docs",
-    "docRootDetection": {
-      "description": "existing-project 모드에서 기존 문서 디렉토리를 감지하여 사용",
-      "candidates": ["documents", "document", "docs", "doc"],
-      "strategy": "기존 디렉토리 중 첫 번째 매칭 사용. 없으면 defaultDocRoot 사용.",
-      "specsSubdir": "specs"
-    },
+    "outputRoot": "docs/specs",
     "pathPatterns": {
-      "service-definition": "{doc_root}/specs/service-definition.md",
-      "architecture-rules": "{doc_root}/specs/architecture-rules.md",
-      "naming-guide": "{doc_root}/specs/naming-guide.md",
-      "infra-config": "{doc_root}/specs/infra-config.md",
-      "init-data": "{doc_root}/specs/init-data.md",
-      "policy": "{doc_root}/specs/policies/POLICY-{domain}-{number}-{name}.md",
-      "nfr-policy": "{doc_root}/specs/policies/POLICY-NFR-001-비기능요구사항.md",
-      "use-case": "{doc_root}/specs/{domain}/{PREFIX}-{DOMAIN}-{number}-{name}.md",
-      "api-spec": "{doc_root}/specs/{domain}/{PREFIX}-API-{DOMAIN}-{number}-{name}.md"
+      "service-definition": "docs/specs/service-definition.md",
+      "architecture-rules": "docs/specs/architecture-rules.md",
+      "naming-guide": "docs/specs/naming-guide.md",
+      "infra-config": "docs/specs/infra-config.md",
+      "init-data": "docs/specs/init-data.md",
+      "policy": "docs/specs/policies/POLICY-{domain}-{number}-{name}.md",
+      "nfr-policy": "docs/specs/policies/POLICY-NFR-001-비기능요구사항.md",
+      "spec": "docs/specs/{PREFIX}-{DOMAIN}-{number}-{name}.md"
     },
     "idPrefix": "프로젝트 service-definition에서 결정"
+  },
+  "outputRules": {
+    "singleFilePerSpec": true,
+    "singleFileDescription": "하나의 Spec은 하나의 Markdown 파일로 출력한다. 관련 정책, 모델, 검증 조건, 테스트 시나리오를 모두 동일 파일에 포함한다.",
+    "noCode": true,
+    "noCodeDescription": "Spec에 구현 코드(Java/Kotlin/TypeScript 등)를 포함하지 않는다. import 문, 메서드 구현체, 클래스 코드, 어노테이션, SQL DDL/DML을 넣지 않는다. 흐름, 조건, 시나리오만 자연어로 기술한다. 코드 생성은 code-from-spec의 역할이다.",
+    "decomposition": "소규모 변경은 usecase 단일 Spec으로 충분하다. 대규모 변경 시 model → service → usecase로 분해하여 선행/후행 관계를 dependsOn으로 기록한다."
   },
   "quality": {
     "inputQuality": {
@@ -82,17 +81,45 @@
     "extensible": true
   },
   "specTypes": {
-    "use-case": {
-      "specFile": "skills/spec-from-design/specs/use-case.md",
-      "templateFile": "skills/spec-from-design/templates/use-case.md",
+    "usecase": {
+      "description": "동작이 바뀌는 모든 변경. Actor가 있는 기능 추가/변경, 외부 연동 추가. 소규모면 이 유형만으로 충분.",
+      "specFile": "skills/spec-from-design/specs/usecase.md",
+      "templateFile": "skills/spec-from-design/templates/usecase.md",
       "writer": "usecase-api-writer",
-      "source": "LLD FR + 클래스 설계"
+      "source": "LLD FR + API 설계 + 클래스 설계",
+      "uniqueSections": ["기본 흐름", "대안 흐름", "비기능 요구사항"]
     },
-    "api-spec": {
-      "specFile": "skills/spec-from-design/specs/api-spec.md",
-      "templateFile": "skills/spec-from-design/templates/api-spec.md",
+    "model": {
+      "description": "엔티티/스키마/리포지토리 레이어. 대규모 UC 분해 시 모델 레이어를 선행 개발할 때 사용.",
+      "specFile": "skills/spec-from-design/specs/model.md",
+      "templateFile": "skills/spec-from-design/templates/model.md",
       "writer": "usecase-api-writer",
-      "source": "LLD API 설계"
+      "source": "LLD 클래스/DB 설계",
+      "uniqueSections": ["모델 변경 내역", "필드 정의", "관계 정의", "마이그레이션 설명"]
+    },
+    "service": {
+      "description": "도메인 로직 레이어. 대규모 UC 분해 시 서비스 레이어를 중간 개발할 때 사용.",
+      "specFile": "skills/spec-from-design/specs/service.md",
+      "templateFile": "skills/spec-from-design/templates/service.md",
+      "writer": "usecase-api-writer",
+      "source": "LLD 클래스 설계 + 시퀀스 다이어그램",
+      "uniqueSections": ["서비스 책임", "메서드 설명", "입출력 정의", "에러 처리"]
+    },
+    "refactoring": {
+      "description": "동작 변경 없이 구조 개선. 클래스 분리, 패턴 적용, 레거시 제거.",
+      "specFile": "skills/spec-from-design/specs/refactoring.md",
+      "templateFile": "skills/spec-from-design/templates/refactoring.md",
+      "writer": "usecase-api-writer",
+      "source": "LLD 설계 판단 + 기존 코드 분석",
+      "uniqueSections": ["변경 전 구조", "변경 후 구조", "변경 사유", "영향 범위"]
+    },
+    "performance": {
+      "description": "동작 동일, 성능 개선. 쿼리 최적화, 캐시 추가, N+1 해결.",
+      "specFile": "skills/spec-from-design/specs/performance.md",
+      "templateFile": "skills/spec-from-design/templates/performance.md",
+      "writer": "usecase-api-writer",
+      "source": "LLD NFR + 성능 분석",
+      "uniqueSections": ["현재 성능 문제", "개선 방안", "목표 수치", "측정 방법"]
     },
     "policy": {
       "specFile": "skills/spec-from-design/specs/policy.md",
@@ -121,11 +148,20 @@
     "lldToSpec": "skills/spec-from-design/mappings/lld-to-spec.md"
   },
   "dependencies": {
-    "description": "Spec 간 cross-domain 의존성 메타데이터. code-from-spec의 스케줄링에서 사용.",
+    "description": "같은 LLD에서 분해된 Spec 간 구현 순서와 병렬 개발 충돌을 관리하기 위한 메타데이터.",
     "field": "dependsOn",
-    "types": ["data", "api", "event"],
-    "scope": "cross-domain only",
+    "scope": "same-lld-specs",
+    "detection": "수정 대상 파일 겹침 (implementation file overlap) 및 레이어 선행 관계 (model → service → usecase)",
+    "purpose": "code-from-spec 스케줄링에서 병렬/순차 실행 결정",
     "writer": "usecase-api-writer",
-    "validation": "spec-reviewer가 순환 의존성 검사"
+    "validation": "spec-reviewer가 파일 겹침 및 순환 의존 검사",
+    "rules": [
+      "같은 LLD에서 도출된 Spec 간에만 적용",
+      "수정 대상 파일 목록을 '수정 대상 파일' 섹션에 기록",
+      "다른 Spec의 수정 대상과 겹치는 파일이 있으면 dependsOn에 해당 Spec ID 기록",
+      "레이어 선행 관계: model → service → usecase 순서로 dependsOn 기록",
+      "단일 Spec이면 dependsOn: [] (빈 배열)",
+      "순환 의존이 발견되면 Spec 분해를 재검토"
+    ]
   }
 }
