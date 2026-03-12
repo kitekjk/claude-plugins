@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "plugin": "spec-from-design",
   "description": "HLD/LLD → Spec 변환의 단일 계약. 모드, 스코어링, 저장, 프리셋 설정.",
   "modes": {
@@ -112,5 +112,13 @@
   "mappings": {
     "hldToSpec": "skills/spec-from-design/mappings/hld-to-spec.md",
     "lldToSpec": "skills/spec-from-design/mappings/lld-to-spec.md"
+  },
+  "dependencies": {
+    "description": "Spec 간 cross-domain 의존성 메타데이터. code-from-spec의 스케줄링에서 사용.",
+    "field": "dependsOn",
+    "types": ["data", "api", "event"],
+    "scope": "cross-domain only",
+    "writer": "usecase-api-writer",
+    "validation": "spec-reviewer가 순환 의존성 검사"
   }
 }

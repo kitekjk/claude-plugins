@@ -6,6 +6,17 @@
 - id: {PREFIX}-{DOMAIN}-{번호}
 - source: {LLD 문서명} FR-{번호}
 
+## 의존성
+
+```yaml
+dependsOn:
+  - spec_id: {PREFIX}-{OTHER_DOMAIN}-{번호}
+    type: data | api | event
+    reason: "{의존 사유}"
+```
+
+> 의존성이 없으면 이 섹션을 비워둡니다 (`dependsOn: []`).
+
 ## 관련 정책
 - POLICY-{DOMAIN}-001 ({정책명})
 - POLICY-NFR-001 (비기능 요구사항)

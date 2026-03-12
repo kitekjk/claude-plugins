@@ -6,6 +6,17 @@
 - id: {PREFIX}-API-{DOMAIN}-{번호}
 - source: {LLD 문서명} Section 6.x
 
+## 의존성
+
+```yaml
+dependsOn:
+  - spec_id: {PREFIX}-API-{OTHER_DOMAIN}-{번호}
+    type: data | api
+    reason: "{의존 사유}"
+```
+
+> 의존성이 없으면 이 섹션을 비워둡니다 (`dependsOn: []`).
+
 ## 관련 정책
 - POLICY-{DOMAIN}-001
 
