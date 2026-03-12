@@ -30,8 +30,8 @@
       "tags": ["spec", "hld", "lld", "design-to-spec", "ddd", "clean-architecture", "korean"]
     },
     {
-      "name": "spec-impl",
-      "source": "./plugins/spec-impl",
+      "name": "code-from-spec",
+      "source": "./plugins/code-from-spec",
       "description": "Spec 기반 코드 구현, 준수도 검증, Spec 피드백. 구현 → 검증 → Spec 수정 제안.",
       "version": "1.1.0",
       "author": {

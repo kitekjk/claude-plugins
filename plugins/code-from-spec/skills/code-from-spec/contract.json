@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "name": "spec-impl",
+  "name": "code-from-spec",
 
   "workflows": {
     "full": {

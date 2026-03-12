@@ -8,10 +8,10 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 
 ## 기준 파일
 
-- `skills/spec-impl/contract.json`
-- `skills/spec-impl/specs/impl-procedure.md`
-- `skills/spec-impl/templates/impl-prompt.md`
-- `skills/spec-impl/checklists/impl-checklist.md`
+- `skills/code-from-spec/contract.json`
+- `skills/code-from-spec/specs/impl-procedure.md`
+- `skills/code-from-spec/templates/impl-prompt.md`
+- `skills/code-from-spec/checklists/impl-checklist.md`
 
 ## 역할
 

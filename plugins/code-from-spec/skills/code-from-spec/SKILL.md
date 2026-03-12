@@ -1,14 +1,14 @@
 ---
-name: spec-impl
+name: code-from-spec
 description: Spec 기반 코드 구현과 Spec 준수도 검증을 수행합니다. Spec으로 코드를 생성하거나, 구현이 Spec을 잘 따르는지 검증하려면 사용하세요.
 allowed-tools: Read, Write, Edit, Grep, Glob, Task, Bash
 ---
 
-# spec-impl
+# code-from-spec
 
 ## 목적
 
-`spec-impl`은 Spec 문서를 기반으로 코드를 구현하고, 구현된 코드가 **Spec을 얼마나 충실히 따르는지 준수도 점수**를 산출하는 스킬입니다.
+`code-from-spec`은 Spec 문서를 기반으로 코드를 구현하고, 구현된 코드가 **Spec을 얼마나 충실히 따르는지 준수도 점수**를 산출하는 스킬입니다.
 
 ## 단일 기준
 

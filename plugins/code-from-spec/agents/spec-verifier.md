@@ -9,10 +9,10 @@ model: opus
 
 ## 기준 파일
 
-- `skills/spec-impl/contract.json`
-- `skills/spec-impl/specs/verify-procedure.md`
-- `skills/spec-impl/templates/compliance-report.md`
-- `skills/spec-impl/checklists/verify-checklist.md`
+- `skills/code-from-spec/contract.json`
+- `skills/code-from-spec/specs/verify-procedure.md`
+- `skills/code-from-spec/templates/compliance-report.md`
+- `skills/code-from-spec/checklists/verify-checklist.md`
 
 ## 역할
 

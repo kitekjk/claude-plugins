@@ -21,7 +21,7 @@
 ```bash
 /plugin install doc-writing-team@kitekjk-plugins
 /plugin install spec-from-design@kitekjk-plugins
-/plugin install spec-impl@kitekjk-plugins
+/plugin install code-from-spec@kitekjk-plugins
 /plugin install md-to-confluence@kitekjk-plugins
 ```
 
@@ -51,7 +51,7 @@ README.md를 wiki에 발행해줘
 |---------|------|------|
 | [doc-writing-team](./plugins/doc-writing-team) | v3.1.0 | ADR/HLD/LLD 설계 문서 작성 — 멀티 에이전트 품질 루프, Spec 도출 가능 수준 보장, HLD→LLD 추적성 |
 | [spec-from-design](./plugins/spec-from-design) | v1.0.0 | HLD/LLD → Use Case·API·Policy·Test Spec 도출 — 3 scales, 프리셋 시스템 |
-| [spec-impl](./plugins/spec-impl) | v1.1.0 | Spec → 코드 구현 + 준수도 검증 + Spec 피드백 — Agent Teams 구현, 4영역 평가, 모호점→Spec 수정 제안 |
+| [code-from-spec](./plugins/code-from-spec) | v1.1.0 | Spec → 코드 구현 + 준수도 검증 + Spec 피드백 — Agent Teams 구현, 4영역 평가, 모호점→Spec 수정 제안 |
 | [md-to-confluence](./plugins/md-to-confluence) | v0.1.0 | 임의의 Markdown 파일을 Confluence wiki에 발행 (Mermaid→이미지 포함, 독립 사용 가능) |
 
 ### 워크플로우 연계
@@ -63,7 +63,7 @@ doc-writing-team  →  HLD / LLD 작성
   ↓
 spec-from-design  →  Use Case / API / Policy / Test Spec 도출
   ↓
-spec-impl         →  Spec → 코드 구현 + 준수도 검증
+code-from-spec         →  Spec → 코드 구현 + 준수도 검증
 
 md-to-confluence  →  Confluence wiki 발행 (독립 사용 가능)
 ```
@@ -96,10 +96,10 @@ kitekjk-plugins/
 │   │       ├── checklists/            # 품질 체크리스트 (80점 게이트)
 │   │       ├── mappings/              # HLD→Spec, LLD→Spec 변환 규칙
 │   │       └── presets/               # DDD+Clean+Kotlin (확장 가능)
-│   ├── spec-impl/
+│   ├── code-from-spec/
 │   │   ├── .claude-plugin/plugin.json
 │   │   ├── agents/                    # 4 agents (orchestrator, generator, verifier, feedback)
-│   │   └── skills/spec-impl/
+│   │   └── skills/code-from-spec/
 │   │       ├── contract.json          # 단일 기준
 │   │       ├── specs/                 # 구현 절차, 검증 절차
 │   │       ├── templates/             # 프롬프트, 리포트 템플릿

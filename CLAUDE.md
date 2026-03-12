@@ -114,7 +114,7 @@ doc-writing-team  →  HLD / LLD 작성
        ↓
 spec-from-design  →  HLD/LLD → Spec 도출
        ↓
-spec-impl         →  Spec → 코드 구현 + 준수도 검증
+code-from-spec         →  Spec → 코드 구현 + 준수도 검증
 
 md-to-confluence  →  Confluence 발행 (독립 사용 가능)
 ```
@@ -124,4 +124,4 @@ md-to-confluence  →  Confluence 발행 (독립 사용 가능)
 
 수정 시 상류/하류 플러그인에 영향이 있는지 확인합니다:
 - HLD/LLD 구조 변경 → spec-from-design의 mappings 확인
-- Spec 구조 변경 → spec-impl의 impl-procedure 확인
+- Spec 구조 변경 → code-from-spec의 impl-procedure 확인

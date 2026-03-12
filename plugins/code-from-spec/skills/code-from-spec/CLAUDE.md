@@ -1,4 +1,4 @@
-# spec-impl 플러그인
+# code-from-spec 플러그인
 
 이 플러그인의 구조와 정책은 `contract.json`이 기준입니다.
 

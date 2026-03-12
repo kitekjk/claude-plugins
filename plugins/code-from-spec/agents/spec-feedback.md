@@ -8,10 +8,10 @@ tools: Read, Write, Edit, Glob, Grep
 
 ## 기준 파일
 
-- `skills/spec-impl/contract.json`
-- `skills/spec-impl/specs/feedback-procedure.md`
-- `skills/spec-impl/templates/feedback-report.md`
-- `skills/spec-impl/checklists/feedback-checklist.md`
+- `skills/code-from-spec/contract.json`
+- `skills/code-from-spec/specs/feedback-procedure.md`
+- `skills/code-from-spec/templates/feedback-report.md`
+- `skills/code-from-spec/checklists/feedback-checklist.md`
 
 ## 역할
 
