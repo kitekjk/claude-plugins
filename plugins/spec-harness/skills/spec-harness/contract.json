@@ -1,0 +1,149 @@
+{
+  "version": "1.0.0",
+  "name": "spec-harness",
+
+  "workflows": {
+    "verify-determinism": {
+      "description": "전자동: 재생성 2회 + 비교 + 점수 산출 + Spec 보강 항목 도출",
+      "steps": ["regen1", "regen2", "server-start", "compare", "score", "server-stop"],
+      "agents": ["code-generator", "determinism-evaluator", "spec-improver"]
+    },
+    "regen": {
+      "description": "Spec 기반 프로젝트 재생성",
+      "agents": ["code-generator"]
+    },
+    "compare": {
+      "description": "기존 regen1/regen2 비교",
+      "agents": ["determinism-evaluator"]
+    },
+    "improve-spec": {
+      "description": "비교 리포트에서 Spec 보강 항목 추출 및 반영",
+      "agents": ["spec-improver"]
+    }
+  },
+
+  "regen": {
+    "independence": {
+      "description": "regen1과 regen2는 반드시 독립적으로 생성",
+      "rules": [
+        "별도 Claude Code 세션에서 실행",
+        "regen1의 코드를 regen2가 참조하지 않음",
+        "동일한 Spec만 입력으로 사용",
+        "대화 이력을 공유하지 않음"
+      ]
+    },
+    "agentTeams": {
+      "teammate1": {
+        "role": "프로젝트 구조 + 인프라",
+        "specSources": ["architecture-rules", "infra-config", "naming-guide"],
+        "outputs": ["build config", "docker-compose", "application config"],
+        "completionCriteria": "빌드 성공"
+      },
+      "teammate2": {
+        "role": "도메인 모듈",
+        "specSources": ["service-definition"],
+        "outputs": ["domain/**"],
+        "dependsOn": ["teammate1"]
+      },
+      "teammate3": {
+        "role": "애플리케이션 + 인터페이스 + 인프라 모듈",
+        "specSources": ["use-case-specs", "api-specs", "policies"],
+        "outputs": ["application/**", "interfaces/**", "infrastructure/**"],
+        "dependsOn": ["teammate2"]
+      },
+      "teammate4": {
+        "role": "테스트 코드",
+        "specSources": ["test-scenarios"],
+        "outputs": ["src/test/**"],
+        "dependsOn": ["teammate1", "teammate2", "teammate3"],
+        "completionCriteria": "전체 테스트 통과"
+      }
+    },
+    "buildVerification": {
+      "maxRetries": 3,
+      "criteria": ["빌드 성공", "전체 테스트 통과", "모든 TC-ID에 대응하는 테스트 존재"]
+    }
+  },
+
+  "comparison": {
+    "levels": [
+      {
+        "id": "L1",
+        "name": "테스트 상호 실행",
+        "weight": 30,
+        "description": "regen1 테스트를 regen2에서, regen2 테스트를 regen1에서 실행",
+        "measures": ["컴파일 성공률", "테스트 통과율"],
+        "specImplication": {
+          "compileFailure": "클래스명/메서드명 모호 → naming-guide 보강",
+          "testFailure": "비즈니스 판정 모호 → policies 보강"
+        }
+      },
+      {
+        "id": "L2",
+        "name": "API 계약 일치",
+        "weight": 25,
+        "description": "동일 요청 → 응답 구조 비교 (동적 값 제외)",
+        "excludeFields": ["id", "createdAt", "updatedAt", "token"],
+        "measures": ["HTTP 상태 코드 일치율", "응답 필드 구조 일치율"],
+        "specImplication": {
+          "fieldDifference": "응답 필드 미명시 → API Spec 보강",
+          "statusCodeDifference": "에러 처리 미명시 → policies 보강"
+        }
+      },
+      {
+        "id": "L3",
+        "name": "비즈니스 시나리오 일치",
+        "weight": 25,
+        "description": "업무 흐름 실행 후 결과 상태 비교",
+        "measures": ["비즈니스 판정 일치율", "금액/수치 일치율"],
+        "specImplication": {
+          "judgmentDifference": "비즈니스 규칙 모호 → policies 보강",
+          "amountDifference": "계산 규칙 모호 (반올림 등) → policies 보강"
+        }
+      },
+      {
+        "id": "L4",
+        "name": "코드 구조 일치",
+        "weight": 10,
+        "description": "모듈/패키지 구조, 아키텍처 패턴 일치 여부",
+        "measures": ["아키텍처 패턴 일치 항목 수"],
+        "specImplication": {
+          "patternDifference": "architecture-rules 규칙 부족"
+        }
+      },
+      {
+        "id": "L5",
+        "name": "네이밍 일치",
+        "weight": 10,
+        "description": "클래스명, API 경로, Enum 이름 일치 여부",
+        "measures": ["클래스명 일치율", "API 경로 일치율", "Enum명 일치율"],
+        "specImplication": {
+          "namingDifference": "naming-guide 규칙 부족"
+        }
+      }
+    ],
+    "totalScore": 100,
+    "grades": {
+      "A": { "min": 95, "label": "우수", "description": "Spec 결정성 우수. 프로덕션 사용 가능" },
+      "B": { "min": 85, "label": "양호", "description": "소규모 보강 후 사용 가능" },
+      "C": { "min": 70, "label": "보통", "description": "Spec 보강 필요" },
+      "D": { "min": 0, "label": "부족", "description": "Spec 대폭 보강 필요" }
+    }
+  },
+
+  "specImprovement": {
+    "source": "comparison report",
+    "target": "Spec 파일들",
+    "maxAutoFixes": 10,
+    "requiresUserApproval": true,
+    "categories": ["naming-guide", "architecture-rules", "policies", "api-spec", "use-case-spec", "service-definition"]
+  },
+
+  "paths": {
+    "specDir": "{spec_project}/docs/specs/",
+    "regen1Dir": "{regen1_dir}/",
+    "regen2Dir": "{regen2_dir}/",
+    "reportDir": "reports/",
+    "reportFile": "reports/determinism-{date}.md"
+  }
+}

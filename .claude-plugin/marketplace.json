@@ -4,7 +4,7 @@
     "name": "kitekjk"
   },
   "metadata": {
-    "description": "개인용 Claude Code 플러그인 모음 — 설계 문서 작성, Spec 도출, Confluence 발행 워크플로우 자동화"
+    "description": "개인용 Claude Code 플러그인 모음 — 설계 문서 작성, Spec 도출, 결정성 검증, Confluence 발행 워크플로우 자동화"
   },
   "plugins": [
     {
@@ -28,6 +28,17 @@
       },
       "category": "documentation",
       "tags": ["spec", "hld", "lld", "design-to-spec", "ddd", "clean-architecture", "korean"]
+    },
+    {
+      "name": "spec-harness",
+      "source": "./plugins/spec-harness",
+      "description": "Spec 기반 코드 생성과 결정성 검증. 독립 2회 구현 비교로 Spec 모호성을 수치화하고 자동 보강.",
+      "version": "1.0.0",
+      "author": {
+        "name": "kitekjk"
+      },
+      "category": "development",
+      "tags": ["spec", "determinism", "harness", "code-generation", "verification", "testing", "korean"]
     },
     {
       "name": "md-to-confluence",
