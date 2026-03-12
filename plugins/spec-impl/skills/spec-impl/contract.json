@@ -1,0 +1,114 @@
+{
+  "version": "1.0.0",
+  "name": "spec-impl",
+
+  "workflows": {
+    "full": {
+      "description": "Spec 기반 구현 + 빌드/테스트 + Spec 준수도 검증",
+      "steps": ["implement", "build-verify", "verify-compliance"],
+      "agents": ["code-generator", "spec-verifier"]
+    },
+    "implement": {
+      "description": "Spec 기반 프로젝트 구현",
+      "agents": ["code-generator"]
+    },
+    "verify": {
+      "description": "구현된 코드의 Spec 준수도 검증",
+      "agents": ["spec-verifier"]
+    }
+  },
+
+  "implementation": {
+    "agentTeams": {
+      "teammate1": {
+        "role": "프로젝트 구조 + 인프라",
+        "specSources": ["architecture-rules", "infra-config", "naming-guide"],
+        "outputs": ["build config", "docker-compose", "application config"],
+        "completionCriteria": "빌드 성공"
+      },
+      "teammate2": {
+        "role": "도메인 모듈",
+        "specSources": ["service-definition"],
+        "outputs": ["domain/**"],
+        "dependsOn": ["teammate1"]
+      },
+      "teammate3": {
+        "role": "애플리케이션 + 인터페이스 + 인프라 모듈",
+        "specSources": ["use-case-specs", "api-specs", "policies"],
+        "outputs": ["application/**", "interfaces/**", "infrastructure/**"],
+        "dependsOn": ["teammate2"]
+      },
+      "teammate4": {
+        "role": "테스트 코드",
+        "specSources": ["test-scenarios"],
+        "outputs": ["src/test/**"],
+        "dependsOn": ["teammate1", "teammate2", "teammate3"],
+        "completionCriteria": "전체 테스트 통과"
+      }
+    },
+    "buildVerification": {
+      "maxRetries": 3,
+      "criteria": ["빌드 성공", "전체 테스트 통과", "모든 TC-ID에 대응하는 테스트 존재"]
+    }
+  },
+
+  "verification": {
+    "areas": [
+      {
+        "id": "V1",
+        "name": "기능 구현 완결성",
+        "weight": 40,
+        "description": "Spec의 모든 Use Case / API 엔드포인트가 구현되었는지 확인",
+        "measures": ["Use Case 구현 비율", "API 엔드포인트 구현 비율"],
+        "specMapping": {
+          "useCase": "Use Case Spec → Application Service",
+          "api": "API Spec → Controller 엔드포인트"
+        }
+      },
+      {
+        "id": "V2",
+        "name": "비즈니스 규칙 준수",
+        "weight": 30,
+        "description": "policies/에 정의된 비즈니스 규칙이 코드에 정확히 반영되었는지 확인",
+        "measures": ["비즈니스 규칙 구현 비율"],
+        "specMapping": {
+          "policy": "policies/ → Domain/Policy 클래스"
+        }
+      },
+      {
+        "id": "V3",
+        "name": "아키텍처 준수",
+        "weight": 15,
+        "description": "architecture-rules.md의 아키텍처 규칙이 지켜졌는지 확인",
+        "measures": ["아키텍처 규칙 준수 항목 수"],
+        "specMapping": {
+          "architecture": "architecture-rules.md → 패키지 구조, import 분석"
+        }
+      },
+      {
+        "id": "V4",
+        "name": "테스트 커버리지",
+        "weight": 15,
+        "description": "Spec에 정의된 테스트 시나리오가 모두 구현되었는지 확인",
+        "measures": ["TC-ID 커버리지", "테스트 통과율"],
+        "specMapping": {
+          "testCase": "TC-ID → @Tag 테스트"
+        }
+      }
+    ],
+    "totalScore": 100,
+    "grades": {
+      "A": { "min": 95, "label": "우수", "description": "Spec 충실 구현. 프로덕션 사용 가능" },
+      "B": { "min": 85, "label": "양호", "description": "소규모 보완 후 사용 가능" },
+      "C": { "min": 70, "label": "보통", "description": "주요 미준수 항목 존재" },
+      "D": { "min": 0, "label": "부족", "description": "상당 부분 미구현 또는 불일치" }
+    }
+  },
+
+  "paths": {
+    "specDir": "{spec_project}/docs/specs/",
+    "implDir": "{target_dir}/",
+    "reportDir": "reports/",
+    "reportFile": "reports/compliance-{date}.md"
+  }
+}

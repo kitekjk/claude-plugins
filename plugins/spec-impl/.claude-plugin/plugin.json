@@ -1,0 +1,16 @@
+{
+  "name": "spec-impl",
+  "description": "Spec 기반 코드 구현과 Spec 준수도 검증을 자동화하는 Claude Code 플러그인. Spec → 코드 구현 → 준수도 검증 + 리포트.",
+  "version": "1.0.0",
+  "author": {
+    "name": "kitekjk"
+  },
+  "license": "MIT",
+  "keywords": ["spec", "implementation", "code-generation", "verification", "compliance", "testing", "korean"],
+  "skills": "./skills/",
+  "agents": [
+    "./agents/impl-orchestrator.md",
+    "./agents/code-generator.md",
+    "./agents/spec-verifier.md"
+  ]
+}

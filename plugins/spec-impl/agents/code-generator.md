@@ -8,15 +8,14 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 
 ## 기준 파일
 
-- `skills/spec-harness/contract.json`
-- `skills/spec-harness/specs/regen-procedure.md`
-- `skills/spec-harness/templates/regen-prompt.md`
-- `skills/spec-harness/checklists/regen-checklist.md`
+- `skills/spec-impl/contract.json`
+- `skills/spec-impl/specs/impl-procedure.md`
+- `skills/spec-impl/templates/impl-prompt.md`
+- `skills/spec-impl/checklists/impl-checklist.md`
 
 ## 역할
 
 Spec 문서만으로 프로젝트를 처음부터 생성합니다.
-같은 Spec으로 여러 번 실행하여 결정성 검증의 입력을 만듭니다.
 
 ## 생성 절차
 
@@ -70,13 +69,6 @@ cp {claude_md_path} ./CLAUDE.md
 - 빌드 성공
 - 전체 테스트 통과
 - Spec의 모든 TC-ID가 @Tag로 테스트 코드에 존재
-
-## 독립성 보장
-
-**반드시 지켜야 하는 규칙:**
-- 다른 regen 디렉토리의 코드를 절대 참조하지 않습니다.
-- Spec 문서만 입력으로 사용합니다.
-- 이전 생성 세션의 대화 이력을 참조하지 않습니다.
 
 ## Teammate별 컨텍스트 범위
 
