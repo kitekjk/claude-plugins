@@ -115,9 +115,12 @@ doc-writing-team  →  HLD / LLD 작성
 spec-from-design  →  HLD/LLD → Spec 도출
        ↓
 spec-harness      →  Spec → 코드 생성 + 결정성 검증
-       ↓
-md-to-confluence  →  Confluence 발행
+
+md-to-confluence  →  Confluence 발행 (독립 사용 가능)
 ```
+
+- `md-to-confluence`는 파이프라인과 무관하게 **임의의 MD 파일**을 Confluence에 발행할 수 있는 독립 플러그인입니다.
+- 파이프라인 내에서는 doc-writing-team / spec-from-design 산출물 발행에 활용되지만, 어떤 Markdown 파일이든 단독으로 사용 가능합니다.
 
 수정 시 상류/하류 플러그인에 영향이 있는지 확인합니다:
 - HLD/LLD 구조 변경 → spec-from-design의 mappings 확인
