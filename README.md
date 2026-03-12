@@ -42,7 +42,7 @@ Spec 결정성을 검증해줘
 
 | 플러그인 | 버전 | 설명 |
 |---------|------|------|
-| [doc-writing-team](./plugins/doc-writing-team) | v3.0.0 | ADR/HLD/LLD 설계 문서 작성 — 멀티 에이전트 품질 루프, Spec 도출 가능 수준 보장 |
+| [doc-writing-team](./plugins/doc-writing-team) | v3.1.0 | ADR/HLD/LLD 설계 문서 작성 — 멀티 에이전트 품질 루프, Spec 도출 가능 수준 보장, HLD→LLD 추적성 |
 | [spec-from-design](./plugins/spec-from-design) | v1.0.0 | HLD/LLD → Use Case·API·Policy·Test Spec 도출 — 3 scales, 프리셋 시스템 |
 | [spec-harness](./plugins/spec-harness) | v1.0.0 | Spec → 코드 생성 + 결정성 검증 — 독립 2회 구현 비교, 5 Level 100점 평가, Spec 자동 보강 |
 | [md-to-confluence](./plugins/md-to-confluence) | v0.1.0 | Markdown 설계문서를 Confluence wiki에 발행 (Mermaid→이미지 포함) |

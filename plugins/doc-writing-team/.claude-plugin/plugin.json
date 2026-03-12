@@ -1,7 +1,7 @@
 {
   "name": "doc-writing-team",
   "description": "Contract 기반으로 ADR, HLD, LLD 문서를 작성하는 Claude Code 플러그인입니다. Spec 도출 가능한 수준의 HLD/LLD를 보장합니다.",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "author": {
     "name": "kitekjk"
   },
