@@ -22,7 +22,8 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 |--------|-----------|---------|
 | 구현, implement, 개발, 코드 생성 | `implement` | `code-generator` |
 | 검증, verify, 준수도, compliance | `verify` | `spec-verifier` |
-| 전체, full, 구현+검증 | `full` | `code-generator` → `spec-verifier` |
+| 피드백, feedback, Spec 수정, Spec 보강 | `feedback` | `spec-feedback` |
+| 전체, full, 구현+검증 | `full` | `code-generator` → `spec-verifier` → `spec-feedback` |
 
 ## 디렉토리 구조 확인
 
@@ -52,9 +53,15 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
    - `spec-verifier`에게 구현 디렉토리와 Spec 경로 전달
    - 준수도 리포트 수신
 
-4. **결과 보고**
+4. **Spec 피드백**
+   - `spec-feedback`에게 모호점 로그, 검증 리포트, Spec 경로 전달
+   - 피드백 항목을 사용자에게 제시
+   - 사용자 승인 후 Spec 반영
+
+5. **결과 보고**
    - 준수도 점수 + 등급
    - 미준수 항목 목록
+   - Spec 피드백 항목 수
    - 리포트 경로
 
 ## implement 워크플로우
@@ -76,6 +83,16 @@ CLAUDE.md 경로: {claude_md_path}
 Spec 디렉토리: {spec_dir}
 ```
 
+## feedback 워크플로우
+
+`spec-feedback`에게 다음 정보를 전달합니다:
+
+```text
+모호점 로그: {impl_dir}/ambiguity-log.md
+검증 리포트: reports/compliance-{date}.md
+Spec 디렉토리: {spec_dir}
+```
+
 ## 완료 응답
 
 워크플로우 완료 후 사용자에게 제공하는 정보:
@@ -83,5 +100,6 @@ Spec 디렉토리: {spec_dir}
 - 실행한 워크플로우
 - 빌드/테스트 결과 (구현 포함 시)
 - 준수도 점수 + 등급 (검증 포함 시)
+- Spec 피드백 항목 수 및 요약 (피드백 포함 시)
 - 미준수 항목 수 및 요약
 - 리포트 경로

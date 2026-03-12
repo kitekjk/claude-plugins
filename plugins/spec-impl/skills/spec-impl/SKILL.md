@@ -18,36 +18,41 @@ allowed-tools: Read, Write, Edit, Grep, Glob, Task, Bash
 
 ```text
 impl-orchestrator
-├── code-generator     # Spec → 코드 구현 (Agent Teams)
-└── spec-verifier      # 구현 → Spec 준수도 검증
+├── code-generator     # Spec → 코드 구현 (Agent Teams) + 모호점 로그
+├── spec-verifier      # 구현 → Spec 준수도 검증 + Spec 갭 플래그
+└── spec-feedback      # 모호점 + 갭 → Spec 수정 제안
 ```
 
 ## 워크플로우
 
-### 전체 흐름 (구현 + 검증)
+### 전체 흐름 (구현 + 검증 + 피드백)
 
 ```
 Spec
  │
  ▼
-code-generator (Agent Teams 4명)
+code-generator (Agent Teams 4명 + 모호점 로그)
  │
  ▼
 빌드 + 테스트 통과
  │
  ▼
-spec-verifier (4영역 준수도 검증)
+spec-verifier (4영역 준수도 검증 + Spec 갭 플래그)
  │
  ▼
-준수도 점수 + 리포트
+spec-feedback (모호점 + 갭 → Spec 수정 제안)
+ │
+ ▼
+사용자 승인 → Spec 반영
 ```
 
 ### 개별 워크플로우
 
 | 커맨드 | 설명 |
 |--------|------|
-| 구현, implement | Spec 기반 프로젝트 구현 |
+| 구현, implement | Spec 기반 프로젝트 구현 (모호점 로그 포함) |
 | 검증, verify | 기존 구현의 Spec 준수도 검증 |
+| 피드백, feedback | 모호점 + 미준수에서 Spec 수정 제안 |
 
 ## 4영역 검증 체계
 
@@ -72,11 +77,14 @@ spec-verifier (4영역 준수도 검증)
 ```
 "이 Spec으로 프로젝트를 구현해줘"           # 구현
 "구현이 Spec을 잘 따르는지 검증해줘"        # 검증
+"모호한 부분을 피드백해서 Spec을 보강해줘"   # 피드백
 "Spec 기반으로 구현하고 준수도도 확인해줘"   # 전체
 ```
 
 ## 고정 정책
 
 - Spec에 없는 것은 구현하지 않음
+- 구현 중 모호점 발견 시 ambiguity-log에 기록
 - 빌드 실패 시 최대 3회 재시도
-- 리포트는 `reports/compliance-{date}.md`에 저장
+- Spec 수정은 사용자 승인 후 반영
+- 리포트는 `reports/` 디렉토리에 저장

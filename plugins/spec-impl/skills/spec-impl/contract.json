@@ -1,20 +1,24 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "spec-impl",
 
   "workflows": {
     "full": {
-      "description": "Spec 기반 구현 + 빌드/테스트 + Spec 준수도 검증",
-      "steps": ["implement", "build-verify", "verify-compliance"],
-      "agents": ["code-generator", "spec-verifier"]
+      "description": "Spec 기반 구현 + 빌드/테스트 + Spec 준수도 검증 + Spec 피드백",
+      "steps": ["implement", "build-verify", "verify-compliance", "feedback"],
+      "agents": ["code-generator", "spec-verifier", "spec-feedback"]
     },
     "implement": {
-      "description": "Spec 기반 프로젝트 구현",
+      "description": "Spec 기반 프로젝트 구현 (모호점 로그 포함)",
       "agents": ["code-generator"]
     },
     "verify": {
-      "description": "구현된 코드의 Spec 준수도 검증",
+      "description": "구현된 코드의 Spec 준수도 검증 (Spec 갭 플래그 포함)",
       "agents": ["spec-verifier"]
+    },
+    "feedback": {
+      "description": "모호점 로그 + 검증 리포트에서 Spec 수정 제안 생성 및 반영",
+      "agents": ["spec-feedback"]
     }
   },
 
@@ -105,10 +109,24 @@
     }
   },
 
+  "feedback": {
+    "sources": ["ambiguity-log", "compliance-report"],
+    "target": "Spec 파일들",
+    "requiresUserApproval": true,
+    "categories": ["policies", "api-spec", "use-case-spec", "service-definition", "architecture-rules", "naming-guide"],
+    "ambiguityLog": {
+      "file": "{impl_dir}/ambiguity-log.md",
+      "format": "AMB-{nn} 형식으로 기록",
+      "generatedBy": "code-generator"
+    }
+  },
+
   "paths": {
     "specDir": "{spec_project}/docs/specs/",
     "implDir": "{target_dir}/",
     "reportDir": "reports/",
-    "reportFile": "reports/compliance-{date}.md"
+    "complianceReport": "reports/compliance-{date}.md",
+    "feedbackReport": "reports/feedback-{date}.md",
+    "ambiguityLog": "{impl_dir}/ambiguity-log.md"
   }
 }
