@@ -25,17 +25,24 @@
     }
   },
   "storage": {
-    "outputRoot": "docs/specs",
+    "outputRoot": "{doc_root}/specs",
+    "defaultDocRoot": "docs",
+    "docRootDetection": {
+      "description": "existing-project 모드에서 기존 문서 디렉토리를 감지하여 사용",
+      "candidates": ["documents", "document", "docs", "doc"],
+      "strategy": "기존 디렉토리 중 첫 번째 매칭 사용. 없으면 defaultDocRoot 사용.",
+      "specsSubdir": "specs"
+    },
     "pathPatterns": {
-      "service-definition": "docs/specs/service-definition.md",
-      "architecture-rules": "docs/specs/architecture-rules.md",
-      "naming-guide": "docs/specs/naming-guide.md",
-      "infra-config": "docs/specs/infra-config.md",
-      "init-data": "docs/specs/init-data.md",
-      "policy": "docs/specs/policies/POLICY-{domain}-{number}-{name}.md",
-      "nfr-policy": "docs/specs/policies/POLICY-NFR-001-비기능요구사항.md",
-      "use-case": "docs/specs/{domain}/{PREFIX}-{DOMAIN}-{number}-{name}.md",
-      "api-spec": "docs/specs/{domain}/{PREFIX}-API-{DOMAIN}-{number}-{name}.md"
+      "service-definition": "{doc_root}/specs/service-definition.md",
+      "architecture-rules": "{doc_root}/specs/architecture-rules.md",
+      "naming-guide": "{doc_root}/specs/naming-guide.md",
+      "infra-config": "{doc_root}/specs/infra-config.md",
+      "init-data": "{doc_root}/specs/init-data.md",
+      "policy": "{doc_root}/specs/policies/POLICY-{domain}-{number}-{name}.md",
+      "nfr-policy": "{doc_root}/specs/policies/POLICY-NFR-001-비기능요구사항.md",
+      "use-case": "{doc_root}/specs/{domain}/{PREFIX}-{DOMAIN}-{number}-{name}.md",
+      "api-spec": "{doc_root}/specs/{domain}/{PREFIX}-API-{DOMAIN}-{number}-{name}.md"
     },
     "idPrefix": "프로젝트 service-definition에서 결정"
   },

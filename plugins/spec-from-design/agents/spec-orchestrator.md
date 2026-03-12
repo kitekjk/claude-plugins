@@ -48,10 +48,34 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 코드 존재 확인:
 1. build.gradle.kts / build.gradle / pom.xml / package.json 존재?
 2. src/ 또는 app/ 디렉토리 존재?
-3. 기존 docs/specs/ 존재?
+3. 기존 문서 디렉토리 존재? (documents/, document/, docs/, doc/)
 
 → 하나라도 있으면: existing-project
 → 모두 없으면: new-project → 프리셋 확인
+```
+
+### existing-project 모드: 문서 디렉토리 감지
+
+기존 프로젝트에서 문서 디렉토리를 자동 감지합니다.
+
+```text
+문서 디렉토리 감지 (우선순위 순):
+1. documents/  → doc_root = "documents"
+2. document/   → doc_root = "document"
+3. docs/       → doc_root = "docs"
+4. doc/        → doc_root = "doc"
+5. 모두 없음   → doc_root = "docs" (기본값, 새로 생성)
+
+기존 specs/ 하위 디렉토리 확인:
+- {doc_root}/specs/ 존재 → 기존 Spec 활용
+- {doc_root}/specs/ 없음 → 새로 생성
+```
+
+감지된 `doc_root`를 모든 출력 경로에 적용합니다. 사용자에게 확인:
+```text
+기존 문서 디렉토리를 감지했습니다: {doc_root}/
+Spec 출력 경로: {doc_root}/specs/
+이 경로로 진행할까요?
 ```
 
 ### new-project 모드
@@ -64,6 +88,8 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 
 프리셋 없이 진행하면 기본값(ddd-clean-kotlin)을 사용합니다.
 ```
+
+new-project 모드에서는 기본값 `docs/specs/`를 사용합니다.
 
 ## 2단계: 입력 검증
 
@@ -100,7 +126,8 @@ policy-extractor는 필요 시에만 호출
 HLD 경로: {경로 또는 N/A}
 LLD 경로: {경로 또는 N/A}
 요청 내용: {사용자 요청}
-출력 경로: docs/specs/
+문서 루트: {doc_root}
+출력 경로: {doc_root}/specs/
 ```
 
 ## 4단계: 품질 게이트
@@ -121,10 +148,12 @@ LLD 경로: {경로 또는 N/A}
 품질 점수: {점수}/100
 추적성: {점수}/15
 
+문서 루트: {doc_root}/
+
 생성된 Spec:
-- docs/specs/service-definition.md (신규/업데이트)
-- docs/specs/{domain}/...
-- docs/specs/policies/...
+- {doc_root}/specs/service-definition.md (신규/업데이트)
+- {doc_root}/specs/{domain}/...
+- {doc_root}/specs/policies/...
 
 추적성 요약:
 - HLD KDD 커버리지: {N}/{M} ({%})

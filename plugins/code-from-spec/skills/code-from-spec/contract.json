@@ -174,7 +174,7 @@
   },
 
   "paths": {
-    "specDir": "{spec_project}/docs/specs/",
+    "specDir": "{spec_project}/{doc_root}/specs/",
     "implDir": "{target_dir}/",
     "reportDir": "reports/",
     "complianceReport": "reports/compliance-{date}.md",
