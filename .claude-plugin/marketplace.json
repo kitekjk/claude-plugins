@@ -4,9 +4,31 @@
     "name": "kitekjk"
   },
   "metadata": {
-    "description": "개인용 Claude Code 플러그인 모음 — 자주 쓰는 워크플로우 자동화 스킬"
+    "description": "개인용 Claude Code 플러그인 모음 — 설계 문서 작성, Spec 도출, Confluence 발행 워크플로우 자동화"
   },
   "plugins": [
+    {
+      "name": "doc-writing-team",
+      "source": "./plugins/doc-writing-team",
+      "description": "ADR/HLD/LLD 설계 문서를 멀티 에이전트 품질 루프로 작성. Spec 도출 가능 수준 보장.",
+      "version": "3.0.0",
+      "author": {
+        "name": "kitekjk"
+      },
+      "category": "documentation",
+      "tags": ["adr", "hld", "lld", "design-document", "spec-derivable", "korean"]
+    },
+    {
+      "name": "spec-from-design",
+      "source": "./plugins/spec-from-design",
+      "description": "HLD/LLD 설계 문서에서 Use Case, API, Policy, Test Spec을 도출. 프리셋 시스템으로 언어/아키텍처 비종속.",
+      "version": "1.0.0",
+      "author": {
+        "name": "kitekjk"
+      },
+      "category": "documentation",
+      "tags": ["spec", "hld", "lld", "design-to-spec", "ddd", "clean-architecture", "korean"]
+    },
     {
       "name": "md-to-confluence",
       "source": "./plugins/md-to-confluence",
