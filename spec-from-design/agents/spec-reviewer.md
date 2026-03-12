@@ -39,7 +39,7 @@ Spec에 구현 코드가 포함되어 있으면 **즉시 FAIL**:
 
 ### 4. 참조 정책 존재 검증
 Spec의 "관련 정책" 섹션에서 참조하는 모든 POLICY ID에 대해:
-1. 해당 정책 파일이 출력 경로에 실제로 존재하는지 확인 (`docs/specs/POLICY-*.md` 또는 `docs/specs/policies/POLICY-*.md`)
+1. 해당 정책 파일이 정책 디렉토리에 실제로 존재하는지 확인 (`docs/policies/POLICY-*.md`)
 2. 존재하지 않는 정책을 참조하면 **즉시 FAIL**
 3. 수정 지시: `[policy-extractor]` 에이전트에게 누락된 정책 생성을 요청하거나, `[usecase-api-writer]`에게 존재하지 않는 정책 참조 제거를 요청
 
