@@ -73,13 +73,23 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 
 ```text
 경로 감지 순서:
-1. 프로젝트에 documents/ 디렉토리가 존재하는가? → outputRoot: documents/specs, policyRoot: documents/policies
-2. 프로젝트에 docs/ 디렉토리가 존재하는가? → outputRoot: docs/specs, policyRoot: docs/policies
-3. 둘 다 없으면 → contract.json 기본값 사용 (docs/specs, docs/policies)
+1. 프로젝트에 documents/ 디렉토리가 존재하는가? → docRoot: documents/, outputRoot: documents/specs, policyRoot: documents/policies
+2. 프로젝트에 docs/ 디렉토리가 존재하는가? → docRoot: docs/, outputRoot: docs/specs, policyRoot: docs/policies
+3. 둘 다 없으면 → contract.json 기본값 사용 (docRoot: docs/, outputRoot: docs/specs, policyRoot: docs/policies)
 4. 기존 specs/, policies/ 하위 디렉토리가 이미 존재하면 해당 경로를 유지
 ```
 
-감지된 경로는 모든 에이전트 호출 시 `출력 경로`와 `정책 경로`로 전달한다.
+**공용 문서와 Spec의 경로 분리:**
+- 공용 문서(service-definition, architecture-rules, naming-guide, infra-config, init-data)는 `docRoot`에 위치
+- Use Case Spec은 `outputRoot`(docRoot/specs/)에 위치
+- 정책 문서는 `policyRoot`(docRoot/policies/)에 위치
+
+예: documents/ 프로젝트의 경우
+- 공용: `documents/service-definition.md`, `documents/architecture-rules.md`, `documents/naming-guide.md`
+- Spec: `documents/specs/PLM-POCANCEL-001-PO취소요청전송.md`
+- 정책: `documents/policies/POLICY-PLM-001-인터페이스상태관리.md`
+
+감지된 경로는 모든 에이전트 호출 시 `문서 루트`, `출력 경로`, `정책 경로`로 전달한다.
 
 ## 2단계: 입력 검증
 
@@ -112,6 +122,7 @@ design-analyzer → policy-extractor → usecase-api-writer (해당 유형 Spec)
 규모: {full|lld-only|request-only}
 모드: {existing-project|new-project}
 LLD 경로: {경로}
+문서 루트: {감지된 docRoot 또는 docs/}
 출력 경로: {감지된 경로 또는 docs/specs/}
 정책 경로: {감지된 경로 또는 docs/policies/}
 Spec 유형: {usecase|model+service+usecase|refactoring|performance}

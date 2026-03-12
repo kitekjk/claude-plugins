@@ -28,16 +28,16 @@
     "outputRoot": "docs/specs",
     "policyRoot": "docs/policies",
     "pathPatterns": {
-      "service-definition": "docs/specs/service-definition.md",
-      "architecture-rules": "docs/specs/architecture-rules.md",
-      "naming-guide": "docs/specs/naming-guide.md",
-      "infra-config": "docs/specs/infra-config.md",
-      "init-data": "docs/specs/init-data.md",
+      "service-definition": "docs/service-definition.md",
+      "architecture-rules": "docs/architecture-rules.md",
+      "naming-guide": "docs/naming-guide.md",
+      "infra-config": "docs/infra-config.md",
+      "init-data": "docs/init-data.md",
       "policy": "docs/policies/POLICY-{domain}-{number}-{name}.md",
       "nfr-policy": "docs/policies/POLICY-NFR-001-비기능요구사항.md",
       "spec": "docs/specs/{PREFIX}-{DOMAIN}-{number}-{name}.md"
     },
-    "pathFlexibility": "outputRoot와 policyRoot는 기본값이다. existing-project 모드에서 프로젝트에 이미 documents/, specs/, policies/ 등의 디렉토리가 존재하면 해당 경로를 우선 사용한다. 예: 프로젝트가 documents/specs/를 사용하면 outputRoot를 documents/specs로 재설정한다.",
+    "pathFlexibility": "outputRoot와 policyRoot는 기본값이다. existing-project 모드에서 프로젝트에 이미 documents/, specs/, policies/ 등의 디렉토리가 존재하면 해당 경로를 우선 사용한다. 예: 프로젝트가 documents/specs/를 사용하면 outputRoot를 documents/specs로 재설정한다. 공용 문서(service-definition, architecture-rules, naming-guide, infra-config, init-data)는 outputRoot의 상위 디렉토리(docRoot)에 위치한다. 예: outputRoot가 documents/specs이면 공용 문서는 documents/에 위치한다.",
     "idPrefix": "프로젝트 service-definition에서 결정"
   },
   "outputRules": {
