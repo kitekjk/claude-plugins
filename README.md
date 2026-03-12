@@ -6,8 +6,14 @@
 
 ### 1. 마켓플레이스 등록
 
+**HTTPS:**
 ```bash
-/plugin marketplace add kitekjk/kitekjk-plugins
+/plugin marketplace add https://github.com/kitekjk/claude-plugins.git
+```
+
+**SSH:**
+```bash
+/plugin marketplace add git@github.com:kitekjk/claude-plugins.git
 ```
 
 ### 2. 플러그인 설치
