@@ -1,703 +1,560 @@
 #!/usr/bin/env python3
-"""
-md2confluence.py — Markdown → Confluence Storage Format converter
+"""md2confluence.py — Markdown → Confluence Storage Format converter + uploader.
 
-Core principle: Markdown is the Single Source of Truth.
-This script converts .md files to Confluence-compatible XHTML,
-rendering Mermaid diagrams to PNG images along the way.
+Zero external dependencies. Uses only Python 3.9+ stdlib.
+
+Converts Markdown to Confluence Storage Format (XHTML) with support for:
+- Headings, paragraphs, bold, italic, strikethrough, inline code, links
+- Tables with thead/tbody
+- Fenced code blocks → Confluence Code macro
+- Mermaid code blocks → Macro Pack macro (server-side rendering)
+- GFM callouts (> [!NOTE], > [!TIP], etc.) → Confluence panel macros
+- Task lists (- [x], - [ ]) → checkbox characters
+- Images (external URL / attachment)
+- Ordered/unordered lists, blockquotes, horizontal rules
+
+Upload/update via Confluence REST API v2 with auth from ~/.claude.json.
 
 Usage:
-    # Convert single file
-    python md2confluence.py input.md -o output/
+    # Convert only (to stdout)
+    python md2confluence.py input.md
 
-    # Convert directory of .md files
-    python md2confluence.py specs/ -o output/
+    # Convert to file
+    python md2confluence.py input.md -o output.html
 
-    # Convert and upload to Confluence
-    python md2confluence.py specs/ --upload
+    # Create new Confluence page
+    python md2confluence.py input.md --create --space-id 12345 --parent-id 67890
 
-Dependencies:
-    pip install markdown pymdown-extensions --break-system-packages
-    npm install -g @mermaid-js/mermaid-cli  # for Mermaid rendering
+    # Update existing Confluence page
+    python md2confluence.py input.md --update --page-id 12345
+
+    # With custom title and version message
+    python md2confluence.py input.md --update --page-id 12345 --title "My Page" --version-msg "v2.0"
 """
-
 import argparse
-import hashlib
+import base64
+import html
 import json
 import os
 import re
-import shutil
-import subprocess
 import sys
-import tempfile
-from pathlib import Path
-from typing import Optional
-
-try:
-    import markdown
-    from markdown.extensions.tables import TableExtension
-    from markdown.extensions.fenced_code import FencedCodeExtension
-    from markdown.extensions.toc import TocExtension
-except ImportError:
-    print("ERROR: 'markdown' package required. Install with:")
-    print("  pip install markdown pymdown-extensions --break-system-packages")
-    sys.exit(1)
+import urllib.error
+import urllib.request
 
 
 # ---------------------------------------------------------------------------
-# Mermaid Rendering
+# Markdown → Confluence Storage Format conversion
 # ---------------------------------------------------------------------------
 
-def find_mmdc() -> Optional[str]:
-    """Locate the mmdc (mermaid-cli) binary."""
-    mmdc = shutil.which("mmdc")
-    if mmdc:
-        return mmdc
-    # Common npm global paths
-    for candidate in [
-        os.path.expanduser("~/.npm-global/bin/mmdc"),
-        "/usr/local/bin/mmdc",
-        os.path.expanduser("~/node_modules/.bin/mmdc"),
-    ]:
-        if os.path.isfile(candidate):
-            return candidate
-    return None
+def escape(text):
+    """HTML-escape text for safe embedding in XHTML."""
+    return html.escape(text, quote=True)
 
 
-def extract_mermaid_blocks(md_content: str) -> list[dict]:
-    """Extract ```mermaid code blocks from Markdown content.
+def inline_format(text):
+    """Convert inline Markdown formatting to HTML."""
+    # Process code spans first (to protect their content)
+    parts = []
+    last = 0
+    for m in re.finditer(r'`([^`]+)`', text):
+        parts.append(_inline_no_code(text[last:m.start()]))
+        parts.append(f'<code>{escape(m.group(1))}</code>')
+        last = m.end()
+    parts.append(_inline_no_code(text[last:]))
+    return ''.join(parts)
 
-    Returns list of dicts with keys: start, end, code, block_id
-    """
-    pattern = re.compile(
-        r"```mermaid\s*\n(.*?)```",
-        re.DOTALL,
+
+def _inline_no_code(text):
+    """Handle bold, italic, strikethrough, links outside code spans."""
+    # Links [text](url)
+    text = re.sub(
+        r'\[([^\]]+)\]\(([^)]+)\)',
+        lambda m: f'<a href="{escape(m.group(2))}">{escape(m.group(1))}</a>',
+        text,
     )
-    blocks = []
-    for i, match in enumerate(pattern.finditer(md_content)):
-        code = match.group(1).strip()
-        block_hash = hashlib.md5(code.encode()).hexdigest()[:8]
-        blocks.append({
-            "start": match.start(),
-            "end": match.end(),
-            "code": code,
-            "block_id": f"diagram-{i + 1}-{block_hash}",
-        })
-    return blocks
+    # Bold + italic ***text***
+    text = re.sub(r'\*\*\*(.+?)\*\*\*', r'<strong><em>\1</em></strong>', text)
+    # Bold **text**
+    text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
+    # Italic *text*
+    text = re.sub(r'\*(.+?)\*', r'<em>\1</em>', text)
+    # Strikethrough ~~text~~
+    text = re.sub(r'~~(.+?)~~', r'<del>\1</del>', text)
+    return text
 
 
-def render_mermaid_block(
-    code: str,
-    output_path: Path,
-    mmdc_path: str,
-    width: int = 1200,
-) -> bool:
-    """Render a single Mermaid diagram to PNG."""
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".mmd", delete=False
-    ) as tmp:
-        tmp.write(code)
-        tmp_path = tmp.name
+def convert_table(lines):
+    """Convert Markdown table lines to Confluence storage format HTML."""
+    if len(lines) < 2:
+        return ''
 
-    try:
-        result = subprocess.run(
-            [
-                mmdc_path,
-                "-i", tmp_path,
-                "-o", str(output_path),
-                "-b", "transparent",
-                "-w", str(width),
-                "--quiet",
-            ],
-            capture_output=True,
-            text=True,
-            timeout=30,
-        )
-        if result.returncode != 0:
-            print(f"  WARNING: mmdc failed: {result.stderr.strip()}")
-            return False
-        return output_path.exists()
-    except subprocess.TimeoutExpired:
-        print("  WARNING: mmdc timed out (30s)")
-        return False
-    except FileNotFoundError:
-        print("  WARNING: mmdc not found")
-        return False
-    finally:
-        os.unlink(tmp_path)
+    headers = [c.strip() for c in lines[0].strip('|').split('|')]
+    rows = []
+    for line in lines[2:]:  # skip separator line
+        cells = [c.strip() for c in line.strip('|').split('|')]
+        rows.append(cells)
+
+    out = ['<table><colgroup>']
+    for _ in headers:
+        out.append('<col />')
+    out.append('</colgroup><thead><tr>')
+    for h in headers:
+        out.append(f'<th><p>{inline_format(h)}</p></th>')
+    out.append('</tr></thead><tbody>')
+    for row in rows:
+        out.append('<tr>')
+        for cell in row:
+            out.append(f'<td><p>{inline_format(cell)}</p></td>')
+        out.append('</tr>')
+    out.append('</tbody></table>')
+    return ''.join(out)
 
 
-def process_mermaid_diagrams(
-    md_content: str,
-    images_dir: Path,
-    mmdc_path: Optional[str] = None,
-) -> tuple[str, list[str]]:
-    """Replace Mermaid blocks with image references, render PNGs.
-
-    Returns (modified_md_content, list_of_image_filenames)
-    """
-    blocks = extract_mermaid_blocks(md_content)
-    if not blocks:
-        return md_content, []
-
-    if mmdc_path is None:
-        mmdc_path = find_mmdc()
-
-    if mmdc_path is None:
-        print("WARNING: mmdc not found. Mermaid blocks will be kept as code blocks.")
-        print("  Install with: npm install -g @mermaid-js/mermaid-cli")
-        return md_content, []
-
-    images_dir.mkdir(parents=True, exist_ok=True)
-    image_files = []
-    # Process in reverse order to preserve string positions
-    for block in reversed(blocks):
-        img_filename = f"{block['block_id']}.png"
-        img_path = images_dir / img_filename
-
-        print(f"  Rendering {block['block_id']}...")
-        success = render_mermaid_block(block["code"], img_path, mmdc_path)
-
-        if success:
-            # Replace with image reference
-            replacement = f"![{block['block_id']}](./images/{img_filename})"
-            image_files.append(img_filename)
-        else:
-            # Fallback: keep as plain code block
-            replacement = f"```\n{block['code']}\n```"
-
-        md_content = (
-            md_content[: block["start"]] + replacement + md_content[block["end"] :]
-        )
-
-    image_files.reverse()
-    return md_content, image_files
-
-
-# ---------------------------------------------------------------------------
-# Markdown → Confluence Storage Format
-# ---------------------------------------------------------------------------
-
-# Language aliases for Confluence code macro
-CONFLUENCE_LANG_MAP = {
-    "python": "python",
-    "py": "python",
-    "javascript": "javascript",
-    "js": "javascript",
-    "typescript": "javascript",
-    "ts": "javascript",
-    "java": "java",
-    "kotlin": "kotlin",
-    "kt": "kotlin",
-    "bash": "bash",
-    "sh": "bash",
-    "shell": "bash",
-    "zsh": "bash",
-    "sql": "sql",
-    "json": "json",
-    "xml": "xml",
-    "html": "html",
-    "css": "css",
-    "yaml": "yaml",
-    "yml": "yaml",
-    "groovy": "groovy",
-    "ruby": "ruby",
-    "go": "go",
-    "rust": "rust",
-    "c": "c",
-    "cpp": "cpp",
-    "c++": "cpp",
-    "csharp": "csharp",
-    "c#": "csharp",
-    "scala": "scala",
-    "swift": "swift",
-    "r": "r",
-    "perl": "perl",
-    "php": "php",
-    "powershell": "powershell",
-    "dockerfile": "bash",
-    "makefile": "bash",
-    "terraform": "plain",
-    "hcl": "plain",
-    "toml": "plain",
-    "ini": "plain",
-    "properties": "plain",
-    "markdown": "plain",
-    "md": "plain",
-    "text": "plain",
-    "txt": "plain",
-    "mermaid": "plain",
-}
-
-
-def code_block_to_confluence(match: re.Match) -> str:
-    """Convert a fenced code block to Confluence Code macro."""
-    lang = (match.group(1) or "").strip().lower()
-    code = match.group(2)
-    confluence_lang = CONFLUENCE_LANG_MAP.get(lang, "plain")
-
-    # XML-escape the code content
-    code = (
-        code.replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-    )
-
+def convert_mermaid(code):
+    """Convert Mermaid code to Macro Pack structured macro."""
+    escaped_code = escape(code.strip())
     return (
-        f'<ac:structured-macro ac:name="code">'
-        f'<ac:parameter ac:name="language">{confluence_lang}</ac:parameter>'
-        f'<ac:parameter ac:name="linenumbers">true</ac:parameter>'
-        f'<ac:plain-text-body><![CDATA[{code}]]></ac:plain-text-body>'
-        f'</ac:structured-macro>'
+        '<ac:structured-macro ac:name="macro-pack" ac:schema-version="1">'
+        '<ac:parameter ac:name="input">mermaid</ac:parameter>'
+        f'<ac:parameter ac:name="text">{escaped_code}</ac:parameter>'
+        '<ac:parameter ac:name="source">'
+        '{&quot;id&quot;:&quot;text&quot;,&quot;type&quot;:&quot;text&quot;}'
+        '</ac:parameter>'
+        '<ac:parameter ac:name="mermaid_height">600</ac:parameter>'
+        '<ac:parameter ac:name="mermaid_enable_custom_height">false</ac:parameter>'
+        '<ac:parameter ac:name="mermaid_custom_icons">false</ac:parameter>'
+        '<ac:parameter ac:name="mermaid_links_new_tab">true</ac:parameter>'
+        '<ac:parameter ac:name="body"></ac:parameter>'
+        '</ac:structured-macro>'
     )
 
 
-def image_to_confluence(match: re.Match) -> str:
-    """Convert Markdown image to Confluence image tag."""
-    alt_text = match.group(1)
-    src = match.group(2)
+def convert_code_block(lang, code):
+    """Convert fenced code block to Confluence Code macro."""
+    lang_attr = (
+        f'<ac:parameter ac:name="language">{escape(lang)}</ac:parameter>'
+        if lang
+        else ''
+    )
+    return (
+        '<ac:structured-macro ac:name="code" ac:schema-version="1">'
+        f'{lang_attr}'
+        '<ac:parameter ac:name="linenumbers">true</ac:parameter>'
+        f'<ac:plain-text-body><![CDATA[{code.rstrip()}]]></ac:plain-text-body>'
+        '</ac:structured-macro>'
+    )
 
-    if src.startswith("http://") or src.startswith("https://"):
-        # External image
+
+def convert_image(alt, src):
+    """Convert image reference to Confluence image tag."""
+    if src.startswith('http://') or src.startswith('https://'):
         return (
-            f'<ac:image ac:alt="{alt_text}">'
-            f'<ri:url ri:value="{src}" />'
-            f'</ac:image>'
+            f'<ac:image ac:alt="{escape(alt)}">'
+            f'<ri:url ri:value="{escape(src)}" />'
+            '</ac:image>'
         )
     else:
-        # Attachment image — use filename only
         filename = os.path.basename(src)
         return (
-            f'<ac:image ac:alt="{alt_text}">'
-            f'<ri:attachment ri:filename="{filename}" />'
-            f'</ac:image>'
+            f'<ac:image ac:alt="{escape(alt)}">'
+            f'<ri:attachment ri:filename="{escape(filename)}" />'
+            '</ac:image>'
         )
 
 
-def callout_to_confluence(match: re.Match) -> str:
-    """Convert GitHub-style callout to Confluence panel macro.
-
-    Supports: > [!NOTE], > [!TIP], > [!WARNING], > [!CAUTION], > [!IMPORTANT]
-    """
-    callout_type = match.group(1).lower()
-    content = match.group(2).strip()
-    # Remove leading '> ' from each line
-    content = re.sub(r"^>\s?", "", content, flags=re.MULTILINE)
-
+def convert_callout(callout_type, content_lines):
+    """Convert GFM callout to Confluence panel macro."""
     type_map = {
-        "note": "info",
-        "tip": "tip",
-        "warning": "warning",
-        "caution": "warning",
-        "important": "note",
+        'note': 'info',
+        'tip': 'tip',
+        'warning': 'warning',
+        'caution': 'warning',
+        'important': 'note',
     }
-    macro_name = type_map.get(callout_type, "info")
-
+    macro_name = type_map.get(callout_type.lower(), 'info')
+    content = inline_format(' '.join(content_lines))
     return (
         f'<ac:structured-macro ac:name="{macro_name}">'
         f'<ac:rich-text-body><p>{content}</p></ac:rich-text-body>'
-        f'</ac:structured-macro>'
+        '</ac:structured-macro>'
     )
 
 
-def task_list_to_html(match: re.Match) -> str:
-    """Convert GFM task list item to HTML checkbox."""
-    checked = match.group(1) == "x"
-    text = match.group(2)
-    checkbox = "☑" if checked else "☐"
-    return f"<li>{checkbox} {text}</li>"
+def parse_list_block(lines, start_idx):
+    """Parse a list block starting at start_idx. Returns (html, end_idx)."""
+    result = []
+    i = start_idx
+    first_line = lines[i]
 
-
-def md_to_confluence_storage(md_content: str) -> str:
-    """Convert Markdown to Confluence storage format XHTML.
-
-    This is a two-pass process:
-    1. Pre-process: handle elements that need special Confluence macros
-    2. Convert remaining Markdown to HTML via python-markdown
-    """
-    content = md_content
-
-    # --- Pre-pass: Extract code blocks to protect them ---
-    code_blocks = {}
-    code_counter = [0]
-
-    def stash_code_block(match):
-        placeholder = f"%%CODE_BLOCK_{code_counter[0]}%%"
-        code_blocks[placeholder] = code_block_to_confluence(match)
-        code_counter[0] += 1
-        return placeholder
-
-    content = re.sub(
-        r"```(\w*)\s*\n(.*?)```",
-        stash_code_block,
-        content,
-        flags=re.DOTALL,
-    )
-
-    # --- Pre-pass: Handle GFM callouts ---
-    content = re.sub(
-        r"^>\s*\[!(NOTE|TIP|WARNING|CAUTION|IMPORTANT)\]\s*\n((?:>.*\n?)*)",
-        callout_to_confluence,
-        content,
-        flags=re.MULTILINE | re.IGNORECASE,
-    )
-
-    # --- Pre-pass: Handle images ---
-    content = re.sub(
-        r"!\[([^\]]*)\]\(([^)]+)\)",
-        image_to_confluence,
-        content,
-    )
-
-    # --- Pre-pass: Handle task lists ---
-    content = re.sub(
-        r"^-\s+\[([ x])\]\s+(.*)",
-        task_list_to_html,
-        content,
-        flags=re.MULTILINE,
-    )
-
-    # --- Pre-pass: Replace TOC markers ---
-    content = re.sub(
-        r"^\[TOC\]\s*$",
-        '<ac:structured-macro ac:name="toc"/>',
-        content,
-        flags=re.MULTILINE | re.IGNORECASE,
-    )
-
-    # --- Main conversion: Markdown → HTML ---
-    md_converter = markdown.Markdown(
-        extensions=[
-            "tables",
-            "sane_lists",
-            "smarty",
-        ],
-        output_format="html5",
-    )
-    html_content = md_converter.convert(content)
-
-    # --- Post-pass: Restore code blocks ---
-    for placeholder, replacement in code_blocks.items():
-        html_content = html_content.replace(
-            f"<p>{placeholder}</p>", replacement
-        )
-        html_content = html_content.replace(placeholder, replacement)
-
-    # --- Post-pass: Clean up ---
-    # Remove empty paragraphs
-    html_content = re.sub(r"<p>\s*</p>", "", html_content)
-
-    return html_content
-
-
-# ---------------------------------------------------------------------------
-# Title Extraction
-# ---------------------------------------------------------------------------
-
-def extract_title(md_content: str) -> str:
-    """Extract page title from the first H1 heading."""
-    match = re.search(r"^#\s+(.+)$", md_content, re.MULTILINE)
-    if match:
-        return match.group(1).strip()
-    return "Untitled"
-
-
-# ---------------------------------------------------------------------------
-# Confluence API Upload
-# ---------------------------------------------------------------------------
-
-def upload_to_confluence(
-    title: str,
-    body_html: str,
-    image_files: list[Path],
-    domain: str,
-    space_id: str,
-    api_token: str,
-    email: str,
-    parent_id: Optional[str] = None,
-    page_id: Optional[str] = None,
-) -> dict:
-    """Create or update a Confluence page with attachments.
-
-    Uses Confluence REST API v2 for page operations.
-    Uses REST API v1 for attachments (v2 doesn't support file upload).
-    """
-    try:
-        import requests
-    except ImportError:
-        print("ERROR: 'requests' package required for upload.")
-        print("  pip install requests --break-system-packages")
-        sys.exit(1)
-
-    base_url = f"https://{domain}.atlassian.net/wiki"
-    auth = (email, api_token)
-
-    headers_json = {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-    }
-
-    if page_id:
-        # --- Update existing page ---
-        # First, get current version number
-        resp = requests.get(
-            f"{base_url}/api/v2/pages/{page_id}",
-            auth=auth,
-            headers={"Accept": "application/json"},
-        )
-        resp.raise_for_status()
-        current_version = resp.json()["version"]["number"]
-
-        payload = {
-            "id": page_id,
-            "status": "current",
-            "title": title,
-            "body": {
-                "representation": "storage",
-                "value": body_html,
-            },
-            "version": {
-                "number": current_version + 1,
-                "message": "Updated from Markdown (md2confluence)",
-            },
-        }
-        resp = requests.put(
-            f"{base_url}/api/v2/pages/{page_id}",
-            auth=auth,
-            headers=headers_json,
-            json=payload,
-        )
-        resp.raise_for_status()
-        page_data = resp.json()
-        print(f"  Updated page: {title} (id={page_id}, v{current_version + 1})")
-
+    if re.match(r'^\d+\.\s', first_line.strip()):
+        tag = 'ol'
+        pattern = r'^\d+\.\s+(.*)'
     else:
-        # --- Create new page ---
-        payload = {
-            "spaceId": space_id,
-            "status": "current",
-            "title": title,
-            "body": {
-                "representation": "storage",
-                "value": body_html,
-            },
-        }
-        if parent_id:
-            payload["parentId"] = parent_id
+        tag = 'ul'
+        pattern = r'^[-*+]\s+(.*)'
 
-        resp = requests.post(
-            f"{base_url}/api/v2/pages",
-            auth=auth,
-            headers=headers_json,
-            json=payload,
-        )
-        resp.raise_for_status()
-        page_data = resp.json()
-        page_id = page_data["id"]
-        print(f"  Created page: {title} (id={page_id})")
+    result.append(f'<{tag}>')
+    while i < len(lines):
+        line = lines[i]
+        stripped = line.strip()
 
-    # --- Upload image attachments (v1 API — v2 doesn't support file upload) ---
-    for img_path in image_files:
-        if not img_path.exists():
-            print(f"  WARNING: Image not found: {img_path}")
+        # Check for task list items
+        task_match = re.match(r'^[-*+]\s+\[([ xX])\]\s+(.*)', stripped)
+        if task_match and tag == 'ul':
+            checked = task_match.group(1).lower() == 'x'
+            checkbox = '\u2611' if checked else '\u2610'
+            text = inline_format(task_match.group(2))
+            result.append(f'<li>{checkbox} {text}</li>')
+            i += 1
             continue
 
-        with open(img_path, "rb") as f:
-            resp = requests.post(
-                f"{base_url}/rest/api/content/{page_id}/child/attachment",
-                auth=auth,
-                headers={"X-Atlassian-Token": "nocheck"},
-                files={"file": (img_path.name, f, "image/png")},
+        m = re.match(pattern, stripped)
+        if not m:
+            break
+        result.append(f'<li>{inline_format(m.group(1))}</li>')
+        i += 1
+    result.append(f'</{tag}>')
+    return ''.join(result), i
+
+
+def md_to_confluence(md_text):
+    """Convert full Markdown text to Confluence storage format XHTML."""
+    lines = md_text.split('\n')
+    output = []
+    i = 0
+
+    while i < len(lines):
+        line = lines[i]
+        stripped = line.strip()
+
+        # Empty line — skip
+        if not stripped:
+            i += 1
+            continue
+
+        # HTML comment — skip (<!-- ... -->)
+        if stripped.startswith('<!--'):
+            while i < len(lines) and '-->' not in lines[i]:
+                i += 1
+            i += 1  # skip closing line
+            continue
+
+        # Fenced code block
+        if stripped.startswith('```'):
+            lang = stripped[3:].strip()
+            code_lines = []
+            i += 1
+            while i < len(lines) and not lines[i].strip().startswith('```'):
+                code_lines.append(lines[i])
+                i += 1
+            i += 1  # skip closing ```
+            code = '\n'.join(code_lines)
+
+            if lang == 'mermaid':
+                output.append(convert_mermaid(code))
+            else:
+                output.append(convert_code_block(lang, code))
+            continue
+
+        # Heading
+        m = re.match(r'^(#{1,6})\s+(.*)', stripped)
+        if m:
+            level = len(m.group(1))
+            text = inline_format(m.group(2))
+            output.append(f'<h{level}>{text}</h{level}>')
+            i += 1
+            continue
+
+        # Horizontal rule
+        if re.match(r'^[-*_]{3,}\s*$', stripped):
+            output.append('<hr />')
+            i += 1
+            continue
+
+        # Table (current line has |, next line is separator)
+        if ('|' in stripped and i + 1 < len(lines)
+                and re.match(r'^\|?[\s:]*[-|:]+[\s:]*\|?$', lines[i + 1].strip())):
+            table_lines = []
+            while i < len(lines) and '|' in lines[i].strip():
+                table_lines.append(lines[i])
+                i += 1
+            output.append(convert_table(table_lines))
+            continue
+
+        # Image (standalone line)
+        img_match = re.match(r'^!\[([^\]]*)\]\(([^)]+)\)\s*$', stripped)
+        if img_match:
+            output.append(convert_image(img_match.group(1), img_match.group(2)))
+            i += 1
+            continue
+
+        # Blockquote — check for GFM callout first
+        if stripped.startswith('>'):
+            # Check for GFM callout: > [!NOTE], > [!TIP], etc.
+            callout_match = re.match(
+                r'^>\s*\[!(NOTE|TIP|WARNING|CAUTION|IMPORTANT)\]\s*$',
+                stripped,
+                re.IGNORECASE,
             )
-        if resp.status_code in (200, 201):
-            print(f"  Uploaded attachment: {img_path.name}")
-        else:
-            print(f"  WARNING: Failed to upload {img_path.name}: {resp.status_code}")
+            if callout_match:
+                callout_type = callout_match.group(1)
+                i += 1
+                content_lines = []
+                while i < len(lines) and lines[i].strip().startswith('>'):
+                    content_lines.append(
+                        re.sub(r'^>\s?', '', lines[i].strip())
+                    )
+                    i += 1
+                output.append(convert_callout(callout_type, content_lines))
+            else:
+                # Regular blockquote
+                quote_lines = []
+                while i < len(lines) and lines[i].strip().startswith('>'):
+                    quote_lines.append(
+                        re.sub(r'^>\s?', '', lines[i].strip())
+                    )
+                    i += 1
+                content = inline_format(' '.join(quote_lines))
+                output.append(f'<blockquote><p>{content}</p></blockquote>')
+            continue
 
-    return page_data
+        # Unordered list (including task lists)
+        if re.match(r'^[-*+]\s', stripped):
+            html_block, i = parse_list_block(lines, i)
+            output.append(html_block)
+            continue
+
+        # Ordered list
+        if re.match(r'^\d+\.\s', stripped):
+            html_block, i = parse_list_block(lines, i)
+            output.append(html_block)
+            continue
+
+        # Regular paragraph — collect contiguous non-special lines
+        para_lines = []
+        while (i < len(lines) and lines[i].strip()
+               and not lines[i].strip().startswith('#')
+               and not lines[i].strip().startswith('```')
+               and not lines[i].strip().startswith('>')
+               and not lines[i].strip().startswith('<!--')
+               and not re.match(r'^[-*_]{3,}\s*$', lines[i].strip())
+               and not re.match(r'^[-*+]\s', lines[i].strip())
+               and not re.match(r'^\d+\.\s', lines[i].strip())
+               and not re.match(r'^!\[', lines[i].strip())
+               and not ('|' in lines[i].strip() and i + 1 < len(lines)
+                        and re.match(r'^\|?[\s:]*[-|:]+',
+                                     lines[min(i + 1, len(lines) - 1)].strip()))):
+            para_lines.append(lines[i].strip())
+            i += 1
+        if para_lines:
+            text = inline_format(' '.join(para_lines))
+            output.append(f'<p>{text}</p>')
+        continue
+
+    return '\n'.join(output)
+
+
+def extract_title(md_text):
+    """Extract page title from the first H1 heading."""
+    m = re.search(r'^#\s+(.+)$', md_text, re.MULTILINE)
+    if m:
+        return m.group(1).strip()
+    return 'Untitled'
 
 
 # ---------------------------------------------------------------------------
-# Mapping file (tracks MD file ↔ Confluence page ID)
+# Confluence REST API (auth from ~/.claude.json)
 # ---------------------------------------------------------------------------
 
-MAPPING_FILE = ".confluence-mapping.json"
+def get_credentials():
+    """Read Confluence credentials from ~/.claude.json MCP server config."""
+    claude_json = os.path.expanduser('~/.claude.json')
+    if not os.path.isfile(claude_json):
+        print('ERROR: ~/.claude.json not found.', file=sys.stderr)
+        print('  Configure Confluence MCP server in Claude Code settings.',
+              file=sys.stderr)
+        sys.exit(1)
+
+    with open(claude_json, 'r', encoding='utf-8') as f:
+        config = json.load(f)
+
+    try:
+        env = config['mcpServers']['confluence']['env']
+        return {
+            'site': env['ATLASSIAN_SITE_NAME'],
+            'email': env['ATLASSIAN_USER_EMAIL'],
+            'token': env['ATLASSIAN_API_TOKEN'],
+        }
+    except KeyError as e:
+        print(f'ERROR: Missing key in ~/.claude.json: {e}', file=sys.stderr)
+        print('  Expected: mcpServers.confluence.env.ATLASSIAN_SITE_NAME',
+              file=sys.stderr)
+        print('            mcpServers.confluence.env.ATLASSIAN_USER_EMAIL',
+              file=sys.stderr)
+        print('            mcpServers.confluence.env.ATLASSIAN_API_TOKEN',
+              file=sys.stderr)
+        sys.exit(1)
 
 
-def load_mapping(base_dir: Path) -> dict:
-    mapping_path = base_dir / MAPPING_FILE
-    if mapping_path.exists():
-        with open(mapping_path) as f:
-            return json.load(f)
-    return {}
+def _make_auth_header(creds):
+    """Create Basic auth header value."""
+    auth_str = f"{creds['email']}:{creds['token']}"
+    auth_b64 = base64.b64encode(auth_str.encode()).decode()
+    return f'Basic {auth_b64}'
 
 
-def save_mapping(base_dir: Path, mapping: dict):
-    mapping_path = base_dir / MAPPING_FILE
-    with open(mapping_path, "w") as f:
-        json.dump(mapping, f, indent=2, ensure_ascii=False)
+def _api_request(url, method='GET', data=None, creds=None):
+    """Make an authenticated Confluence API request."""
+    headers = {
+        'Authorization': _make_auth_header(creds),
+        'Accept': 'application/json',
+    }
+    if data is not None:
+        headers['Content-Type'] = 'application/json; charset=utf-8'
+        body = json.dumps(data).encode('utf-8')
+    else:
+        body = None
+
+    req = urllib.request.Request(url, data=body, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(req) as resp:
+            return json.loads(resp.read().decode('utf-8'))
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode('utf-8', errors='replace')
+        print(f'ERROR {e.code}: {error_body[:500]}', file=sys.stderr)
+        sys.exit(1)
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
-
-def process_single_file(
-    md_path: Path,
-    output_dir: Path,
-    upload: bool = False,
-    mapping: Optional[dict] = None,
-) -> dict:
-    """Process a single Markdown file through the full pipeline."""
-    print(f"\nProcessing: {md_path}")
-
-    md_content = md_path.read_text(encoding="utf-8")
-    title = extract_title(md_content)
-
-    # Stage 1: Mermaid → Images
-    images_dir = output_dir / "images"
-    processed_md, image_files = process_mermaid_diagrams(md_content, images_dir)
-
-    # Stage 2: Markdown → Confluence storage format
-    body_html = md_to_confluence_storage(processed_md)
-
-    # Save output
-    output_dir.mkdir(parents=True, exist_ok=True)
-    stem = md_path.stem
-    html_path = output_dir / f"{stem}.confluence.html"
-    html_path.write_text(body_html, encoding="utf-8")
-    print(f"  Output: {html_path}")
-
-    result = {
-        "source": str(md_path),
-        "title": title,
-        "output_html": str(html_path),
-        "images": image_files,
+def get_page_info(creds, page_id):
+    """Get current page version, title, and spaceId."""
+    url = f"https://{creds['site']}.atlassian.net/wiki/api/v2/pages/{page_id}"
+    result = _api_request(url, creds=creds)
+    return {
+        'version': result['version']['number'],
+        'title': result['title'],
+        'spaceId': result['spaceId'],
     }
 
-    # Stage 3: Upload (optional)
-    if upload:
-        domain = os.environ.get("CONFLUENCE_DOMAIN")
-        space_id = os.environ.get("CONFLUENCE_SPACE_ID")
-        api_token = os.environ.get("CONFLUENCE_API_TOKEN")
-        email = os.environ.get("CONFLUENCE_EMAIL")
-        parent_id = os.environ.get("CONFLUENCE_PARENT_PAGE_ID")
 
-        if not all([domain, space_id, api_token, email]):
-            print("  ERROR: Missing environment variables for upload.")
-            print("  Required: CONFLUENCE_DOMAIN, CONFLUENCE_SPACE_ID,")
-            print("            CONFLUENCE_API_TOKEN, CONFLUENCE_EMAIL")
-            return result
+def create_page(creds, space_id, title, html_content, parent_id=None):
+    """Create a new Confluence page."""
+    url = f"https://{creds['site']}.atlassian.net/wiki/api/v2/pages"
+    payload = {
+        'spaceId': space_id,
+        'status': 'current',
+        'title': title,
+        'body': {
+            'representation': 'storage',
+            'value': html_content,
+        },
+    }
+    if parent_id:
+        payload['parentId'] = parent_id
 
-        # Check if page already exists in mapping
-        page_id = None
-        if mapping and str(md_path) in mapping:
-            page_id = mapping[str(md_path)]
-
-        image_paths = [images_dir / f for f in image_files]
-        page_data = upload_to_confluence(
-            title=title,
-            body_html=body_html,
-            image_files=image_paths,
-            domain=domain,
-            space_id=space_id,
-            api_token=api_token,
-            email=email,
-            parent_id=parent_id,
-            page_id=page_id,
-        )
-
-        result["page_id"] = page_data.get("id")
-        if mapping is not None:
-            mapping[str(md_path)] = page_data.get("id")
-
+    result = _api_request(url, method='POST', data=payload, creds=creds)
+    page_id = result['id']
+    page_url = f"https://{creds['site']}.atlassian.net/wiki/pages/{page_id}"
+    print(f"SUCCESS: Created '{title}' (id={page_id})")
+    print(f"URL: {page_url}")
     return result
 
 
+def update_page(creds, page_id, html_content, title=None, version_msg='Updated from Markdown'):
+    """Update an existing Confluence page with version management."""
+    info = get_page_info(creds, page_id)
+    new_version = info['version'] + 1
+    page_title = title or info['title']
+
+    url = f"https://{creds['site']}.atlassian.net/wiki/api/v2/pages/{page_id}"
+    payload = {
+        'id': page_id,
+        'status': 'current',
+        'title': page_title,
+        'spaceId': info['spaceId'],
+        'body': {
+            'representation': 'storage',
+            'value': html_content,
+        },
+        'version': {
+            'number': new_version,
+            'message': version_msg,
+        },
+    }
+
+    result = _api_request(url, method='PUT', data=payload, creds=creds)
+    page_url = f"https://{creds['site']}.atlassian.net/wiki/pages/{page_id}"
+    print(f"SUCCESS: Updated '{page_title}' to version {new_version}")
+    print(f"URL: {page_url}")
+    return result
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
 def main():
     parser = argparse.ArgumentParser(
-        description="Convert Markdown to Confluence storage format",
+        description='Markdown → Confluence Storage Format converter + uploader',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  %(prog)s README.md -o output/
-  %(prog)s specs/ -o output/
-  %(prog)s specs/ --upload
+  %(prog)s input.md                              # convert to stdout
+  %(prog)s input.md -o output.html               # convert to file
+  %(prog)s input.md --create --space-id 12345 --parent-id 67890
+  %(prog)s input.md --update --page-id 12345
+  %(prog)s input.md --update --page-id 12345 --title "My Title" --version-msg "v2"
         """,
     )
-    parser.add_argument(
-        "input",
-        help="Markdown file or directory containing .md files",
-    )
-    parser.add_argument(
-        "-o", "--output",
-        default="./confluence-output",
-        help="Output directory (default: ./confluence-output)",
-    )
-    parser.add_argument(
-        "--upload",
-        action="store_true",
-        help="Upload to Confluence (requires env vars)",
-    )
-    parser.add_argument(
-        "--width",
-        type=int,
-        default=1200,
-        help="Mermaid diagram width in pixels (default: 1200)",
-    )
+    parser.add_argument('input', help='Markdown file to convert')
+    parser.add_argument('-o', '--output', help='Output HTML file (default: stdout)')
+    parser.add_argument('--create', action='store_true',
+                        help='Create a new Confluence page')
+    parser.add_argument('--update', action='store_true',
+                        help='Update an existing Confluence page')
+    parser.add_argument('--page-id', help='Page ID for update')
+    parser.add_argument('--space-id', help='Space ID for create')
+    parser.add_argument('--parent-id', help='Parent page ID for create')
+    parser.add_argument('--title', help='Page title (default: first H1 heading)')
+    parser.add_argument('--version-msg', default='Updated from Markdown',
+                        help='Version message for update')
 
     args = parser.parse_args()
-    input_path = Path(args.input)
-    output_dir = Path(args.output)
 
-    if not input_path.exists():
-        print(f"ERROR: {input_path} does not exist")
-        sys.exit(1)
+    # Read input
+    with open(args.input, 'r', encoding='utf-8') as f:
+        md_text = f.read()
 
-    # Collect .md files
-    if input_path.is_file():
-        md_files = [input_path]
-    else:
-        md_files = sorted(input_path.rglob("*.md"))
-        if not md_files:
-            print(f"No .md files found in {input_path}")
+    # Convert
+    html_content = md_to_confluence(md_text)
+    title = args.title or extract_title(md_text)
+
+    if args.create:
+        if not args.space_id:
+            print('ERROR: --space-id required for --create', file=sys.stderr)
             sys.exit(1)
+        creds = get_credentials()
+        create_page(creds, args.space_id, title, html_content, args.parent_id)
 
-    print(f"Found {len(md_files)} Markdown file(s)")
+    elif args.update:
+        if not args.page_id:
+            print('ERROR: --page-id required for --update', file=sys.stderr)
+            sys.exit(1)
+        creds = get_credentials()
+        update_page(creds, args.page_id, html_content, args.title, args.version_msg)
 
-    # Load mapping for upload tracking
-    mapping = load_mapping(input_path if input_path.is_dir() else input_path.parent)
+    elif args.output:
+        with open(args.output, 'w', encoding='utf-8') as f:
+            f.write(html_content)
+        print(f'Output: {args.output} ({len(html_content)} chars)')
 
-    results = []
-    for md_file in md_files:
-        # Preserve directory structure in output
-        if input_path.is_dir():
-            relative = md_file.relative_to(input_path)
-            file_output_dir = output_dir / relative.parent
+    else:
+        # Write to stdout (handle encoding on Windows)
+        if hasattr(sys.stdout, 'buffer'):
+            sys.stdout.buffer.write(html_content.encode('utf-8'))
+            sys.stdout.buffer.write(b'\n')
         else:
-            file_output_dir = output_dir
-
-        result = process_single_file(
-            md_file, file_output_dir, args.upload, mapping
-        )
-        results.append(result)
-
-    # Save mapping
-    if args.upload:
-        save_mapping(
-            input_path if input_path.is_dir() else input_path.parent,
-            mapping,
-        )
-
-    # Summary
-    print(f"\n{'=' * 60}")
-    print(f"Processed {len(results)} file(s)")
-    print(f"Output directory: {output_dir}")
-    if args.upload:
-        uploaded = sum(1 for r in results if r.get("page_id"))
-        print(f"Uploaded: {uploaded}/{len(results)}")
-    print(f"{'=' * 60}")
+            print(html_content)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
