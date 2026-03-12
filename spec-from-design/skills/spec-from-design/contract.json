@@ -37,6 +37,7 @@
       "nfr-policy": "docs/policies/POLICY-NFR-001-비기능요구사항.md",
       "spec": "docs/specs/{PREFIX}-{DOMAIN}-{number}-{name}.md"
     },
+    "pathFlexibility": "outputRoot와 policyRoot는 기본값이다. existing-project 모드에서 프로젝트에 이미 documents/, specs/, policies/ 등의 디렉토리가 존재하면 해당 경로를 우선 사용한다. 예: 프로젝트가 documents/specs/를 사용하면 outputRoot를 documents/specs로 재설정한다.",
     "idPrefix": "프로젝트 service-definition에서 결정"
   },
   "outputRules": {
@@ -44,8 +45,7 @@
     "singleFileDescription": "하나의 Spec은 하나의 Markdown 파일로 출력한다. 관련 정책, 모델, 검증 조건, 테스트 시나리오를 모두 동일 파일에 포함한다.",
     "noCode": true,
     "noCodeDescription": "Spec에 구현 코드(Java/Kotlin/TypeScript 등)를 포함하지 않는다. import 문, 메서드 구현체, 클래스 코드, 어노테이션, SQL DDL/DML을 넣지 않는다. 흐름, 조건, 시나리오만 자연어로 기술한다. 코드 생성은 code-from-spec의 역할이다.",
-    "decomposition": "소규모 변경은 usecase 단일 Spec으로 충분하다. 대규모 변경 시 model → service → usecase로 분해하여 선행/후행 관계를 dependsOn으로 기록한다.",
-    "policyGenerality": "정책은 특정 Use Case 전용이 아닌 도메인 수준의 범용 규칙으로 작성한다. 기존 정책 재사용을 우선한다."
+    "decomposition": "소규모 변경은 usecase 단일 Spec으로 충분하다. 대규모 변경 시 model → service → usecase로 분해하여 선행/후행 관계를 dependsOn으로 기록한다."
   },
   "quality": {
     "inputQuality": {

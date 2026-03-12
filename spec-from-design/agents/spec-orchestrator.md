@@ -67,6 +67,20 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 → 모두 없으면: new-project → 프리셋 확인
 ```
 
+### 출력 경로 감지 (existing-project)
+
+기존 프로젝트에서는 contract.json의 기본 경로(docs/specs, docs/policies)를 그대로 쓰지 않고, 프로젝트의 실제 디렉토리 구조를 우선 사용한다.
+
+```text
+경로 감지 순서:
+1. 프로젝트에 documents/ 디렉토리가 존재하는가? → outputRoot: documents/specs, policyRoot: documents/policies
+2. 프로젝트에 docs/ 디렉토리가 존재하는가? → outputRoot: docs/specs, policyRoot: docs/policies
+3. 둘 다 없으면 → contract.json 기본값 사용 (docs/specs, docs/policies)
+4. 기존 specs/, policies/ 하위 디렉토리가 이미 존재하면 해당 경로를 유지
+```
+
+감지된 경로는 모든 에이전트 호출 시 `출력 경로`와 `정책 경로`로 전달한다.
+
 ## 2단계: 입력 검증
 
 - `full`: HLD + LLD 전체 검증
@@ -98,7 +112,8 @@ design-analyzer → policy-extractor → usecase-api-writer (해당 유형 Spec)
 규모: {full|lld-only|request-only}
 모드: {existing-project|new-project}
 LLD 경로: {경로}
-출력 경로: {사용자 지정 경로 또는 docs/specs/}
+출력 경로: {감지된 경로 또는 docs/specs/}
+정책 경로: {감지된 경로 또는 docs/policies/}
 Spec 유형: {usecase|model+service+usecase|refactoring|performance}
 분해 여부: {단일|분해}
 ```
