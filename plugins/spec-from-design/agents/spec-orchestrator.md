@@ -67,6 +67,30 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 → 모두 없으면: new-project → 프리셋 확인
 ```
 
+### 출력 경로 감지 (existing-project)
+
+기존 프로젝트에서는 contract.json의 기본 경로(docs/specs, docs/policies)를 그대로 쓰지 않고, 프로젝트의 실제 디렉토리 구조를 우선 사용한다.
+
+```text
+경로 감지 순서:
+1. 프로젝트에 documents/ 디렉토리가 존재하는가? → docRoot: documents/, outputRoot: documents/specs, policyRoot: documents/policies
+2. 프로젝트에 docs/ 디렉토리가 존재하는가? → docRoot: docs/, outputRoot: docs/specs, policyRoot: docs/policies
+3. 둘 다 없으면 → contract.json 기본값 사용 (docRoot: docs/, outputRoot: docs/specs, policyRoot: docs/policies)
+4. 기존 specs/, policies/ 하위 디렉토리가 이미 존재하면 해당 경로를 유지
+```
+
+**공용 문서와 Spec의 경로 분리:**
+- 공용 문서(service-definition, architecture-rules, naming-guide, infra-config, init-data)는 `docRoot`에 위치
+- Use Case Spec은 `outputRoot`(docRoot/specs/)에 위치
+- 정책 문서는 `policyRoot`(docRoot/policies/)에 위치
+
+예: documents/ 프로젝트의 경우
+- 공용: `documents/service-definition.md`, `documents/architecture-rules.md`, `documents/naming-guide.md`
+- Spec: `documents/specs/PLM-POCANCEL-001-PO취소요청전송.md`
+- 정책: `documents/policies/POLICY-PLM-001-인터페이스상태관리.md`
+
+감지된 경로는 모든 에이전트 호출 시 `문서 루트`, `출력 경로`, `정책 경로`로 전달한다.
+
 ## 2단계: 입력 검증
 
 - `full`: HLD + LLD 전체 검증
@@ -77,18 +101,20 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 
 ### 소규모 (분해 불필요)
 ```text
-design-analyzer → usecase-api-writer (usecase Spec 1개) → spec-reviewer
+design-analyzer → policy-extractor → usecase-api-writer (usecase Spec 1개) → spec-reviewer
 ```
 
 ### 대규모 (분해 필요)
 ```text
-design-analyzer → usecase-api-writer (model + service + usecase Spec N개) → spec-reviewer
+design-analyzer → policy-extractor → usecase-api-writer (model + service + usecase Spec N개) → spec-reviewer
 ```
 
 ### refactoring / performance
 ```text
-design-analyzer → usecase-api-writer (해당 유형 Spec) → spec-reviewer
+design-analyzer → policy-extractor → usecase-api-writer (해당 유형 Spec) → spec-reviewer
 ```
+
+**주의**: `policy-extractor`는 반드시 `usecase-api-writer`보다 먼저 실행한다. `usecase-api-writer`는 "관련 정책" 섹션에서 이미 생성된 정책 파일만 참조해야 한다.
 
 ## 에이전트 호출 형식
 
@@ -96,7 +122,9 @@ design-analyzer → usecase-api-writer (해당 유형 Spec) → spec-reviewer
 규모: {full|lld-only|request-only}
 모드: {existing-project|new-project}
 LLD 경로: {경로}
-출력 경로: {사용자 지정 경로 또는 docs/specs/}
+문서 루트: {감지된 docRoot 또는 docs/}
+출력 경로: {감지된 경로 또는 docs/specs/}
+정책 경로: {감지된 경로 또는 docs/policies/}
 Spec 유형: {usecase|model+service+usecase|refactoring|performance}
 분해 여부: {단일|분해}
 ```
@@ -108,6 +136,7 @@ Spec 유형: {usecase|model+service+usecase|refactoring|performance}
 검증 항목:
 - 80점 이상 통과
 - **코드 포함 여부 검사**: 코드 블록(```java 등)이 있으면 FAIL (dependsOn의 ```yaml은 예외)
+- **참조 정책 존재 검증**: Spec이 참조하는 POLICY ID에 대응하는 파일이 실제로 존재하는지 확인. 없으면 FAIL
 - **dependsOn 검증**: 수정 대상 파일 겹침 및 레이어 순서가 올바른지 확인
 - **Spec 유형 적합성**: 유형에 맞는 고유 섹션이 있는지 확인
 
