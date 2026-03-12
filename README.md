@@ -34,8 +34,9 @@ Claude Code에서 자연어로 요청하면 스킬이 자동 트리거됩니다:
 이 Spec으로 프로젝트를 재생성해줘
 Spec 결정성을 검증해줘
 
-# Confluence 발행
+# Confluence 발행 (어떤 MD 파일이든 가능)
 이 HLD.md를 Confluence에 올려줘
+README.md를 wiki에 발행해줘
 ```
 
 ## 플러그인 목록
@@ -45,7 +46,7 @@ Spec 결정성을 검증해줘
 | [doc-writing-team](./plugins/doc-writing-team) | v3.1.0 | ADR/HLD/LLD 설계 문서 작성 — 멀티 에이전트 품질 루프, Spec 도출 가능 수준 보장, HLD→LLD 추적성 |
 | [spec-from-design](./plugins/spec-from-design) | v1.0.0 | HLD/LLD → Use Case·API·Policy·Test Spec 도출 — 3 scales, 프리셋 시스템 |
 | [spec-harness](./plugins/spec-harness) | v1.0.0 | Spec → 코드 생성 + 결정성 검증 — 독립 2회 구현 비교, 5 Level 100점 평가, Spec 자동 보강 |
-| [md-to-confluence](./plugins/md-to-confluence) | v0.1.0 | Markdown 설계문서를 Confluence wiki에 발행 (Mermaid→이미지 포함) |
+| [md-to-confluence](./plugins/md-to-confluence) | v0.1.0 | 임의의 Markdown 파일을 Confluence wiki에 발행 (Mermaid→이미지 포함, 독립 사용 가능) |
 
 ### 워크플로우 연계
 
@@ -57,9 +58,11 @@ doc-writing-team  →  HLD / LLD 작성
 spec-from-design  →  Use Case / API / Policy / Test Spec 도출
   ↓
 spec-harness      →  Spec → 코드 생성 + 결정성 검증 + Spec 보강
-  ↓
-md-to-confluence  →  Confluence wiki 발행
+
+md-to-confluence  →  Confluence wiki 발행 (독립 사용 가능)
 ```
+
+> `md-to-confluence`는 파이프라인과 무관하게 어떤 Markdown 파일이든 단독으로 Confluence에 발행할 수 있습니다.
 
 ## 구조
 
