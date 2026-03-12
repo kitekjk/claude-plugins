@@ -1,0 +1,19 @@
+{
+  "name": "spec-from-design",
+  "description": "HLD/LLD 설계 문서와 기존 코드를 분석하여 코드 생성 가능한 Spec을 생성하는 Claude Code 플러그인. 언어/아키텍처 비종속, 프리셋 시스템 지원.",
+  "version": "1.0.0",
+  "author": {
+    "name": "kitekjk"
+  },
+  "license": "MIT",
+  "keywords": ["spec", "hld", "lld", "design-to-spec", "code-generation", "ddd", "clean-architecture", "korean"],
+  "skills": "./skills/",
+  "agents": [
+    "./agents/spec-orchestrator.md",
+    "./agents/design-analyzer.md",
+    "./agents/usecase-api-writer.md",
+    "./agents/policy-extractor.md",
+    "./agents/test-scenario-writer.md",
+    "./agents/spec-reviewer.md"
+  ]
+}

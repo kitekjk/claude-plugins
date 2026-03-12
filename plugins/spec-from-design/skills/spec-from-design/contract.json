@@ -1,0 +1,116 @@
+{
+  "version": "1.0.0",
+  "plugin": "spec-from-design",
+  "description": "HLD/LLD → Spec 변환의 단일 계약. 모드, 스코어링, 저장, 프리셋 설정.",
+  "modes": {
+    "existing-project": {
+      "description": "기존 코드가 있는 프로젝트. 아키텍처/네이밍/스택을 코드에서 추출.",
+      "codeAnalysis": true,
+      "presetFallback": false,
+      "extractionTargets": [
+        "build-system",
+        "package-structure",
+        "naming-conventions",
+        "existing-models",
+        "existing-apis",
+        "existing-specs",
+        "existing-tests"
+      ]
+    },
+    "new-project": {
+      "description": "코드가 없는 신규 프로젝트. 프리셋으로 아키텍처/네이밍/스택 결정.",
+      "codeAnalysis": false,
+      "presetFallback": true,
+      "defaultPreset": "ddd-clean-kotlin"
+    }
+  },
+  "storage": {
+    "outputRoot": "docs/specs",
+    "pathPatterns": {
+      "service-definition": "docs/specs/service-definition.md",
+      "architecture-rules": "docs/specs/architecture-rules.md",
+      "naming-guide": "docs/specs/naming-guide.md",
+      "infra-config": "docs/specs/infra-config.md",
+      "init-data": "docs/specs/init-data.md",
+      "policy": "docs/specs/policies/POLICY-{domain}-{number}-{name}.md",
+      "nfr-policy": "docs/specs/policies/POLICY-NFR-001-비기능요구사항.md",
+      "use-case": "docs/specs/{domain}/{PREFIX}-{DOMAIN}-{number}-{name}.md",
+      "api-spec": "docs/specs/{domain}/{PREFIX}-API-{DOMAIN}-{number}-{name}.md"
+    },
+    "idPrefix": "프로젝트 service-definition에서 결정"
+  },
+  "quality": {
+    "inputQuality": {
+      "checklistFile": "skills/spec-from-design/checklists/input-quality.md",
+      "hldRequired": ["H-01", "H-02", "H-03", "H-05", "H-06", "H-07"],
+      "hldConditional": ["H-04"],
+      "lldRequired": ["L-01", "L-02", "L-03", "L-04", "L-05", "L-06", "L-08"],
+      "lldConditional": ["L-07", "L-09"],
+      "blockOnMissing": true,
+      "allowUserOverride": true
+    },
+    "outputQuality": {
+      "checklistFile": "skills/spec-from-design/checklists/output-quality.md",
+      "passScore": 80,
+      "perFileMinScore": 80,
+      "perCategoryMinPercent": 50,
+      "traceabilityMinScore": 10,
+      "evaluationCategories": [
+        {"name": "구조 완결성", "weight": 15},
+        {"name": "모호성", "weight": 20},
+        {"name": "분기 커버리지", "weight": 20},
+        {"name": "참조 완결성", "weight": 15},
+        {"name": "테스트 도출 가능성", "weight": 15},
+        {"name": "HLD/LLD 추적성", "weight": 15}
+      ]
+    },
+    "traceability": {
+      "checklistFile": "skills/spec-from-design/checklists/traceability.md",
+      "required": true
+    }
+  },
+  "presets": {
+    "directory": "skills/spec-from-design/presets",
+    "available": ["ddd-clean-kotlin"],
+    "extensible": true
+  },
+  "specTypes": {
+    "use-case": {
+      "specFile": "skills/spec-from-design/specs/use-case.md",
+      "templateFile": "skills/spec-from-design/templates/use-case.md",
+      "writer": "usecase-api-writer",
+      "source": "LLD FR + 클래스 설계"
+    },
+    "api-spec": {
+      "specFile": "skills/spec-from-design/specs/api-spec.md",
+      "templateFile": "skills/spec-from-design/templates/api-spec.md",
+      "writer": "usecase-api-writer",
+      "source": "LLD API 설계"
+    },
+    "policy": {
+      "specFile": "skills/spec-from-design/specs/policy.md",
+      "templateFile": "skills/spec-from-design/templates/policy.md",
+      "writer": "policy-extractor",
+      "source": "HLD KDD + LLD 설계 판단"
+    },
+    "service-definition": {
+      "templateFile": "skills/spec-from-design/templates/service-definition.md",
+      "writer": "design-analyzer",
+      "source": "HLD Glossary + Overview"
+    },
+    "architecture-rules": {
+      "templateFile": "skills/spec-from-design/templates/architecture-rules.md",
+      "writer": "design-analyzer",
+      "source": "HLD Architecture + LLD 패키지 구조 또는 프리셋"
+    },
+    "naming-guide": {
+      "templateFile": "skills/spec-from-design/templates/naming-guide.md",
+      "writer": "design-analyzer",
+      "source": "기존 코드 추출 또는 프리셋"
+    }
+  },
+  "mappings": {
+    "hldToSpec": "skills/spec-from-design/mappings/hld-to-spec.md",
+    "lldToSpec": "skills/spec-from-design/mappings/lld-to-spec.md"
+  }
+}
