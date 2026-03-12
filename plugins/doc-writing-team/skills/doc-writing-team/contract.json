@@ -61,6 +61,24 @@
         "Glossary", "Problem Statement", "Functional Requirements",
         "Non-Functional Requirements", "Goal / Non-Goal", "Proposed Design"
       ],
+      "conditionalSections": {
+        "연관 HLD": {
+          "condition": "hld_exists",
+          "description": "연관 HLD가 있을 때만 필수. 소규모 LLD 단독 작성 시 생략 가능."
+        }
+      },
+      "hldTraceability": {
+        "required": false,
+        "requiredWhen": "hld_exists",
+        "sectionName": "연관 HLD",
+        "fields": ["hldPath", "hldTitle", "targetComponents", "kddMapping"],
+        "rules": [
+          "LLD는 HLD의 특정 컴포넌트를 상세화하는 문서",
+          "HLD의 KDD가 LLD 설계 판단 근거와 일관되어야 함",
+          "HLD의 NFR이 LLD NFR에 구체화되어야 함",
+          "HLD Glossary 용어를 LLD에서 동일하게 사용"
+        ]
+      },
       "requiredSubsections": {
         "Proposed Design": [
           "API 설계", "클래스/컴포넌트 설계", "DB 스키마", "설계 판단 근거"

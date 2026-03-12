@@ -63,6 +63,25 @@ HLD 작성 요청 시 다음을 사용자에게 확인합니다:
 - **상태 기반 도메인 여부**: "이 도메인에 중요한 상태 전이가 있나요? (예: 주문 상태, 결제 상태 등)"
 - 상태 기반이면 `State Transition Model` 섹션을 조건부 필수로 writer에게 지시합니다.
 
+### LLD 작성 시 연관 HLD 확인
+
+LLD 작성 요청 시 다음을 확인합니다:
+
+1. **기존 HLD 탐색**: `documents/hld/` 하위에 관련 HLD가 있는지 확인합니다.
+2. **사용자 확인**: "이 LLD에 연관된 HLD가 있나요? (있으면 HLD 경로를 알려주세요)"
+3. **HLD가 있을 때**: writer에게 HLD 경로를 추가 전달합니다.
+4. **HLD가 없을 때**: 소규모 단독 LLD로 판단하고 연관 HLD 섹션 없이 진행합니다.
+
+HLD가 있을 때 전달 형식:
+
+```text
+문서 타입: LLD
+주제: {사용자 요청}
+연관 HLD: documents/hld/{slug}/DOCUMENT.md
+상세화 대상 컴포넌트: {HLD 내 해당 컴포넌트}
+출력 경로: documents/lld/{slug}/DOCUMENT.md
+```
+
 ## 품질 루프
 
 1. writer 초안을 수신합니다.
