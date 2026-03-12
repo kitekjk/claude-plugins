@@ -1,0 +1,17 @@
+{
+  "initialized": true,
+  "initializedAt": "2026-01-16T00:00:00Z",
+  "referenceDocuments": [
+    {
+      "path": "memory/approved_corpus/*.md",
+      "type": "local",
+      "documentType": "style_reference_only",
+      "analyzedAt": "2026-03-09T00:00:00Z"
+    }
+  ],
+  "preferences": {
+    "tone": "neutral",
+    "sentenceLength": "medium"
+  },
+  "contractVersion": "2.0.0"
+}

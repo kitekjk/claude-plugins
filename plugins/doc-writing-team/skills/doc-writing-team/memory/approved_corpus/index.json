@@ -1,0 +1,55 @@
+{
+  "lastUpdated": "2026-03-09",
+  "totalDocuments": 6,
+  "note": "승인 코퍼스는 스타일과 예시 참고용입니다. 구조, 저장 경로, Appendix 정책, ADR Decision 정책은 contract.json을 우선합니다.",
+  "documents": {
+    "adr": [
+      {
+        "filename": "ADR-Inventory-OLTP-DB-선정.md",
+        "title": "Inventory OLTP DB 선정",
+        "date": "2026-01-16",
+        "qualityScore": 9.5,
+        "highlights": ["수치 기반 의사결정", "Model A/B/C 비교", "Hot SKU 전략"]
+      },
+      {
+        "filename": "Promise-Inventory-조회-전략-토폴로지.md",
+        "title": "Promise Inventory 데이터 조회 전략 및 연결 토폴로지 선정",
+        "date": "2026-01-16",
+        "qualityScore": 9.3,
+        "highlights": ["P99 50ms SLO", "Envoy vs Nginx", "Hot SKU 변동 주기 분석"]
+      }
+    ],
+    "hld": [
+      {
+        "filename": "CIAP: HLD (Promise).md",
+        "title": "CIAP HLD - Promise",
+        "date": "2026-01-16",
+        "qualityScore": 9.7,
+        "highlights": ["Promise 시스템 아키텍처", "전략 계층 설계"]
+      },
+      {
+        "filename": "CIAP: HLD (Inventory).md",
+        "title": "CIAP HLD - Inventory",
+        "date": "2026-01-16",
+        "qualityScore": 9.2,
+        "highlights": ["재고 시스템 아키텍처", "통합 재고 관리"]
+      }
+    ],
+    "lld": [
+      {
+        "filename": "CIAP-LLD-I00-Inventory-Data-Strategy.md",
+        "title": "LLD-I00 Inventory Data Strategy",
+        "date": "2026-01-16",
+        "qualityScore": 9.4,
+        "highlights": ["데이터 전략", "엔티티 설계", "NFR 정의"]
+      },
+      {
+        "filename": "CIAP-LLD-P00-Promise-Data-Strategy.md",
+        "title": "LLD-P00 Promise Data Strategy",
+        "date": "2026-01-16",
+        "qualityScore": 9.1,
+        "highlights": ["Promise 데이터 전략", "캐시 레이어", "조회 최적화"]
+      }
+    ]
+  }
+}

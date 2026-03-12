@@ -1,0 +1,107 @@
+{
+  "version": "3.0.0",
+  "plugin": "doc-writing-team",
+  "description": "Canonical contract for document types, storage, scoring, and feedback schema. Enhanced for spec-derivable HLD/LLD.",
+  "storage": {
+    "documentsRoot": "documents",
+    "pathPattern": "documents/{type}/{slug}/DOCUMENT.md",
+    "reviewPathPattern": "documents/{type}/{slug}/REVIEW.md",
+    "assetsPathPattern": "documents/{type}/{slug}/assets/",
+    "forbidRootMarkdownFiles": true,
+    "bodyFilename": "DOCUMENT.md",
+    "reviewFilename": "REVIEW.md"
+  },
+  "quality": {
+    "passScore": 88,
+    "qualityLoopMaxIterations": 5,
+    "userRevisionLoop": "until_approved",
+    "commonChecklistAppliesTo": ["ADR", "HLD", "LLD"]
+  },
+  "documentTypes": {
+    "ADR": {
+      "writer": "adr-writer",
+      "specFile": "skills/doc-writing-team/specs/adr.md",
+      "templateFile": "skills/doc-writing-team/templates/adr.md",
+      "checklistFile": "skills/doc-writing-team/checklists/adr-checklist.md",
+      "requiredSections": ["Context", "Agenda", "Decision", "Next Step"],
+      "optionalSections": [],
+      "appendixAllowed": false,
+      "decisionPolicy": "user_confirmed_or_tbd"
+    },
+    "HLD": {
+      "writer": "hld-writer",
+      "specFile": "skills/doc-writing-team/specs/hld.md",
+      "templateFile": "skills/doc-writing-team/templates/hld.md",
+      "checklistFile": "skills/doc-writing-team/checklists/hld-checklist.md",
+      "requiredSections": [
+        "Glossary", "Overview", "System Context",
+        "High-Level Architecture", "Key Design Decisions",
+        "Non-Functional Requirements"
+      ],
+      "conditionalSections": {
+        "State Transition Model": {
+          "condition": "domain_has_state",
+          "description": "상태가 중요한 도메인에서만 필수. 상태 enum + 전이 조건 + Mermaid stateDiagram 포함."
+        }
+      },
+      "optionalSections": ["Deployment Overview", "Appendix"],
+      "appendixAllowed": true,
+      "specDerivability": {
+        "enabled": true,
+        "checklistIds": ["H-20", "H-21", "H-22"],
+        "derivableSpecs": ["service-definition", "architecture-rules", "policy", "nfr-policy", "state-policy", "infra-config"]
+      }
+    },
+    "LLD": {
+      "writer": "lld-writer",
+      "specFile": "skills/doc-writing-team/specs/lld.md",
+      "templateFile": "skills/doc-writing-team/templates/lld.md",
+      "checklistFile": "skills/doc-writing-team/checklists/lld-checklist.md",
+      "requiredSections": [
+        "Glossary", "Problem Statement", "Functional Requirements",
+        "Non-Functional Requirements", "Goal / Non-Goal", "Proposed Design"
+      ],
+      "requiredSubsections": {
+        "Proposed Design": [
+          "API 설계", "클래스/컴포넌트 설계", "DB 스키마", "설계 판단 근거"
+        ]
+      },
+      "optionalSections": ["Appendix"],
+      "appendixAllowed": true,
+      "specDerivability": {
+        "enabled": true,
+        "checklistIds": ["L-20", "L-21", "L-22", "L-23"],
+        "derivableSpecs": ["use-case", "api-spec", "policy", "test-scenario"]
+      }
+    }
+  },
+  "feedbackSchema": {
+    "requiredFields": [
+      "feedback_id", "timestamp", "document_type", "user_feedback_raw",
+      "classification", "proposed_updates", "immediate_applicable",
+      "lifecycle", "conflicts"
+    ],
+    "optionalFields": [
+      "document_id", "document_path", "session_id",
+      "extracted_preferences", "extracted_aversions",
+      "immediate_apply_reason", "application"
+    ],
+    "classification": {
+      "layers": ["common", "adr", "hld", "lld", "both"],
+      "confidenceLevels": ["high", "medium", "low"]
+    },
+    "proposedUpdateShape": {
+      "requiredFields": ["file", "section", "action", "content"],
+      "optionalFields": ["before", "after", "rationale"],
+      "actionValues": ["add", "modify", "remove"]
+    },
+    "lifecycleStatuses": [
+      "recorded", "classified", "applied", "verified", "rejected", "superseded"
+    ]
+  },
+  "corpus": {
+    "purpose": "style_reference_only",
+    "mustNotOverrideContract": true,
+    "note": "Approved corpus guides tone and examples, but the contract defines structure and policy."
+  }
+}
