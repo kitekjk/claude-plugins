@@ -1,12 +1,16 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "name": "code-from-spec",
 
   "workflows": {
     "full": {
-      "description": "Spec 기반 구현 + 빌드/테스트 + Spec 준수도 검증 + Spec 피드백",
-      "steps": ["implement", "build-verify", "verify-compliance", "feedback"],
-      "agents": ["code-generator", "spec-verifier", "spec-feedback"]
+      "description": "스케줄링 + Spec 기반 구현 + 빌드/테스트 + Spec 준수도 검증 + Spec 피드백",
+      "steps": ["schedule", "implement", "build-verify", "verify-compliance", "feedback"],
+      "agents": ["work-scheduler", "code-generator", "spec-verifier", "spec-feedback"]
+    },
+    "schedule": {
+      "description": "Spec 의존성 분석 → Jira 티켓 생성 → Git worktree 구성 → 실행 계획 수립",
+      "agents": ["work-scheduler"]
     },
     "implement": {
       "description": "Spec 기반 프로젝트 구현 (모호점 로그 포함)",
@@ -121,12 +125,61 @@
     }
   },
 
+  "scheduling": {
+    "description": "Spec 단위 작업 스케줄링 — Jira 티켓, Git worktree, 의존성 기반 실행 순서",
+    "jira": {
+      "ticketPerSpec": true,
+      "project": "{jira_project}",
+      "issueType": "Task",
+      "fields": {
+        "summary": "[Spec] {spec_id}: {spec_title}",
+        "description": "Spec 기반 구현 작업\n\nSpec 파일: {spec_file}\n의존성: {dependencies}",
+        "labels": ["spec-impl", "auto-generated"]
+      },
+      "transitions": {
+        "created": "To Do",
+        "implementing": "In Progress",
+        "verifying": "In Review",
+        "done": "Done"
+      }
+    },
+    "worktree": {
+      "enabled": true,
+      "basePath": "{worktree_base}/",
+      "branchPattern": "{jira_key}-{spec_id_kebab}",
+      "cleanupOnMerge": true
+    },
+    "dependencies": {
+      "source": "Spec 파일의 dependsOn 메타데이터 (spec-from-design이 생성)",
+      "strategy": "topological-sort",
+      "parallelExecution": true,
+      "maxParallel": 3,
+      "fallback": "Spec에 dependsOn이 없으면 모든 Spec을 독립으로 간주"
+    }
+  },
+
+  "tracking": {
+    "description": "Spec 파일에 구현 상태 기록 — Spec을 SSOT로 유지",
+    "section": "## 구현 추적",
+    "fields": {
+      "status": "not-started | in-progress | completed | verified",
+      "jiraTicket": "Jira 티켓 키 (예: PROJ-123)",
+      "branch": "Git 브랜치명",
+      "pr": "Pull Request URL",
+      "commit": "최종 커밋 SHA",
+      "completedAt": "완료 일시"
+    },
+    "location": "각 Spec 파일 최하단",
+    "format": "YAML frontmatter 블록 (```yaml ... ```)"
+  },
+
   "paths": {
     "specDir": "{spec_project}/docs/specs/",
     "implDir": "{target_dir}/",
     "reportDir": "reports/",
     "complianceReport": "reports/compliance-{date}.md",
     "feedbackReport": "reports/feedback-{date}.md",
-    "ambiguityLog": "{impl_dir}/ambiguity-log.md"
+    "ambiguityLog": "{impl_dir}/ambiguity-log.md",
+    "workPlan": "reports/work-plan-{date}.md"
   }
 }

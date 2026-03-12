@@ -51,7 +51,7 @@ README.md를 wiki에 발행해줘
 |---------|------|------|
 | [doc-writing-team](./plugins/doc-writing-team) | v3.1.0 | ADR/HLD/LLD 설계 문서 작성 — 멀티 에이전트 품질 루프, Spec 도출 가능 수준 보장, HLD→LLD 추적성 |
 | [spec-from-design](./plugins/spec-from-design) | v1.0.0 | HLD/LLD → Use Case·API·Policy·Test Spec 도출 — 3 scales, 프리셋 시스템 |
-| [code-from-spec](./plugins/code-from-spec) | v1.1.0 | Spec → 코드 구현 + 준수도 검증 + Spec 피드백 — Agent Teams 구현, 4영역 평가, 모호점→Spec 수정 제안 |
+| [code-from-spec](./plugins/code-from-spec) | v1.2.0 | Spec → 코드 구현 + 준수도 검증 + Spec 피드백 — Jira 티켓 + Git worktree + 의존성 스케줄링, Spec = SSOT |
 | [md-to-confluence](./plugins/md-to-confluence) | v0.1.0 | 임의의 Markdown 파일을 Confluence wiki에 발행 (Mermaid→이미지 포함, 독립 사용 가능) |
 
 ### 워크플로우 연계
@@ -63,7 +63,7 @@ doc-writing-team  →  HLD / LLD 작성
   ↓
 spec-from-design  →  Use Case / API / Policy / Test Spec 도출
   ↓
-code-from-spec         →  Spec → 코드 구현 + 준수도 검증
+code-from-spec         →  Jira + worktree + Spec → 코드 구현 + 준수도 검증
 
 md-to-confluence  →  Confluence wiki 발행 (독립 사용 가능)
 ```
@@ -98,12 +98,12 @@ kitekjk-plugins/
 │   │       └── presets/               # DDD+Clean+Kotlin (확장 가능)
 │   ├── code-from-spec/
 │   │   ├── .claude-plugin/plugin.json
-│   │   ├── agents/                    # 4 agents (orchestrator, generator, verifier, feedback)
+│   │   ├── agents/                    # 5 agents (orchestrator, scheduler, generator, verifier, feedback)
 │   │   └── skills/code-from-spec/
 │   │       ├── contract.json          # 단일 기준
-│   │       ├── specs/                 # 구현 절차, 검증 절차
-│   │       ├── templates/             # 프롬프트, 리포트 템플릿
-│   │       └── checklists/            # 구현, 검증 체크리스트
+│   │       ├── specs/                 # 스케줄링, 구현, 검증, 피드백 절차
+│   │       ├── templates/             # 작업 계획서, 프롬프트, 리포트 템플릿
+│   │       └── checklists/            # 스케줄링, 구현, 검증, 피드백 체크리스트
 │   └── md-to-confluence/
 │       ├── .claude-plugin/plugin.json
 │       ├── skills/md-to-confluence/

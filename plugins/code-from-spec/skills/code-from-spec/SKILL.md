@@ -18,6 +18,7 @@ allowed-tools: Read, Write, Edit, Grep, Glob, Task, Bash
 
 ```text
 impl-orchestrator
+├── work-scheduler     # Spec 의존성 분석 + Jira 티켓 + Git worktree + 실행 계획
 ├── code-generator     # Spec → 코드 구현 (Agent Teams) + 모호점 로그
 ├── spec-verifier      # 구현 → Spec 준수도 검증 + Spec 갭 플래그
 └── spec-feedback      # 모호점 + 갭 → Spec 수정 제안
@@ -25,13 +26,16 @@ impl-orchestrator
 
 ## 워크플로우
 
-### 전체 흐름 (구현 + 검증 + 피드백)
+### 전체 흐름 (스케줄링 + 구현 + 검증 + 피드백)
 
 ```
 Spec
  │
  ▼
-code-generator (Agent Teams 4명 + 모호점 로그)
+work-scheduler (의존성 분석 + Jira 티켓 + worktree 구성)
+ │
+ ▼
+code-generator (Agent Teams 4명 + 모호점 로그) ← worktree별 병렬/순차
  │
  ▼
 빌드 + 테스트 통과
@@ -43,13 +47,14 @@ spec-verifier (4영역 준수도 검증 + Spec 갭 플래그)
 spec-feedback (모호점 + 갭 → Spec 수정 제안)
  │
  ▼
-사용자 승인 → Spec 반영
+사용자 승인 → Spec 반영 + 구현 추적 업데이트
 ```
 
 ### 개별 워크플로우
 
 | 커맨드 | 설명 |
 |--------|------|
+| 스케줄, schedule | Spec 의존성 분석 + Jira 티켓 + worktree 구성 |
 | 구현, implement | Spec 기반 프로젝트 구현 (모호점 로그 포함) |
 | 검증, verify | 기존 구현의 Spec 준수도 검증 |
 | 피드백, feedback | 모호점 + 미준수에서 Spec 수정 제안 |
@@ -75,6 +80,7 @@ spec-feedback (모호점 + 갭 → Spec 수정 제안)
 ## 사용 예시
 
 ```
+"이 Spec들의 작업 계획을 세워줘"            # 스케줄
 "이 Spec으로 프로젝트를 구현해줘"           # 구현
 "구현이 Spec을 잘 따르는지 검증해줘"        # 검증
 "모호한 부분을 피드백해서 Spec을 보강해줘"   # 피드백
@@ -88,3 +94,5 @@ spec-feedback (모호점 + 갭 → Spec 수정 제안)
 - 빌드 실패 시 최대 3회 재시도
 - Spec 수정은 사용자 승인 후 반영
 - 리포트는 `reports/` 디렉토리에 저장
+- Spec은 SSOT — 구현 상태(Jira, PR, commit)를 Spec 파일에 기록
+- 기존 Jira 티켓이 있는 Spec은 중복 생성하지 않음

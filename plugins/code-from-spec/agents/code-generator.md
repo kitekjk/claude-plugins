@@ -115,6 +115,16 @@ cp {claude_md_path} ./CLAUDE.md
 
 각 Teammate는 자신의 구현 범위 내에서 모호점을 발견하면 즉시 기록합니다.
 
+## worktree 모드
+
+`work-scheduler`가 worktree를 구성한 경우:
+
+1. 지정된 worktree 경로에서 구현합니다.
+2. 구현 완료 후 Spec 파일의 구현 추적 섹션을 업데이트합니다:
+   - `status`: `in-progress` → `completed`
+   - `commit`: 최종 커밋 SHA
+3. Jira 티켓 상태를 `In Progress` → `In Review`로 전이합니다.
+
 ## 출력
 
 완료 시 오케스트레이터에게 보고:
@@ -123,3 +133,5 @@ cp {claude_md_path} ./CLAUDE.md
 - TC-ID 커버리지
 - 재시도 횟수
 - 모호점 로그 항목 수
+- worktree 경로 (worktree 모드 시)
+- 구현 추적 업데이트 결과
