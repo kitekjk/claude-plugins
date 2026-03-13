@@ -1,5 +1,5 @@
 {
-  "version": "1.4.0",
+  "version": "1.5.0",
   "plugin": "spec-from-design",
   "description": "HLD/LLD → Spec 변환. Use Case 단위 단일 파일 출력. 대규모 UC는 model/service/usecase로 분해 가능. 코드 없이 흐름/조건/시나리오만 정의.",
   "modes": {
@@ -45,7 +45,7 @@
     "singleFileDescription": "하나의 Spec은 하나의 Markdown 파일로 출력한다. 관련 정책, 모델, 검증 조건, 테스트 시나리오를 모두 동일 파일에 포함한다.",
     "noCode": true,
     "noCodeDescription": "Spec에 구현 코드(Java/Kotlin/TypeScript 등)를 포함하지 않는다. import 문, 메서드 구현체, 클래스 코드, 어노테이션, SQL DDL/DML을 넣지 않는다. 흐름, 조건, 시나리오만 자연어로 기술한다. 코드 생성은 code-from-spec의 역할이다.",
-    "decomposition": "소규모 변경은 usecase 단일 Spec으로 충분하다. 대규모 변경 시 model → service → usecase로 분해하여 선행/후행 관계를 dependsOn으로 기록한다."
+    "decomposition": "Use Case는 application layer use case 단위로 분리한다. 외부 요청(API, Kafka, Temporal Workflow/Activity, RFC 등)이 들어올 때 대응하는 use case 각각이 하나의 Spec이 된다. 동일 use case를 여러 경로가 공유하면 Spec은 하나만 생성한다. 개별 Use Case가 대규모이면 추가로 model → service → usecase로 분해하여 dependsOn으로 기록한다."
   },
   "quality": {
     "inputQuality": {
@@ -86,12 +86,29 @@
   },
   "specTypes": {
     "usecase": {
-      "description": "동작이 바뀌는 모든 변경. Actor가 있는 기능 추가/변경, 외부 연동 추가. 소규모면 이 유형만으로 충분.",
+      "description": "DDD/Hexagonal 아키텍처의 application layer use case 단위. 외부 요청이 들어올 때 이를 처리하는 application layer의 use case 각각이 하나의 Spec이 된다.",
       "specFile": "skills/spec-from-design/specs/usecase.md",
       "templateFile": "skills/spec-from-design/templates/usecase.md",
       "writer": "usecase-api-writer",
       "source": "LLD FR + API 설계 + 클래스 설계",
-      "uniqueSections": ["기본 흐름", "대안 흐름", "비기능 요구사항"]
+      "uniqueSections": ["기본 흐름", "대안 흐름", "비기능 요구사항"],
+      "usecaseIdentification": {
+        "description": "외부에서 시스템으로 요청이 들어오는 모든 경로에는 대응하는 application layer use case가 존재해야 한다. Spec은 이 use case 단위로 생성한다.",
+        "externalRequestSources": [
+          "API Controller (REST/GraphQL 엔드포인트)",
+          "Kafka Consumer (메시지 수신)",
+          "Temporal Workflow Implementation (워크플로우 실행)",
+          "Temporal Activity Implementation (액티비티 실행)",
+          "RFC, Socket 등 외부 통신 모듈",
+          "Scheduler/Cron (스케줄 트리거)"
+        ],
+        "rules": [
+          "외부 요청 경로를 식별하고, 각 경로에 대응하는 application layer use case를 도출한다",
+          "서로 다른 외부 요청이 동일한 use case를 호출하면 Spec은 하나만 생성한다 (예: API와 Kafka가 같은 use case 호출)",
+          "서로 다른 use case는 외부 요청 경로가 같더라도 별도 Spec으로 분리한다",
+          "하나의 LLD에 여러 use case가 포함되면 use case별로 개별 Spec을 생성한다"
+        ]
+      }
     },
     "model": {
       "description": "엔티티/스키마/리포지토리 레이어. 대규모 UC 분해 시 모델 레이어를 선행 개발할 때 사용.",

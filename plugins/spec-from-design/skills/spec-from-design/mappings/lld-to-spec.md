@@ -5,7 +5,7 @@
 | LLD 섹션 | 생성되는 Spec | 담당 | 변환 방식 |
 |----------|-------------|------|----------|
 | Problem Statement | Use Case 개요 | usecase-api-writer | 기술 배경 → 비즈니스 배경 |
-| FR | Use Case 흐름 + 검증 조건 | usecase-api-writer | FR 1개 → Use Case 1개 또는 흐름 |
+| FR | Use Case 흐름 + 검증 조건 | usecase-api-writer | FR을 해당 use case에 배분 후 흐름으로 변환 |
 | FR 검증 기준 | 테스트 Given-When-Then | test-scenario-writer | 검증 기준 → Then 절 |
 | NFR | NFR 정책 수치 보강 | policy-extractor | 목표 + 측정방법 → 정책 상세 |
 | Goal | Use Case 기본 흐름 | usecase-api-writer | 목표 → 시스템 동작 단계 |
@@ -17,6 +17,28 @@
 | 트레이드오프 | 정책 제약 조건 | policy-extractor | 단점 → 알려진 제약 |
 | 미해결 리스크 | 엣지 케이스 테스트 | test-scenario-writer | 리스크 → 네거티브 테스트 |
 | Appendix 시뮬레이션 | Integration 테스트 | test-scenario-writer | 시뮬레이션 → Given-When-Then |
+
+## Use Case 식별 (FR 매핑 전 필수)
+
+FR을 Use Case에 매핑하기 전에, LLD 클래스 설계에서 **application layer use case를 먼저 식별**한다.
+
+### 식별 방법
+
+1. LLD 클래스 설계에서 외부 요청이 들어오는 경로를 모두 나열한다:
+   - API Controller, Kafka Consumer, Temporal Workflow/Activity, RFC/Socket, Scheduler 등
+2. 각 경로에 대응하는 application layer use case를 도출한다
+3. 서로 다른 경로가 동일한 use case를 호출하면 하나로 통합한다
+
+### FR 배분
+
+식별된 use case에 FR을 배분한다. 하나의 FR이 특정 use case의 흐름에 해당하면 해당 use case Spec에 포함한다.
+
+```text
+Use Case 식별 → FR 배분:
+  UC-001 ({UseCase명}) ← FR-01, FR-08
+  UC-002 ({UseCase명}) ← FR-02, FR-03, FR-04, FR-05, FR-06, FR-09
+  UC-003 ({UseCase명}) ← FR-07
+```
 
 ## FR → Use Case 변환 상세
 

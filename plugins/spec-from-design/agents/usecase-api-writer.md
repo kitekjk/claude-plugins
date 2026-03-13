@@ -45,6 +45,40 @@ Spec에 구현 코드를 절대 포함하지 않는다:
 - policy-extractor의 결과를 "관련 정책" 섹션에 참조로 포함합니다.
 - test-scenario-writer의 결과를 "테스트 시나리오" 섹션에 포함합니다.
 
+## Use Case 식별 (최우선)
+
+Spec 작성 전에 LLD에서 **application layer use case를 먼저 식별**한다.
+Hexagonal 아키텍처에서 외부 요청은 반드시 application layer를 경유하며, 각 use case가 하나의 Spec이 된다.
+
+### 식별 절차
+
+1. LLD 클래스 설계에서 **외부 요청이 들어오는 경로**를 모두 나열한다:
+   - API Controller (REST/GraphQL 엔드포인트)
+   - Kafka Consumer (메시지 수신)
+   - Temporal Workflow Implementation (워크플로우 실행)
+   - Temporal Activity Implementation (액티비티 실행)
+   - RFC, Socket 등 외부 통신 모듈
+   - Scheduler/Cron (스케줄 트리거)
+
+2. 각 외부 요청 경로에 대응하는 **application layer use case를 도출**한다.
+
+3. 서로 다른 외부 경로가 **동일한 use case를 호출**하면 하나의 Spec으로 통합한다.
+   예: API Controller와 Kafka Consumer가 모두 `PoCancelReceiveUsecase`를 호출 → Spec 1개
+
+4. 서로 다른 use case는 **각각 별도 Spec**으로 분리한다.
+   예: `PoCancelReceiveUsecase`, `PoCancelWorkflow`, `PoCancelActivity` → Spec 3개
+
+### 식별 결과 보고
+
+Spec 작성 전에 식별된 use case 목록을 정리한다:
+
+```text
+Use Case 식별 결과:
+- UC-001: {UseCase명} ← {외부 요청 경로 1}, {외부 요청 경로 2}
+- UC-002: {UseCase명} ← {외부 요청 경로}
+- UC-003: {UseCase명} ← {외부 요청 경로}
+```
+
 ## 규모별 동작
 
 ### full / lld-only 모드

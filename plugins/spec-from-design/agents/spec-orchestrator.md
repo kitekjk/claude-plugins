@@ -22,23 +22,41 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 1. **단일 파일**: 하나의 Spec = 하나의 Markdown 파일. 용도별로 분리하지 않는다.
 2. **코드 금지**: Spec에 구현 코드를 포함하지 않는다. 자연어로만 기술한다.
 3. **5가지 Spec 유형**: usecase, model, service, refactoring, performance
-4. **소규모는 usecase 하나**: 소규모 변경은 usecase Spec 하나로 충분하다.
-5. **대규모는 분해**: 대규모 UC는 model → service → usecase로 분해하고 dependsOn으로 순서를 기록한다.
+4. **Use Case 식별**: 외부 요청 경로를 분석하여 application layer use case를 도출하고, use case별로 Spec을 생성한다.
+5. **대규모는 분해**: 개별 use case가 대규모이면 model → service → usecase로 분해하고 dependsOn으로 순서를 기록한다.
 
 ## Spec 유형 체계
 
 | 유형 | 기준 | 레이어 |
 |------|------|--------|
-| **usecase** | 동작이 바뀌는 모든 변경 | 흐름/오케스트레이션 |
+| **usecase** | application layer use case 단위 | 흐름/오케스트레이션 |
 | **model** | 엔티티/스키마/리포지토리 변경 | 데이터 레이어 (선행) |
 | **service** | 도메인 로직 변경 | 비즈니스 레이어 (중간) |
 | **refactoring** | 동작 변경 없이 구조 개선 | 전체 |
 | **performance** | 동작 동일, 성능 개선 | 전체 |
 
-### 분해 판단 기준
+### Use Case 식별 (진입점 분석)
 
-- 수정 대상 파일 10개 이하 + FR 5개 이하 → **소규모**: usecase 단일 Spec
-- 수정 대상 파일 10개 초과 또는 FR 5개 초과 → **대규모**: 분해 검토
+LLD에서 **외부 요청이 들어오는 경로를 모두 식별**하고, 각 경로에 대응하는 **application layer use case를 도출**한다.
+
+외부 요청 경로:
+- API Controller (REST/GraphQL 엔드포인트)
+- Kafka Consumer (메시지 수신)
+- Temporal Workflow Implementation (워크플로우 실행)
+- Temporal Activity Implementation (액티비티 실행)
+- RFC, Socket 등 외부 통신 모듈
+- Scheduler/Cron (스케줄 트리거)
+
+**규칙:**
+- 서로 다른 외부 경로가 동일한 use case를 호출하면 Spec은 하나만 생성
+- 서로 다른 use case는 각각 별도 Spec으로 분리
+- 하나의 LLD에서 여러 use case가 도출될 수 있음
+
+### 규모 판단 기준 (Use Case별 적용)
+
+식별된 각 use case에 대해 규모를 판단한다:
+- 해당 use case의 수정 대상 파일 10개 이하 + FR 5개 이하 → **소규모**: usecase 단일 Spec
+- 해당 use case의 수정 대상 파일 10개 초과 또는 FR 5개 초과 → **대규모**: 분해 검토
 - 분해 시: model(엔티티/리포지토리) → service(도메인 로직) → usecase(오케스트레이션)
 
 ## 역할
@@ -110,17 +128,30 @@ Foundation 판단:
 
 **규모와 무관하게** Foundation이 없으면 반드시 생성한다. Foundation은 Spec writer가 프로젝트 컨벤션(네이밍, 레이어, 모델)을 따르기 위한 필수 컨텍스트이다.
 
-## 3단계: Spec 유형 결정 및 에이전트 호출
+## 3단계: Use Case 식별 및 Spec 유형 결정
 
-### 소규모 (분해 불필요)
+### 3-1. Use Case 식별
+
+LLD 클래스 설계에서 외부 요청 경로(API Controller, Kafka Consumer, Temporal Workflow/Activity, RFC/Socket, Scheduler 등)를 모두 식별하고, 각 경로에 대응하는 application layer use case를 도출한다.
+
 ```text
-design-analyzer → policy-extractor → usecase-api-writer (usecase Spec 1개) → spec-reviewer
+Use Case 식별 결과:
+- UC-001: {UseCase명} ← {외부 요청 경로}
+- UC-002: {UseCase명} ← {외부 요청 경로}
+...
 ```
 
-### 대규모 (분해 필요)
+### 3-2. 에이전트 호출
+
+식별된 use case 수와 규모에 따라 워크플로우를 결정한다:
+
 ```text
-design-analyzer → policy-extractor → usecase-api-writer (model + service + usecase Spec N개) → spec-reviewer
+design-analyzer → policy-extractor → usecase-api-writer (식별된 use case별 Spec 생성) → spec-reviewer
 ```
+
+- **단일 use case + 소규모**: usecase Spec 1개
+- **단일 use case + 대규모**: model + service + usecase Spec으로 분해
+- **복수 use case**: use case별로 각각 Spec 생성 (각 use case가 대규모이면 추가 분해)
 
 ### refactoring / performance
 ```text
@@ -138,6 +169,7 @@ LLD 경로: {경로}
 문서 루트: {감지된 docRoot 또는 docs/}
 출력 경로: {감지된 경로 또는 docs/specs/}
 정책 경로: {감지된 경로 또는 docs/policies/}
+식별된 Use Case: {UC-001: UseCase명, UC-002: UseCase명, ...}
 Spec 유형: {usecase|model+service+usecase|refactoring|performance}
 분해 여부: {단일|분해}
 ```

@@ -1,8 +1,41 @@
 # Use Case Spec 정의
 
-동작이 바뀌는 모든 변경에 사용합니다. Actor가 있는 기능 추가/변경, 외부 연동 추가 등.
-소규모 변경이면 이 유형 하나로 충분합니다.
+**DDD/Hexagonal 아키텍처의 application layer use case 단위**입니다.
+외부에서 시스템으로 요청이 들어올 때, 이를 처리하는 application layer의 use case 각각이 하나의 Spec이 됩니다.
 **하나의 Spec은 하나의 파일**로 출력하며, **구현 코드를 포함하지 않습니다**.
+
+## Use Case 식별 기준
+
+Hexagonal 아키텍처에서 외부와 통신하는 레이어(adapter)는 반드시 application layer를 경유합니다.
+application layer에는 use case가 들어 있으며, **외부 요청에 대응하는 use case 각각이 하나의 Spec**입니다.
+
+### 외부 요청 경로 (Port/Adapter)
+
+다음은 외부에서 시스템으로 요청이 들어오는 경로입니다. 각 경로에 대응하는 use case를 식별해야 합니다:
+
+| 외부 요청 경로 | 설명 | 예시 |
+|--------------|------|------|
+| API Controller | REST/GraphQL 엔드포인트로 인입 | PlmPoCancelController |
+| Kafka Consumer | Kafka 토픽 메시지 수신 처리 | PoStatusChangeConsumer |
+| Temporal Workflow | Temporal 런타임이 워크플로우 실행 | PoCancelWorkflowImpl |
+| Temporal Activity | Temporal 런타임이 액티비티 실행 | PoCancelActivityImpl |
+| RFC/Socket | 외부 시스템 통신 모듈 진입 | SapRfcReceiver |
+| Scheduler/Cron | 스케줄러 트리거 진입 | DailyBatchJob |
+
+### 분리 원칙
+
+- 하나의 LLD에 여러 use case가 포함되면 **use case별로 개별 Spec을 생성**합니다
+- 서로 다른 외부 경로(예: API + Kafka)가 **동일한 use case를 호출하면 Spec은 하나만** 생성합니다
+- 서로 다른 use case는 별도 Spec으로 분리합니다
+
+### 예시
+
+PO 취소 처리 LLD에 API Controller, Temporal Workflow, Temporal Activity가 있으면:
+- UC-001: PoCancelReceiveUsecase — 취소 요청 수신 및 워크플로우 시작 (API Controller가 호출)
+- UC-002: PoCancelWorkflow — 취소 프로세스 오케스트레이션 (Temporal 런타임이 실행)
+- UC-003: PoCancelActivity — 취소 처리 개별 액티비티 구현 (Temporal 런타임이 실행)
+
+만약 API와 Kafka Consumer가 모두 PoCancelReceiveUsecase를 호출한다면 UC-001 하나로 통합합니다.
 
 ## 출력 규칙
 
