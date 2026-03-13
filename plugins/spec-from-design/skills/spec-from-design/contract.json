@@ -1,5 +1,5 @@
 {
-  "version": "1.5.1",
+  "version": "1.6.0",
   "plugin": "spec-from-design",
   "description": "HLD/LLD → Spec 변환. Use Case 단위 단일 파일 출력. 대규모 UC는 model/service/usecase로 분해 가능. 코드 없이 흐름/조건/시나리오만 정의.",
   "modes": {
@@ -45,7 +45,7 @@
     "singleFileDescription": "하나의 Spec은 하나의 Markdown 파일로 출력한다. 관련 정책, 모델, 검증 조건, 테스트 시나리오를 모두 동일 파일에 포함한다.",
     "noCode": true,
     "noCodeDescription": "Spec에 구현 코드(Java/Kotlin/TypeScript 등)를 포함하지 않는다. import 문, 메서드 구현체, 클래스 코드, 어노테이션, SQL DDL/DML을 넣지 않는다. 흐름, 조건, 시나리오만 자연어로 기술한다. 코드 생성은 code-from-spec의 역할이다.",
-    "decomposition": "Use Case는 application layer use case 단위로 분리한다. 외부 요청(API, Kafka, Temporal Workflow/Activity, RFC 등)이 들어올 때 대응하는 use case 각각이 하나의 Spec이 된다. 동일 use case를 여러 경로가 공유하면 Spec은 하나만 생성한다. 개별 Use Case가 대규모이면 추가로 model → service → usecase로 분해하여 dependsOn으로 기록한다."
+    "decomposition": "2단계 분류: (1) LLD에서 application layer use case를 식별하고 모두 usecase 유형 Spec으로 생성한다. (2) 개별 use case가 대규모이면 model + service + usecase로 분해한다. model과 service 유형은 이 분해의 산출물로만 존재하며 단독 생성하지 않는다."
   },
   "quality": {
     "inputQuality": {
@@ -84,39 +84,46 @@
     "available": ["ddd-clean-kotlin"],
     "extensible": true
   },
+  "classificationFlow": {
+    "description": "2단계 분류 프로세스. 유형 선택의 혼동을 제거하기 위해, 1단계에서 모든 use case를 usecase 유형으로 생성하고, 2단계에서 대규모 use case만 분해한다.",
+    "phase1": {
+      "name": "Use Case 식별 → 전부 usecase 유형",
+      "description": "LLD에서 외부 진입점을 분석하여 application layer use case를 식별한다. 식별된 모든 use case는 usecase 유형 Spec으로 생성한다.",
+      "externalRequestSources": [
+        "API Controller (REST/GraphQL 엔드포인트)",
+        "Kafka Consumer (메시지 수신)",
+        "Temporal Workflow Implementation (워크플로우 실행)",
+        "Temporal Activity Implementation (액티비티 실행)",
+        "RFC, Socket 등 외부 통신 모듈",
+        "Scheduler/Cron (스케줄 트리거)"
+      ],
+      "rules": [
+        "외부 요청 경로를 식별하고, 각 경로에 대응하는 application layer use case를 도출한다",
+        "서로 다른 외부 요청이 동일한 use case를 호출하면 Spec은 하나만 생성한다",
+        "서로 다른 use case는 별도 Spec으로 분리한다",
+        "식별된 use case는 모두 usecase 유형이다. 이 단계에서 model이나 service 유형을 선택하지 않는다"
+      ]
+    },
+    "phase2": {
+      "name": "규모 판단 → 대규모만 분해",
+      "description": "각 use case의 규모를 판단한다. 대규모이면 model + service + usecase로 분해한다. model과 service는 이 분해의 산출물로만 존재한다.",
+      "sizeThreshold": {
+        "small": "수정 대상 파일 10개 이하 + FR 5개 이하 → usecase 단일 Spec 유지",
+        "large": "수정 대상 파일 10개 초과 또는 FR 5개 초과 → model + service + usecase로 분해"
+      }
+    }
+  },
   "specTypes": {
     "usecase": {
-      "description": "DDD/Hexagonal 아키텍처의 application layer use case 단위. 외부 요청이 들어올 때 이를 처리하는 application layer의 use case 각각이 하나의 Spec이 된다.",
+      "description": "기본 Spec 유형. LLD에서 식별된 모든 use case는 이 유형으로 생성한다. DDD/Hexagonal 아키텍처의 application layer use case 단위.",
       "specFile": "skills/spec-from-design/specs/usecase.md",
       "templateFile": "skills/spec-from-design/templates/usecase.md",
       "writer": "usecase-api-writer",
       "source": "LLD FR + API 설계 + 클래스 설계",
-      "uniqueSections": ["기본 흐름", "대안 흐름", "비기능 요구사항"],
-      "usecaseIdentification": {
-        "description": "외부에서 시스템으로 요청이 들어오는 모든 경로에는 대응하는 application layer use case가 존재해야 한다. Spec은 이 use case 단위로 생성한다.",
-        "externalRequestSources": [
-          "API Controller (REST/GraphQL 엔드포인트)",
-          "Kafka Consumer (메시지 수신)",
-          "Temporal Workflow Implementation (워크플로우 실행)",
-          "Temporal Activity Implementation (액티비티 실행)",
-          "RFC, Socket 등 외부 통신 모듈",
-          "Scheduler/Cron (스케줄 트리거)"
-        ],
-        "rules": [
-          "외부 요청 경로를 식별하고, 각 경로에 대응하는 application layer use case를 도출한다",
-          "서로 다른 외부 요청이 동일한 use case를 호출하면 Spec은 하나만 생성한다 (예: API와 Kafka가 같은 use case 호출)",
-          "서로 다른 use case는 외부 요청 경로가 같더라도 별도 Spec으로 분리한다",
-          "하나의 LLD에 여러 use case가 포함되면 use case별로 개별 Spec을 생성한다"
-        ],
-        "typeDisambiguation": [
-          "수정 대상 클래스가 외부 진입점(API Controller, Kafka Consumer, Temporal Workflow/Activity Implementation, RFC/Socket, Scheduler)이면 반드시 usecase 유형이다. service나 다른 유형으로 분류하지 않는다.",
-          "service 유형은 대규모 use case를 model → service → usecase로 분해할 때만 사용한다. 단독 Spec으로 service 유형을 생성하지 않는다.",
-          "Activity 내부에서 도메인 로직을 수행하더라도, Activity 자체가 외부 진입점이므로 usecase 유형이다."
-        ]
-      }
+      "uniqueSections": ["기본 흐름", "대안 흐름", "비기능 요구사항"]
     },
     "model": {
-      "description": "엔티티/스키마/리포지토리 레이어. 대규모 UC 분해 시 모델 레이어를 선행 개발할 때 사용.",
+      "description": "대규모 use case 분해 산출물 전용. 단독 생성 불가. 분해 시 엔티티/스키마/리포지토리 레이어를 선행 개발할 때 사용.",
       "specFile": "skills/spec-from-design/specs/model.md",
       "templateFile": "skills/spec-from-design/templates/model.md",
       "writer": "usecase-api-writer",
@@ -124,7 +131,7 @@
       "uniqueSections": ["모델 변경 내역", "필드 정의", "관계 정의", "마이그레이션 설명"]
     },
     "service": {
-      "description": "대규모 Use Case 분해 전용. 개별 use case가 대규모일 때 model → service → usecase로 분해하는 경우에만 사용한다. 외부 진입점(API Controller, Kafka Consumer, Temporal Workflow/Activity, Scheduler 등)을 수정하는 Spec은 규모에 관계없이 반드시 usecase 유형이다.",
+      "description": "대규모 use case 분해 산출물 전용. 단독 생성 불가. 분해 시 도메인 로직 레이어를 중간 개발할 때 사용.",
       "specFile": "skills/spec-from-design/specs/service.md",
       "templateFile": "skills/spec-from-design/templates/service.md",
       "writer": "usecase-api-writer",

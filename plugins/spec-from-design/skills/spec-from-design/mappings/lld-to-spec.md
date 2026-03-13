@@ -29,9 +29,10 @@ FR을 Use Case에 매핑하기 전에, LLD 클래스 설계에서 **application 
 2. 각 경로에 대응하는 application layer use case를 도출한다
 3. 서로 다른 경로가 동일한 use case를 호출하면 하나로 통합한다
 
-### 유형 결정
+### 2단계 분류
 
-식별된 use case는 모두 `usecase` 유형이다. 외부 진입점(API Controller, Kafka Consumer, Temporal Workflow/Activity, Scheduler 등)을 수정하는 Spec은 `service`로 분류하지 않는다. `service` 유형은 대규모 use case를 model → service → usecase로 분해할 때만 사용한다.
+1. **1단계 — 전부 usecase 유형**: 식별된 use case는 모두 `usecase` 유형이다. 이 단계에서 model이나 service 유형을 선택하지 않는다.
+2. **2단계 — 대규모만 분해**: 개별 use case가 대규모(파일 10개 초과 또는 FR 5개 초과)이면 model + service + usecase로 분해한다. model과 service는 분해 산출물로만 존재한다.
 
 ### FR 배분
 
