@@ -26,7 +26,7 @@ FR을 Use Case에 매핑하기 전에, LLD 클래스 설계에서 **application 
 
 1. LLD 클래스 설계에서 외부 요청이 들어오는 **구현 클래스를 모두 나열**한다:
    - API Controller, Kafka Consumer, Temporal Workflow/Activity, RFC/Socket, Scheduler 등
-   - **유형이 아니라 구현 클래스 단위**: ActivityImpl이 3개이면 진입점 3개, Controller가 2개이면 진입점 2개
+   - **각 구현 클래스 = 하나의 API**: REST 엔드포인트가 각각 별도 API인 것처럼, 각 ActivityImpl, 각 Consumer도 별도 API이다
 2. 각 구현 클래스에 대응하는 application layer use case를 도출한다
 3. 서로 다른 구현 클래스가 동일한 use case를 호출하면 하나로 통합한다
 

@@ -60,8 +60,8 @@ Hexagonal 아키텍처에서 외부 요청은 반드시 application layer를 경
    - RFC, Socket 등 외부 통신 모듈
    - Scheduler/Cron (스케줄 트리거)
 
-   **중요: 유형이 아니라 구현 클래스 단위로 나열한다.**
-   ActivityImpl이 3개이면 진입점 3개, Controller가 2개이면 진입점 2개.
+   **각 구현 클래스 = 하나의 API**: REST 엔드포인트 각각이 별도 API인 것처럼,
+   각 ActivityImpl, 각 Kafka Consumer, 각 Workflow도 별도 API이다. 유형으로 묶지 않는다.
 
 2. 각 구현 클래스에 대응하는 **application layer use case를 도출**한다.
 
