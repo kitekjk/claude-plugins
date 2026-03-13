@@ -24,10 +24,11 @@ FR을 Use Case에 매핑하기 전에, LLD 클래스 설계에서 **application 
 
 ### 식별 방법
 
-1. LLD 클래스 설계에서 외부 요청이 들어오는 경로를 모두 나열한다:
+1. LLD 클래스 설계에서 외부 요청이 들어오는 **구현 클래스를 모두 나열**한다:
    - API Controller, Kafka Consumer, Temporal Workflow/Activity, RFC/Socket, Scheduler 등
-2. 각 경로에 대응하는 application layer use case를 도출한다
-3. 서로 다른 경로가 동일한 use case를 호출하면 하나로 통합한다
+   - **유형이 아니라 구현 클래스 단위**: ActivityImpl이 3개이면 진입점 3개, Controller가 2개이면 진입점 2개
+2. 각 구현 클래스에 대응하는 application layer use case를 도출한다
+3. 서로 다른 구현 클래스가 동일한 use case를 호출하면 하나로 통합한다
 
 ### 2단계 분류
 

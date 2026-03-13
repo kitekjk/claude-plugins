@@ -52,7 +52,7 @@ Hexagonal 아키텍처에서 외부 요청은 반드시 application layer를 경
 
 ### 식별 절차
 
-1. LLD 클래스 설계에서 **외부 요청이 들어오는 경로**를 모두 나열한다:
+1. LLD 클래스 설계에서 **외부 요청이 들어오는 구현 클래스**를 모두 나열한다:
    - API Controller (REST/GraphQL 엔드포인트)
    - Kafka Consumer (메시지 수신)
    - Temporal Workflow Implementation (워크플로우 실행)
@@ -60,13 +60,16 @@ Hexagonal 아키텍처에서 외부 요청은 반드시 application layer를 경
    - RFC, Socket 등 외부 통신 모듈
    - Scheduler/Cron (스케줄 트리거)
 
-2. 각 외부 요청 경로에 대응하는 **application layer use case를 도출**한다.
+   **중요: 유형이 아니라 구현 클래스 단위로 나열한다.**
+   ActivityImpl이 3개이면 진입점 3개, Controller가 2개이면 진입점 2개.
 
-3. 서로 다른 외부 경로가 **동일한 use case를 호출**하면 하나의 Spec으로 통합한다.
+2. 각 구현 클래스에 대응하는 **application layer use case를 도출**한다.
+
+3. 서로 다른 구현 클래스가 **동일한 use case를 호출**하면 하나의 Spec으로 통합한다.
    예: API Controller와 Kafka Consumer가 모두 `PoCancelReceiveUsecase`를 호출 → Spec 1개
 
 4. 서로 다른 use case는 **각각 별도 Spec**으로 분리한다.
-   예: `PoCancelReceiveUsecase`, `PoCancelWorkflow`, `PoCancelActivity` → Spec 3개
+   예: `SapPoSendActivityImpl`, `RfidProductTagOrderActivityImpl`, `RfidProductAssortInfoActivityImpl` → Spec 3개
 
 ### 식별 결과 보고
 

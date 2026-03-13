@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0",
+  "version": "1.6.1",
   "plugin": "spec-from-design",
   "description": "HLD/LLD → Spec 변환. Use Case 단위 단일 파일 출력. 대규모 UC는 model/service/usecase로 분해 가능. 코드 없이 흐름/조건/시나리오만 정의.",
   "modes": {
@@ -101,7 +101,8 @@
         "외부 요청 경로를 식별하고, 각 경로에 대응하는 application layer use case를 도출한다",
         "서로 다른 외부 요청이 동일한 use case를 호출하면 Spec은 하나만 생성한다",
         "서로 다른 use case는 별도 Spec으로 분리한다",
-        "식별된 use case는 모두 usecase 유형이다. 이 단계에서 model이나 service 유형을 선택하지 않는다"
+        "식별된 use case는 모두 usecase 유형이다. 이 단계에서 model이나 service 유형을 선택하지 않는다",
+        "외부 진입점은 유형이 아니라 구현 클래스 단위로 식별한다. 예: Temporal Activity가 3개(SapPoSendActivityImpl, RfidProductTagOrderActivityImpl, RfidProductAssortInfoActivityImpl)이면 use case도 3개이다. 'Temporal Activity'라는 유형으로 묶어서 1개로 만들지 않는다."
       ]
     },
     "phase2": {
