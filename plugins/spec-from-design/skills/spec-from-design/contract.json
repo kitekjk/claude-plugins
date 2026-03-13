@@ -1,5 +1,5 @@
 {
-  "version": "1.6.2",
+  "version": "1.7.0",
   "plugin": "spec-from-design",
   "description": "HLD/LLD → Spec 변환. Use Case 단위 단일 파일 출력. 대규모 UC는 model/service/usecase로 분해 가능. 코드 없이 흐름/조건/시나리오만 정의.",
   "modes": {
@@ -112,6 +112,15 @@
         "small": "수정 대상 파일 10개 이하 + FR 5개 이하 → usecase 단일 Spec 유지",
         "large": "수정 대상 파일 10개 초과 또는 FR 5개 초과 → model + service + usecase로 분해"
       }
+    },
+    "hardGuardrails": {
+      "description": "프롬프트 기반 soft rule로는 교정되지 않는 유형 오분류를 구조적으로 방지하는 하드 가드레일.",
+      "rules": [
+        "orchestrator가 writer에게 '지정 유형' 파라미터로 유형을 전달한다. writer는 유형을 스스로 판단하지 않는다.",
+        "1단계에서 orchestrator는 반드시 '지정 유형: usecase'로 호출한다. model/service는 2단계 분해 시에만 지정한다.",
+        "writer가 지정 유형과 다른 유형으로 Spec을 생성하면 spec-reviewer가 자동 FAIL 처리한다.",
+        "spec-reviewer는 model/service 유형 Spec이 같은 LLD의 usecase Spec 없이 단독 존재하면 즉시 FAIL 처리한다."
+      ]
     }
   },
   "specTypes": {

@@ -170,6 +170,8 @@ design-analyzer → policy-extractor → usecase-api-writer (해당 유형 Spec)
 
 ## 에이전트 호출 형식
 
+**하드 가드레일: 오케스트레이터가 유형을 지정한다. writer는 유형을 선택하지 않는다.**
+
 ```text
 규모: {full|lld-only|request-only}
 모드: {existing-project|new-project}
@@ -178,9 +180,16 @@ LLD 경로: {경로}
 출력 경로: {감지된 경로 또는 docs/specs/}
 정책 경로: {감지된 경로 또는 docs/policies/}
 식별된 Use Case: {UC-001: UseCase명, UC-002: UseCase명, ...}
-Spec 유형: {usecase|model+service+usecase|refactoring|performance}
+지정 유형: usecase  ← 1단계에서는 반드시 usecase. writer가 변경 불가.
 분해 여부: {단일|분해}
 ```
+
+### 유형 지정 규칙 (하드 가드레일)
+
+- **1단계 호출**: `지정 유형: usecase` — 예외 없음
+- **2단계 분해 호출**: `지정 유형: model`, `지정 유형: service`, `지정 유형: usecase` — 분해 시에만 model/service 허용
+- **writer는 지정된 유형을 그대로 사용**해야 한다. LLD 내용을 보고 유형을 변경하는 것은 금지.
+- writer가 `지정 유형`과 다른 유형으로 Spec을 생성하면 spec-reviewer가 자동 FAIL 처리한다.
 
 ## 4단계: 품질 게이트
 

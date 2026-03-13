@@ -38,9 +38,19 @@ Spec에 구현 코드를 절대 포함하지 않는다:
 - 주 모델: User — id(UserId, UUID), email(Email), password(Password, BCrypt)
 ```
 
+## 유형 지정 규칙 (하드 가드레일)
+
+**유형은 오케스트레이터가 `지정 유형` 파라미터로 전달한다. 이 writer는 유형을 스스로 판단하지 않는다.**
+
+- 오케스트레이터가 `지정 유형: usecase`로 호출하면 → usecase Spec을 작성한다
+- 오케스트레이터가 `지정 유형: model`로 호출하면 → model Spec을 작성한다 (분해 시에만)
+- 오케스트레이터가 `지정 유형: service`로 호출하면 → service Spec을 작성한다 (분해 시에만)
+- **LLD 내용이 "모델 변경", "상태 전이", "도메인 로직" 등을 다루더라도 지정된 유형을 변경하지 않는다**
+- 지정 유형과 다른 유형으로 Spec을 생성하면 spec-reviewer가 자동 FAIL 처리한다
+
 ## 역할
 
-- LLD FR + API 설계 + 클래스 설계에서 Use Case Spec을 단일 파일로 작성합니다.
+- LLD FR + API 설계 + 클래스 설계에서 **오케스트레이터가 지정한 유형의** Spec을 단일 파일로 작성합니다.
 - design-analyzer에서 받은 모델 정의와 상태 전이 맵을 활용합니다.
 - policy-extractor의 결과를 "관련 정책" 섹션에 참조로 포함합니다.
 - test-scenario-writer의 결과를 "테스트 시나리오" 섹션에 포함합니다.

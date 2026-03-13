@@ -22,7 +22,7 @@
       "name": "spec-from-design",
       "source": "./plugins/spec-from-design",
       "description": "HLD/LLD 설계 문서에서 Use Case, API, Policy, Test Spec을 도출. 의존성 메타데이터 포함. 프리셋 시스템.",
-      "version": "1.6.2",
+      "version": "1.7.0",
       "author": {
         "name": "kitekjk"
       },

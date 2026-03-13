@@ -37,6 +37,14 @@ Spec에 구현 코드가 포함되어 있으면 **즉시 FAIL**:
 - type 필드가 5가지 유형(usecase, model, service, refactoring, performance) 중 하나인지 확인
 - 해당 유형의 고유 섹션이 모두 포함되어 있는지 확인
 
+### 3-1. model/service 단독 사용 금지 (하드 가드레일)
+model 또는 service 유형의 Spec이 있으면 다음을 검증한다:
+1. **같은 LLD에서 usecase 유형 Spec이 함께 존재하는가?** — 없으면 **즉시 FAIL**
+2. **해당 model/service Spec이 usecase Spec의 분해 산출물인가?** (dependsOn으로 연결) — 아니면 **즉시 FAIL**
+3. model/service 유형은 대규모 use case를 분해할 때만 생성할 수 있다. 단독 사용은 허용하지 않는다.
+
+수정 지시: `[spec-orchestrator]`에게 해당 Spec을 usecase 유형으로 재분류하도록 요청
+
 ### 4. 참조 정책 존재 검증
 Spec의 "관련 정책" 섹션에서 참조하는 모든 POLICY ID에 대해:
 1. 프로젝트의 정책 디렉토리를 탐색하여 해당 정책 파일이 실제로 존재하는지 확인
@@ -96,6 +104,7 @@ Spec의 "관련 정책" 섹션에서 참조하는 모든 POLICY ID에 대해:
 - 코드 포함 여부: PASS | FAIL
 - 단일 파일 규칙: PASS | FAIL
 - Spec 유형 적합성: PASS | FAIL
+- model/service 단독 사용 금지: PASS | FAIL | N/A(usecase 유형)
 - 참조 정책 존재: PASS | FAIL — {누락 목록}
 - dependsOn 정합성: PASS | FAIL
 
