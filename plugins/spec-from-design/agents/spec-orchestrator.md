@@ -97,6 +97,19 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 - `lld-only`: LLD만 검증
 - `request-only`: 스킵
 
+## 2.5단계: Foundation 문서 판단
+
+Spec 생성 전에 Foundation 문서(service-definition.md, architecture-rules.md, naming-guide.md)의 존재 여부를 확인한다.
+
+```text
+Foundation 판단:
+1. docRoot에 service-definition.md가 존재하는가?
+   → 존재: design-analyzer에게 "Foundation 생성 스킵, 분석만 수행" 지시
+   → 미존재: design-analyzer에게 "Foundation 생성 포함" 지시 (규모 무관)
+```
+
+**규모와 무관하게** Foundation이 없으면 반드시 생성한다. Foundation은 Spec writer가 프로젝트 컨벤션(네이밍, 레이어, 모델)을 따르기 위한 필수 컨텍스트이다.
+
 ## 3단계: Spec 유형 결정 및 에이전트 호출
 
 ### 소규모 (분해 불필요)

@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0",
+  "version": "1.4.0",
   "plugin": "spec-from-design",
   "description": "HLD/LLD → Spec 변환. Use Case 단위 단일 파일 출력. 대규모 UC는 model/service/usecase로 분해 가능. 코드 없이 흐름/조건/시나리오만 정의.",
   "modes": {
@@ -64,12 +64,14 @@
       "perCategoryMinPercent": 50,
       "traceabilityMinScore": 10,
       "evaluationCategories": [
-        {"name": "구조 완결성", "weight": 15},
-        {"name": "모호성", "weight": 20},
+        {"name": "구조 완결성", "weight": 10},
+        {"name": "모호성", "weight": 15},
         {"name": "분기 커버리지", "weight": 20},
-        {"name": "참조 완결성", "weight": 15},
+        {"name": "참조 완결성", "weight": 10},
         {"name": "테스트 도출 가능성", "weight": 15},
-        {"name": "HLD/LLD 추적성", "weight": 15}
+        {"name": "HLD/LLD 추적성", "weight": 10},
+        {"name": "YAGNI", "weight": 10},
+        {"name": "스코프 적정성", "weight": 10}
       ]
     },
     "traceability": {

@@ -50,7 +50,7 @@ README.md를 wiki에 발행해줘
 | 플러그인 | 버전 | 설명 |
 |---------|------|------|
 | [doc-writing-team](./plugins/doc-writing-team) | v3.1.0 | ADR/HLD/LLD 설계 문서 작성 — 멀티 에이전트 품질 루프, Spec 도출 가능 수준 보장, HLD→LLD 추적성 |
-| [spec-from-design](./plugins/spec-from-design) | v1.3.0 | HLD/LLD → Use Case·Model·Service·Policy Spec 도출 — 의존성 메타데이터, 5 Spec 유형, 프리셋 시스템 |
+| [spec-from-design](./plugins/spec-from-design) | v1.4.0 | HLD/LLD → Use Case·Model·Service·Policy Spec 도출 — 의존성 메타데이터, 5 Spec 유형, YAGNI·스코프 품질 게이트, 프리셋 시스템 |
 | [code-from-spec](./plugins/code-from-spec) | v1.3.0 | Spec → 코드 구현 + 준수도 검증 + Spec 피드백 — Jira 티켓 + Git worktree + 의존성 스케줄링, Spec = SSOT |
 | [md-to-confluence](./plugins/md-to-confluence) | v0.1.0 | 임의의 Markdown 파일을 Confluence wiki에 발행 (Mermaid→이미지 포함, 독립 사용 가능) |
 

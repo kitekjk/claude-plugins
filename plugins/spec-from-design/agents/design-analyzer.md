@@ -30,8 +30,8 @@ model: opus
 
 ### lld-only 모드
 - LLD만 정독
-- 기존 service-definition.md가 있으면 업데이트만 수행
-- architecture-rules.md, naming-guide.md는 기존 것이 있으면 유지
+- Foundation 문서가 이미 존재하면 생성 스킵 (orchestrator가 "Foundation 생성 스킵" 지시)
+- Foundation 문서가 없으면 LLD + 코드 분석으로 생성 (orchestrator가 "Foundation 생성 포함" 지시)
 
 ### request-only 모드
 - 이 에이전트는 호출되지 않음
