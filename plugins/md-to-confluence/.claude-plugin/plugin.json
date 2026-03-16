@@ -4,5 +4,8 @@
   "description": "Markdown 설계문서를 Confluence wiki에 발행. Storage Format 변환, Macro Pack Mermaid, 제로 의존성.",
   "author": {
     "name": "kitekjk"
-  }
+  },
+  "license": "MIT",
+  "keywords": ["markdown", "confluence", "wiki", "mermaid", "hld", "lld", "documentation", "korean"],
+  "skills": "./skills/"
 }

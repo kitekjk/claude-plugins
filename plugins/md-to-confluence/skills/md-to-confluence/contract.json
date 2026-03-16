@@ -1,0 +1,55 @@
+{
+  "version": "0.2.0",
+  "name": "md-to-confluence",
+
+  "principle": "원본은 항상 Markdown이다. Confluence는 공유 뷰일 뿐이다.",
+
+  "requirements": {
+    "python": "3.9+",
+    "confluenceMacro": "Macro Pack 앱 설치 필요 (Mermaid 렌더링용)",
+    "auth": "~/.claude.json의 Confluence MCP 서버 설정에서 자동 읽기"
+  },
+
+  "script": {
+    "path": "scripts/md2confluence.py",
+    "dependencies": "외부 패키지 없음 (Python 표준 라이브러리만 사용)"
+  },
+
+  "conversion": {
+    "supported": [
+      "H1~H6 헤딩",
+      "bold / italic / code / strikethrough",
+      "링크",
+      "테이블",
+      "코드 블록 (ac:structured-macro ac:name=code)",
+      "Mermaid 블록 (ac:structured-macro ac:name=macro-pack)",
+      "GFM callout ([!NOTE] 등 → info/warning/tip/note 매크로)",
+      "task list (- [x])",
+      "이미지 (attachment/external)",
+      "blockquote",
+      "ul/ol 목록",
+      "수평선"
+    ],
+    "mermaidStrategy": "Macro Pack 매크로로 변환 (서버 렌더링, mmdc CLI 불필요)"
+  },
+
+  "workflows": {
+    "create": "새 페이지 생성 — space-id + parent-id 필요",
+    "update": "기존 페이지 업데이트 — page-id 필요",
+    "convertOnly": "변환만 (업로드 없음) — output 파일 경로 지정"
+  },
+
+  "auth": {
+    "source": "~/.claude.json",
+    "fields": [
+      "mcpServers.confluence.env.ATLASSIAN_SITE_NAME",
+      "mcpServers.confluence.env.ATLASSIAN_USER_EMAIL",
+      "mcpServers.confluence.env.ATLASSIAN_API_TOKEN"
+    ]
+  },
+
+  "limits": {
+    "largeDoc": "100KB+ 문서는 MCP 도구 대신 스크립트 사용",
+    "storageFormat": "ADF 대비 3-5배 작아 대용량 문서에 적합"
+  }
+}

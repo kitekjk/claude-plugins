@@ -87,7 +87,28 @@ git branch {jira_key}-{spec_id_kebab} main
 git worktree add {worktree_base}/{jira_key}-{spec_id_kebab} {jira_key}-{spec_id_kebab}
 ```
 
-## Phase 6: 구현 추적 섹션 초기화
+## Phase 6: 실행 모드 결정
+
+`contract.json`의 `execution.default` 또는 사용자 요청에서 실행 모드를 결정합니다.
+
+| 판별 | 모드 |
+|------|------|
+| 사용자 요청에 '리뷰 포함', 'review-gate', '리뷰 게이트' 포함 | `review-gate` |
+| 사용자 요청에 '자동', 'auto', '전자동' 포함 | `auto` |
+| 명시 없음 | `contract.json`의 `execution.default` |
+
+**review-gate 모드 추가 분석:**
+
+Level별로 `shared_files` 겹침 맵을 생성합니다.
+
+```text
+Level N의 Spec A의 shared_files ∩ Level N+1의 Spec B의 shared_files → 겹침 여부
+```
+
+- 겹침이 없는 Level N+1 Spec → `lookahead` 대상으로 표시
+- 겹침이 있는 Level N+1 Spec → 리뷰 완료 후 구현
+
+## Phase 7: 구현 추적 섹션 초기화
 
 각 Spec 파일 하단에 구현 추적 섹션을 추가합니다:
 
@@ -101,27 +122,52 @@ branch: PROJ-123-plm-pocancel-001
 pr: ""
 commit: ""
 completedAt: ""
+reviewedAt: ""
 `` `
 ```
 
 - 이미 구현 추적 섹션이 존재하면 누락 필드만 추가합니다.
 - 기존 값은 덮어쓰지 않습니다.
 
-## Phase 7: 작업 계획서 출력
+## Phase 8: 작업 계획서 출력
 
 `reports/work-plan-{date}.md` 파일에 전체 계획을 기록합니다.
 
 포함 내용:
+- 실행 모드 (auto / review-gate)
 - Spec 목록 + 실행 Level
 - 의존성 그래프 (Mermaid)
 - Jira 티켓 매핑 테이블
 - worktree 경로 매핑 테이블
 - 예상 실행 순서
+- (review-gate 모드) 리뷰 체크포인트 목록 + lookahead 대상 Spec 표시
+
+**review-gate 모드 작업 계획서 추가 섹션:**
+
+```markdown
+## 리뷰 체크포인트
+
+| 체크포인트 | Level | 리뷰 대상 Spec | Lookahead 가능 Spec |
+|-----------|-------|--------------|-------------------|
+| CP-0 | Level 0 완료 후 | {spec_list} | {lookahead_list} |
+| CP-1 | Level 1 완료 후 | {spec_list} | {lookahead_list} |
+...
+```
 
 ## 후속 동작
 
 스케줄링 완료 후:
+
+**auto 모드:**
 - `implement` 워크플로우가 실행 Level 순서대로 각 worktree에서 구현을 시작합니다.
-- 각 Spec 구현 완료 시 구현 추적 섹션의 `status`를 `completed`로 업데이트합니다.
+
+**review-gate 모드:**
+- Level 0 구현 시작
+- Level 0 완료 → `review-pending` 상태 + Jira `In Review` + 리뷰 요청 메시지 출력 + 대기
+- 사용자 승인 → `review-approved` 상태 + Level 1 진행
+- 반복
+
+**공통:**
+- Spec 구현 완료 시 구현 추적 섹션의 `status`를 `completed`로 업데이트합니다.
 - `verify` 워크플로우 완료 시 `verified`로 업데이트합니다.
 - PR 생성 시 `pr` 필드를 업데이트합니다.

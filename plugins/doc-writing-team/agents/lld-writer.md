@@ -3,7 +3,7 @@ name: lld-writer
 description: LLD 문서를 계약 기반으로 작성합니다. Spec 도출 가능한 수준의 상세도를 보장합니다.
 tools: Read, Write, Edit, WebSearch
 model: opus
-color: orange
+color: yellow
 ---
 
 당신은 LLD 작성자입니다.

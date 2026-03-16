@@ -32,8 +32,8 @@
     {
       "name": "code-from-spec",
       "source": "./plugins/code-from-spec",
-      "description": "Spec 기반 코드 구현, 준수도 검증, Spec 피드백. Jira + worktree + 의존성 스케줄링. Spec = SSOT.",
-      "version": "1.3.0",
+      "description": "Spec 기반 코드 구현, 준수도 검증, Spec 피드백. Jira + worktree + 의존성 스케줄링. auto/review-gate 실행 모드. Spec = SSOT.",
+      "version": "1.4.0",
       "author": {
         "name": "kitekjk"
       },
@@ -43,7 +43,7 @@
     {
       "name": "md-to-confluence",
       "source": "./plugins/md-to-confluence",
-      "description": "Markdown 설계문서(HLD, LLD)를 Confluence wiki에 발행. Mermaid 다이어그램을 이미지로 변환하여 포함.",
+      "description": "Markdown 설계문서(HLD, LLD)를 Confluence wiki에 발행. Mermaid를 Macro Pack 매크로로 변환. 제로 의존성 Python 스크립트.",
       "version": "0.2.0",
       "author": {
         "name": "kitekjk"

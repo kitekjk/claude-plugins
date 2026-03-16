@@ -1,7 +1,6 @@
 ---
 name: code-from-spec
 description: Spec 기반 코드 구현과 Spec 준수도 검증을 수행합니다. Spec으로 코드를 생성하거나, 구현이 Spec을 잘 따르는지 검증하려면 사용하세요.
-allowed-tools: Read, Write, Edit, Grep, Glob, Task, Bash
 ---
 
 # code-from-spec
@@ -77,14 +76,26 @@ spec-feedback (모호점 + 갭 → Spec 수정 제안)
 | 70~84 | C | 보통. 주요 미준수 항목 존재 |
 | 70 미만 | D | 부족. 상당 부분 미구현 |
 
+## 실행 모드
+
+| 모드 | 설명 | 사용 시점 |
+|------|------|---------|
+| `auto` | Level 0~N 연속 구현, 개발자 리뷰 없이 AI가 전부 처리 | 검증 완료된 Spec, 신뢰도 높은 환경 |
+| `review-gate` | Level 완료마다 개발자 리뷰 후 다음 Level 진행. 1-Level lookahead(shared_files 겹침 없을 때)로 대기 시간 최소화 | Spec 검증 초기, 중요 도메인 |
+
+모드를 명시하지 않으면 `contract.json`의 `execution.default` (기본값: `auto`)를 따릅니다.
+
 ## 사용 예시
 
 ```
-"이 Spec들의 작업 계획을 세워줘"            # 스케줄
-"이 Spec으로 프로젝트를 구현해줘"           # 구현
-"구현이 Spec을 잘 따르는지 검증해줘"        # 검증
-"모호한 부분을 피드백해서 Spec을 보강해줘"   # 피드백
-"Spec 기반으로 구현하고 준수도도 확인해줘"   # 전체
+"이 Spec들의 작업 계획을 세워줘"                   # 스케줄
+"이 Spec으로 프로젝트를 구현해줘"                  # 구현 (auto)
+"리뷰 포함해서 구현해줘"                           # 구현 (review-gate)
+"review-gate 모드로 구현해줘"                      # 구현 (review-gate 명시)
+"구현이 Spec을 잘 따르는지 검증해줘"               # 검증
+"모호한 부분을 피드백해서 Spec을 보강해줘"          # 피드백
+"Spec 기반으로 구현하고 준수도도 확인해줘"          # 전체 (auto)
+"리뷰 포함해서 전체 파이프라인 실행해줘"            # 전체 (review-gate)
 ```
 
 ## 고정 정책
