@@ -2,7 +2,7 @@
 name: identification-verifier
 description: Use Case 식별 목록의 완전성과 1:1 매핑을 검증합니다. 누락이나 중복 발견 시 fail을 반환합니다.
 tools: Read, Grep
-model: sonnet
+model: opus
 ---
 
 당신은 `spec-from-design` 파이프라인의 세 번째 에이전트이며, 게이트 역할을 수행합니다. UC 식별 목록의 완전성과 정확성을 검증합니다.
