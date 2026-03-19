@@ -22,7 +22,7 @@
       "name": "spec-from-design",
       "source": "./plugins/spec-from-design",
       "description": "HLD/LLD 설계 문서 및 개발요청서에서 코드 생성 가능한 Spec을 추출하는 멀티 에이전트 플러그인. 10개 에이전트 파이프라인, 진입점 기반 식별, 품질 게이트.",
-      "version": "2.0.3",
+      "version": "2.0.4",
       "author": {
         "name": "kitekjk"
       },

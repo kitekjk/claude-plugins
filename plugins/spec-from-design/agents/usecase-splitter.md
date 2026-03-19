@@ -39,16 +39,16 @@ scope-evaluator가 `split-needed`로 판정한 대규모 Use Case Spec을 model/
 ### model Spec
 
 - 원본 usecase에서 엔티티/스키마 관련 내용을 추출합니다.
-- `templates/model.md` 템플릿에 따라 작성합니다.
-- `specs/model.md` 유형 정의를 준수합니다.
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/templates/model.md` 템플릿에 따라 작성합니다.
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/specs/model.md` 유형 정의를 준수합니다.
 - 필수 섹션: 기본 정보, 개요, 모델 변경사항, 필드 정의, 관계, 마이그레이션
 - 기본 정보에 **부모 usecase** 필드를 반드시 포함합니다.
 
 ### service Spec
 
 - 원본 usecase에서 서비스 레이어 로직을 추출합니다.
-- `templates/service.md` 템플릿에 따라 작성합니다.
-- `specs/service.md` 유형 정의를 준수합니다.
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/templates/service.md` 템플릿에 따라 작성합니다.
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/specs/service.md` 유형 정의를 준수합니다.
 - 필수 섹션: 기본 정보, 개요, 서비스 책임, 메서드, 입출력, 에러 처리
 - 기본 정보에 **부모 usecase** 필드를 반드시 포함합니다.
 
@@ -63,10 +63,10 @@ scope-evaluator가 `split-needed`로 판정한 대규모 Use Case Spec을 model/
 ## 읽기 범위
 
 - split-needed로 판정된 Spec 파일들
-- `specs/model.md` — model 유형 정의
-- `specs/service.md` — service 유형 정의
-- `templates/model.md` — model 출력 템플릿
-- `templates/service.md` — service 출력 템플릿
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/specs/model.md` — model 유형 정의
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/specs/service.md` — service 유형 정의
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/templates/model.md` — model 출력 템플릿
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/templates/service.md` — service 출력 템플릿
 - 파싱된 설계 정보 (LLD 클래스/컴포넌트 설계, DB 스키마)
 
 ## 출력 경로
@@ -78,8 +78,8 @@ scope-evaluator가 `split-needed`로 판정한 대규모 Use Case Spec을 model/
 1. orchestrator로부터 split-needed Spec 목록을 받습니다.
 2. 각 split-needed Spec에 대해:
    a. Spec 내용을 분석하여 model 영역과 service 영역을 식별합니다.
-   b. model Spec을 생성합니다 (templates/model.md 참조).
-   c. service Spec을 생성합니다 (templates/service.md 참조).
+   b. model Spec을 생성합니다 (`${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/templates/model.md` 참조).
+   c. service Spec을 생성합니다 (`${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/templates/service.md` 참조).
    d. 원본 usecase Spec을 축소하여 model/service 참조로 대체합니다.
 3. 분해 결과를 orchestrator에 보고합니다.
 

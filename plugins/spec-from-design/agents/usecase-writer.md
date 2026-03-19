@@ -97,9 +97,9 @@ SPEC-{PREFIX}-{DOMAIN}-{number}-{name}.md
 
 | 유형 | 템플릿 | 유형 정의 |
 |------|-------|---------|
-| usecase | `templates/usecase.md` | `specs/usecase.md` |
-| refactoring | `templates/refactoring.md` | `specs/refactoring.md` |
-| performance | `templates/performance.md` | `specs/performance.md` |
+| usecase | `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/templates/usecase.md` | `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/specs/usecase.md` |
+| refactoring | `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/templates/refactoring.md` | `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/specs/refactoring.md` |
+| performance | `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/templates/performance.md` | `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/specs/performance.md` |
 
 > model/service 유형은 writer가 직접 생성하지 않습니다. usecase-splitter만 생성합니다.
 

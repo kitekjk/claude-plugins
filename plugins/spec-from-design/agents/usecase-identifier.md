@@ -9,7 +9,7 @@ model: opus
 
 ## 최우선 기준
 
-`skills/spec-from-design/contract.json`의 `identificationRules`가 단일 기준입니다.
+`${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/contract.json`의 `identificationRules`가 단일 기준입니다.
 
 ## 역할
 

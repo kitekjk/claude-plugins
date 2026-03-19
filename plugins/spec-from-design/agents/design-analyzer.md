@@ -9,7 +9,7 @@ model: opus
 
 ## 최우선 기준
 
-`skills/spec-from-design/contract.json`이 단일 기준입니다.
+`${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/contract.json`이 단일 기준입니다.
 
 ## 역할
 
@@ -50,7 +50,7 @@ model: opus
 
 ## 2. input-quality 체크리스트
 
-파싱 전 `skills/spec-from-design/checklists/input-quality.md`를 적용합니다.
+파싱 전 `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/checklists/input-quality.md`를 적용합니다.
 
 - 필수 항목이 누락된 경우 orchestrator에 보고합니다.
 - `blockOnMissing` 항목은 파이프라인을 중단합니다.
@@ -58,7 +58,7 @@ model: opus
 
 ## 3. Foundation 문서 생성
 
-`skills/spec-from-design/templates/`의 3개 Foundation 템플릿을 참조하여 생성합니다.
+`${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/templates/`의 3개 Foundation 템플릿을 참조하여 생성합니다.
 
 ### service-definition.md
 
@@ -94,7 +94,7 @@ model: opus
 ### new-project 모드
 
 preset을 사용합니다:
-- 기본 preset: `skills/spec-from-design/presets/ddd-clean-kotlin.md`
+- 기본 preset: `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/presets/ddd-clean-kotlin.md`
 - preset에서 기술 스택, 레이어 구조, 네이밍 규칙을 가져옴
 - customEntryPoints가 있으면 contract.json에 반영
 

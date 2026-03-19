@@ -9,7 +9,7 @@ model: opus
 
 ## 최우선 기준
 
-`skills/spec-from-design/contract.json`이 단일 기준입니다.
+`${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/contract.json`이 단일 기준입니다.
 
 ## 역할
 
@@ -22,7 +22,7 @@ model: opus
 
 ### 1-1. identification-completeness 체크리스트
 
-`skills/spec-from-design/checklists/identification-completeness.md`를 적용합니다.
+`${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/checklists/identification-completeness.md`를 적용합니다.
 
 검증 내용:
 - LLD의 **모든 진입점 구현 클래스**가 UC 식별 목록에 포함되었는지 확인
@@ -33,7 +33,7 @@ model: opus
 
 ### 1-2. one-to-one-mapping 체크리스트
 
-`skills/spec-from-design/checklists/one-to-one-mapping.md`를 적용합니다.
+`${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/checklists/one-to-one-mapping.md`를 적용합니다.
 
 검증 내용:
 - 하나의 구현 클래스가 정확히 하나의 UC에 매핑되었는지 확인

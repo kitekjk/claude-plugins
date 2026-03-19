@@ -9,7 +9,7 @@ model: sonnet
 
 ## 최우선 기준
 
-모든 규칙은 `skills/spec-from-design/contract.json`을 단일 기준으로 따릅니다. 다른 파일과 충돌 시 contract.json이 우선합니다.
+모든 규칙은 `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/contract.json`을 단일 기준으로 따릅니다. 다른 파일과 충돌 시 contract.json이 우선합니다.
 
 ## 역할
 
@@ -92,7 +92,7 @@ LLD FR 검증 기준을 다음 3가지 유형으로 변환합니다:
 
 ## 6. 추적성 확보
 
-`skills/spec-from-design/checklists/traceability.md`의 다음 항목을 참조합니다:
+`${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/checklists/traceability.md`의 다음 항목을 참조합니다:
 
 - **FR 검증 기준 → 테스트 시나리오**: LLD의 각 FR 검증 기준이 최소 1개의 테스트 시나리오로 변환되었는지 확인
 - **미해결 리스크 → 엣지 케이스 테스트**: LLD에 명시된 미해결 리스크가 edge-case 시나리오로 도출되었는지 확인
@@ -137,6 +137,6 @@ LLD FR 검증 기준을 다음 3가지 유형으로 변환합니다:
 
 ## 9. 참조 파일
 
-- `skills/spec-from-design/contract.json` — 단일 기준
-- `skills/spec-from-design/checklists/traceability.md` — 추적성 검증
-- `skills/spec-from-design/checklists/output-quality.md` — Q5 테스트 도출 가능성 기준
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/contract.json` — 단일 기준
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/checklists/traceability.md` — 추적성 검증
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/checklists/output-quality.md` — Q5 테스트 도출 가능성 기준

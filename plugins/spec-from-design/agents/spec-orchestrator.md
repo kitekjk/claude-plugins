@@ -8,7 +8,7 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 
 ## 최우선 기준
 
-모든 규칙은 `skills/spec-from-design/contract.json`을 단일 기준으로 따릅니다. 다른 파일과 충돌 시 contract.json이 우선합니다.
+모든 규칙은 `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/contract.json`을 단일 기준으로 따릅니다. 다른 파일과 충돌 시 contract.json이 우선합니다.
 
 ## 역할
 
@@ -112,10 +112,10 @@ writer 호출 시 반드시 다음을 전달합니다:
 ## 7. 참조 파일
 
 파이프라인 전반에서 참조하는 파일:
-- `skills/spec-from-design/contract.json` — 단일 기준
-- `skills/spec-from-design/CLAUDE.md` — 내부 규칙
-- `skills/spec-from-design/specs/` — Spec 유형 정의
-- `skills/spec-from-design/templates/` — 출력 템플릿
-- `skills/spec-from-design/checklists/` — 평가 체크리스트
-- `skills/spec-from-design/mappings/` — HLD/LLD → Spec 매핑 규칙
-- `skills/spec-from-design/presets/` — 프로젝트 preset
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/contract.json` — 단일 기준
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/CLAUDE.md` — 내부 규칙
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/specs/` — Spec 유형 정의
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/templates/` — 출력 템플릿
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/checklists/` — 평가 체크리스트
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/mappings/` — HLD/LLD → Spec 매핑 규칙
+- `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/presets/` — 프로젝트 preset
