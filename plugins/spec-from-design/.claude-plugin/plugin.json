@@ -1,20 +1,18 @@
 {
   "name": "spec-from-design",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "HLD/LLD 설계 문서 및 개발요청서에서 코드 생성 가능한 Spec을 추출하는 멀티 에이전트 플러그인",
   "agents": [
-    { "name": "spec-orchestrator", "path": "./agents/spec-orchestrator.md" },
-    { "name": "design-analyzer", "path": "./agents/design-analyzer.md" },
-    { "name": "usecase-identifier", "path": "./agents/usecase-identifier.md" },
-    { "name": "identification-verifier", "path": "./agents/identification-verifier.md" },
-    { "name": "policy-extractor", "path": "./agents/policy-extractor.md" },
-    { "name": "usecase-writer", "path": "./agents/usecase-writer.md" },
-    { "name": "scope-evaluator", "path": "./agents/scope-evaluator.md" },
-    { "name": "usecase-splitter", "path": "./agents/usecase-splitter.md" },
-    { "name": "test-scenario-writer", "path": "./agents/test-scenario-writer.md" },
-    { "name": "spec-reviewer", "path": "./agents/spec-reviewer.md" }
+    "./agents/spec-orchestrator.md",
+    "./agents/design-analyzer.md",
+    "./agents/usecase-identifier.md",
+    "./agents/identification-verifier.md",
+    "./agents/policy-extractor.md",
+    "./agents/usecase-writer.md",
+    "./agents/scope-evaluator.md",
+    "./agents/usecase-splitter.md",
+    "./agents/test-scenario-writer.md",
+    "./agents/spec-reviewer.md"
   ],
-  "skills": [
-    { "name": "spec-from-design", "path": "./skills/spec-from-design" }
-  ]
+  "skills": "./skills/"
 }
