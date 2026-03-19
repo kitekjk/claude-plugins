@@ -1,5 +1,5 @@
 {
-  "version": "2.0.1",
+  "version": "2.0.2",
   "modes": {
     "existing-project": "코드에서 아키텍처 추출 (build files, package structure, naming conventions)",
     "new-project": "preset 사용 (기본: ddd-clean-kotlin)"

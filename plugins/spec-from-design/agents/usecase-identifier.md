@@ -95,3 +95,34 @@ UC 식별 목록을 테이블로 산출합니다:
 - **여러 클래스를 하나로 묶지 않습니다**: 유사한 기능이라도 개별 구현 클래스마다 별도 UC로 식별합니다.
 - **LLD 내용에 의한 유형 변경 금지**: 클래스가 모델 변경을 포함하더라도 유형은 `usecase`입니다.
 - **verifier 피드백 수용**: identification-verifier에서 fail이 반환된 경우, 피드백(누락·중복·사유 불명확)을 반영하여 목록을 수정합니다.
+
+## 5. 병합 금지 안티패턴
+
+LLD에서 복수의 구현 클래스가 동일한 섹션이나 테이블에 함께 기술되더라도, 각 클래스는 반드시 별도의 UC로 식별합니다.
+
+### 5.1 Temporal Workflow + Activity 분리 (필수)
+
+WorkflowImpl과 ActivityImpl은 서로 다른 진입점 유형입니다. 동일한 기능을 구성하더라도 반드시 별도 UC로 식별합니다.
+
+| 잘못된 예 (병합) | 올바른 예 (분리) |
+|----------------|----------------|
+| UC-01: PoStaleStateDetectionWorkflowImpl + PoStaleStateDetectionActivityImpl | UC-01: PoStaleStateDetectionWorkflowImpl |
+| | UC-02: PoStaleStateDetectionActivityImpl |
+
+### 5.2 동일 섹션 내 복수 ActivityImpl 분리 (필수)
+
+LLD가 하나의 섹션에서 여러 ActivityImpl을 함께 설명하는 경우, "기능적 공통점"으로 묶지 않고 각 ActivityImpl을 별도 UC로 식별합니다.
+
+| 잘못된 예 (병합) | 올바른 예 (분리) |
+|----------------|----------------|
+| UC-01: "Activity 상태 전이" (SapPoSendActivityImpl + RfidProductTagOrderActivityImpl + RfidProductAssortInfoActivityImpl) | UC-01: SapPoSendActivityImpl |
+| | UC-02: RfidProductTagOrderActivityImpl |
+| | UC-03: RfidProductAssortInfoActivityImpl |
+
+### 5.3 병합 판단 금지 기준
+
+다음 이유로 복수 클래스를 하나의 UC에 묶으면 안 됩니다:
+- ❌ "동일한 패턴을 따르므로"
+- ❌ "같은 LLD 섹션에 기술되어 있으므로"
+- ❌ "같은 도메인 개념을 다루므로"
+- ❌ "서로 의존 관계가 있으므로"

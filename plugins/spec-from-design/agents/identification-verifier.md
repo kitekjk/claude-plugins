@@ -39,6 +39,8 @@ model: sonnet
 - 하나의 구현 클래스가 정확히 하나의 UC에 매핑되었는지 확인
 - **중복 매핑 탐지**: 하나의 클래스가 여러 UC에 매핑된 경우
 - **병합 매핑 탐지**: 여러 클래스가 하나의 UC로 묶인 경우
+- **Temporal 분리 탐지**: WorkflowImpl과 ActivityImpl이 동일 UC에 묶인 경우
+- **ActivityImpl 병합 탐지**: 서로 다른 ActivityImpl이 동일 UC에 묶인 경우
 
 ## 2. 판정
 
@@ -54,6 +56,8 @@ model: sonnet
 - 진입점 구현 클래스가 UC 목록에서 누락
 - 중복 매핑 존재 (1 클래스 → N UC)
 - 병합 매핑 존재 (N 클래스 → 1 UC)
+- Temporal 병합 존재 (WorkflowImpl + ActivityImpl이 동일 UC)
+- ActivityImpl 병합 존재 (서로 다른 ActivityImpl이 동일 UC)
 - 제외 사유가 불명확하거나 부적절
 
 ## 3. fail 시 피드백 형식
@@ -77,6 +81,11 @@ fail 판정 시 다음 형식으로 피드백을 제공합니다:
 | # | UC 항목 | 병합된 클래스 목록 |
 |---|--------|-----------------|
 | 1 | {UC명} | {Class-1, Class-2, ...} |
+
+### Temporal 병합 매핑
+| # | UC 항목 | 병합된 클래스 목록 | 위반 유형 |
+|---|--------|-----------------|----------|
+| 1 | {UC명} | {WorkflowImpl, ActivityImpl} | Workflow+Activity 병합 |
 
 ### 제외 사유 불명확
 | # | 클래스명 | 현재 사유 | 문제 |
