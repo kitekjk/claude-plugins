@@ -1,0 +1,65 @@
+{
+  "version": "2.0.0",
+  "modes": {
+    "existing-project": "코드에서 아키텍처 추출 (build files, package structure, naming conventions)",
+    "new-project": "preset 사용 (기본: ddd-clean-kotlin)"
+  },
+  "pipeline": [
+    "design-analyzer",
+    "usecase-identifier",
+    "identification-verifier",
+    "policy-extractor",
+    "usecase-writer",
+    "scope-evaluator",
+    "usecase-splitter",
+    "test-scenario-writer",
+    "spec-reviewer"
+  ],
+  "classificationFlow": {
+    "phase1": "모든 진입점 → usecase 유형",
+    "phase2": "scope-evaluator 판정 → split-needed만 분해"
+  },
+  "identificationRules": {
+    "unit": "각 구현 클래스 = 하나의 Spec",
+    "entryPointPrinciple": "외부 요청을 직접 수신하는 클래스/메서드",
+    "entryPoints": [
+      "REST API (Controller 엔드포인트 메서드)",
+      "Temporal Activity (ActivityImpl 클래스)",
+      "Temporal Workflow (WorkflowImpl 클래스)",
+      "Kafka Consumer (Consumer 클래스)",
+      "Scheduler (@Scheduled 메서드)"
+    ],
+    "customEntryPoints": []
+  },
+  "decompositionThreshold": {
+    "files": 10,
+    "functionalRequirements": 5
+  },
+  "retryLimits": {
+    "identification-verifier": 2,
+    "spec-reviewer": 2
+  },
+  "outputRules": {
+    "singleFilePerSpec": true,
+    "noImplementationCode": true,
+    "pseudocodeAllowed": true,
+    "specPrefix": "SPEC-{PREFIX}-{DOMAIN}-{number}-{name}"
+  },
+  "storagePaths": {
+    "specs": "docs/specs/",
+    "policies": "docs/policies/",
+    "foundation": "docs/",
+    "pathFlexibility": true
+  },
+  "hardGuardrails": [
+    "model/service는 분해 산출물로만 생성",
+    "orchestrator가 지정 유형을 writer에 전달",
+    "writer는 지정 유형 변경 불가",
+    "유형 불일치 시 reviewer auto-FAIL"
+  ],
+  "qualityGates": {
+    "passThreshold": 90,
+    "categories": 8,
+    "maxScore": 100
+  }
+}
