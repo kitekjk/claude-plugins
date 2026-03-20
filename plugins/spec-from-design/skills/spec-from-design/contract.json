@@ -1,5 +1,5 @@
 {
-  "version": "2.0.5",
+  "version": "2.0.6",
   "modes": {
     "existing-project": "코드에서 아키텍처 추출 (build files, package structure, naming conventions)",
     "new-project": "preset 사용 (기본: ddd-clean-kotlin)"
@@ -13,6 +13,7 @@
     "scope-evaluator",
     "usecase-splitter",
     "test-scenario-writer",
+    "spec-traceability-verifier",
     "spec-reviewer"
   ],
   "classificationFlow": {
@@ -37,6 +38,7 @@
   },
   "retryLimits": {
     "identification-verifier": 2,
+    "spec-traceability-verifier": 2,
     "spec-reviewer": 2
   },
   "outputRules": {

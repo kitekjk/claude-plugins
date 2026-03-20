@@ -1,6 +1,6 @@
 # 출력 품질 체크리스트 (output-quality)
 
-> **사용 시점**: spec-reviewer(⑨)가 전체 Spec 세트 평가 시 적용
+> **사용 시점**: spec-reviewer(⑩)가 전체 Spec 세트 평가 시 적용
 > **목적**: 생성된 Spec 파일의 품질을 100점 만점으로 평가
 > **합격 기준**: 90점 이상 + auto-FAIL 조건 없음
 

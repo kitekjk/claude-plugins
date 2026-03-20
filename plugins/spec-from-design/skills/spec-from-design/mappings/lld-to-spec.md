@@ -1,6 +1,6 @@
 # LLD → Spec 매핑 규칙 (lld-to-spec)
 
-> **참조 에이전트**: usecase-identifier(②), usecase-writer(⑤), test-scenario-writer(⑧)
+> **참조 에이전트**: usecase-identifier(②), usecase-writer(⑤), test-scenario-writer(⑧), spec-traceability-verifier(⑨)
 > **목적**: LLD의 각 요소가 어느 Spec 요소로 변환되는지 정의
 
 ---

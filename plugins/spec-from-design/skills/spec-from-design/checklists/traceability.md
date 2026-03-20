@@ -1,6 +1,6 @@
 # 추적성 체크리스트 (traceability)
 
-> **사용 시점**: spec-reviewer(⑨)가 전체 Spec 세트 평가 시 적용
+> **사용 시점**: spec-traceability-verifier(⑨)가 전수 대조 시 적용. spec-reviewer(⑩)는 형식 평가 시 참조.
 > **목적**: HLD/LLD의 각 요소가 Spec에 올바르게 반영되었는지 양방향 추적 검증
 
 ---

@@ -20,14 +20,16 @@
 |-------------|------|----------|
 | orchestrator | 파이프라인 조율, 모드 판별, 게이트 관리 | Spec 본문 직접 작성/수정 |
 | identifier | 구현 클래스 식별, UC 목록 산출 | Spec 작성, 유형 변경 |
-| verifier | 식별 완전성·1:1 매핑 검증 | Spec 작성/수정, 식별 목록 수정 |
+| verifier (identification) | 식별 완전성·1:1 매핑 검증 | Spec 작성/수정, 식별 목록 수정 |
 | writer | 검증된 UC 기반 Spec 작성 | 유형 변경, 식별 작업 |
+| verifier (traceability) | HLD/LLD ↔ Spec 양방향 전수 대조 | Spec/Policy 직접 수정, 매핑 임의 보완 |
 | reviewer | 품질 평가, auto-FAIL 검증 | Spec 본문 직접 수정 |
 
 ## 4. 직접 작성 금지
 
 - **orchestrator**가 Spec 본문을 직접 쓰거나 고치지 않습니다.
 - **reviewer**가 Spec 본문을 직접 쓰거나 고치지 않습니다.
+- **traceability-verifier**가 Spec/Policy를 직접 쓰거나 고치지 않습니다.
 - 수정이 필요하면 피드백을 writer에 전달하여 writer가 수정합니다.
 
 ## 5. 식별과 작성 분리
