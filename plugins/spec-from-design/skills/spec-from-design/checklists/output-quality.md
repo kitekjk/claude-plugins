@@ -88,13 +88,15 @@
 ### Q5: 테스트 도출 가능성 (15점)
 
 > 테스트 시나리오 섹션의 품질을 평가합니다.
+> **대상 유형**: usecase, refactoring, performance, simplification (contract.json `testScenarioRequired` 참조)
+> 모든 대상 유형에 동일한 기준을 적용합니다. 테스트 시나리오 섹션이 없으면 해당 배점 전체 감점합니다.
 
 | 세부 항목 | 배점 | 체크 |
 |----------|------|------|
 | 모든 테스트 시나리오가 Given-When-Then 형식으로 기술됨 | 5 | [ ] |
 | TC-ID가 부여됨 (`TC-{DOMAIN}-{번호}-{순번}`) | 3 | [ ] |
 | 테스트 레벨이 분류됨 (Unit / Integration / E2E) | 3 | [ ] |
-| FR당 최소 1개 이상의 테스트 시나리오가 존재함 | 4 | [ ] |
+| 유형별 필수 시나리오가 포함됨 (usecase: FR당 1+, refactoring/simplification: 동작 동등성+하위호환성, performance: 기능 동등성+지표 달성) | 4 | [ ] |
 
 - [ ] **Q5** 테스트 도출 가능성: ___ / 15점
 

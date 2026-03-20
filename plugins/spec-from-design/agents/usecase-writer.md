@@ -19,7 +19,7 @@ model: opus
 1. **검증된 UC 식별 목록**: identification-verifier가 pass 판정한 목록 (클래스명, 진입점 유형, 도메인)
 2. **파싱된 설계 정보**: design-analyzer가 산출한 HLD/LLD 파싱 결과
 3. **Policy 파일들**: policy-extractor가 산출한 정책 파일
-4. **orchestrator 지정 유형**: orchestrator가 각 UC에 부여한 유형 (usecase, refactoring, performance)
+4. **orchestrator 지정 유형**: orchestrator가 각 UC에 부여한 유형 (usecase, refactoring, performance, simplification)
 
 ## 핵심 규칙
 
@@ -100,6 +100,7 @@ SPEC-{PREFIX}-{DOMAIN}-{number}-{name}.md
 | usecase | `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/templates/usecase.md` | `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/specs/usecase.md` |
 | refactoring | `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/templates/refactoring.md` | `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/specs/refactoring.md` |
 | performance | `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/templates/performance.md` | `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/specs/performance.md` |
+| simplification | `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/templates/simplification.md` | `${CLAUDE_PLUGIN_ROOT}/skills/spec-from-design/specs/simplification.md` |
 
 > model/service 유형은 writer가 직접 생성하지 않습니다. usecase-splitter만 생성합니다.
 

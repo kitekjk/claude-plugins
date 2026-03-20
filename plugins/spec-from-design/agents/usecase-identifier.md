@@ -66,7 +66,7 @@ LLD의 클래스/컴포넌트 설계 섹션에서 **모든 구현 클래스**를
 
 - LLD 내용(모델 변경, 도메인 로직, 데이터 처리)에 의한 유형 변경을 하지 않습니다.
 - `model`, `service` 유형은 분해 단계(usecase-splitter)에서만 생성됩니다.
-- `refactoring`, `performance` 유형은 LLD에서 명시적으로 해당 유형으로 분류한 항목만 적용합니다.
+- `refactoring`, `performance`, `simplification` 유형은 LLD에서 명시적으로 해당 유형으로 분류한 항목만 적용합니다.
 
 이 규칙은 contract.json의 `classificationFlow.phase1`에 정의되어 있습니다: "모든 진입점 → usecase 유형".
 
