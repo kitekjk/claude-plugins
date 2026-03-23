@@ -6,7 +6,6 @@
 - 도메인: {도메인}
 - 출처: {LLD 참조 — 예: LLD Section 4.1 DB Schema}
 - 부모 usecase: {SPEC-PREFIX-DOMAIN-NNN-parent-name}
-- 구현 상태: not-started
 
 ## 개요
 

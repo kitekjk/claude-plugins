@@ -58,7 +58,6 @@ scope-evaluator가 `split-needed`로 판정한 대규모 Use Case Spec을 model/
 2. **1 Spec = 1 파일**: 분해 후에도 각 Spec은 개별 파일을 유지합니다.
 3. **분해 산출물로만 생성**: model/service 유형은 이 에이전트를 통해서만 생성됩니다 (hardGuardrail).
 4. **구현 코드 금지**: pseudocode는 허용됩니다 (DDL pseudocode 포함).
-5. **구현 상태 초기화**: 분해된 Spec의 구현 상태는 `not-started`입니다.
 
 ## 읽기 범위
 

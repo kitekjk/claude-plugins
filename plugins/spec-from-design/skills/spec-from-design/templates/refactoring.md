@@ -5,7 +5,6 @@
 - 유형: refactoring
 - 도메인: {도메인}
 - 출처: {LLD 참조 — 예: LLD Section 5.1 리팩토링 항목}
-- 구현 상태: not-started
 
 ## 개요
 

@@ -7,7 +7,6 @@
 - 출처: {LLD 참조 — 예: LLD Section 3.3 Service Layer}
 - 부모 usecase: {SPEC-PREFIX-DOMAIN-NNN-parent-name}
 - 구현 클래스: {서비스 클래스명 — 예: OrderDomainService}
-- 구현 상태: not-started
 
 ## 개요
 

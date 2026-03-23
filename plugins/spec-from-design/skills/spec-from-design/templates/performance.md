@@ -5,7 +5,6 @@
 - 유형: performance
 - 도메인: {도메인}
 - 출처: {LLD 참조 — 예: LLD Section 6.1 성능 최적화 항목}
-- 구현 상태: not-started
 
 ## 개요
 

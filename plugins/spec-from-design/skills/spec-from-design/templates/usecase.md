@@ -7,7 +7,6 @@
 - 출처: {LLD 참조 — 예: LLD Section 3.2 FR-001}
 - 진입점 유형: {REST API | Temporal Activity | Temporal Workflow | Kafka Consumer | Scheduler}
 - 구현 클래스: {클래스명 — 예: CreateOrderActivityImpl}
-- 구현 상태: not-started
 
 ## 개요
 

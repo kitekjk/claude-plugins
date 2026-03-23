@@ -5,7 +5,6 @@
 - 유형: simplification
 - 도메인: {도메인}
 - 출처: {LLD 참조 — 예: LLD Section 4.2 상태 모델 단순화}
-- 구현 상태: not-started
 
 ## 개요
 
