@@ -27,12 +27,15 @@ Worktree 기본 경로: {worktree_base}  (선택)
 
 ## 절차
 
-### 1단계: Spec 수집 및 의존성 분석
+### 1단계: Spec 수집, 상태 필터링, 의존성 분석
 
 1. `{spec_dir}` 내 모든 Spec 파일을 수집합니다.
-2. 각 Spec 파일에서 `dependsOn` 메타데이터를 추출합니다.
-3. 의존성 그래프를 구성합니다.
-4. 순환 의존성이 있으면 사용자에게 보고하고 중단합니다.
+2. 각 Spec의 `## 구현 추적` 섹션에서 `status`를 읽습니다.
+3. `status`가 `completed`, `review-approved`, `verified`인 Spec은 스케줄링에서 제외합니다.
+4. 제외된 Spec 목록을 로그로 출력합니다.
+5. 스케줄링 대상 Spec에서 `dependsOn` 메타데이터를 추출합니다.
+6. 의존성 그래프를 구성합니다.
+7. 순환 의존성이 있으면 사용자에게 보고하고 중단합니다.
 
 **dependsOn 메타데이터 형식** (spec-from-design이 생성):
 
@@ -125,7 +128,8 @@ completedAt: ""
 
 오케스트레이터에게 보고:
 - 실행 모드 (auto / review-gate)
-- 총 Spec 수
+- 총 Spec 수 (스케줄링 대상)
+- 제외된 Spec 수 (이미 완료)
 - 실행 Level 수
 - 병렬 실행 가능 Spec 수
 - 생성된 Jira 티켓 목록
@@ -138,3 +142,5 @@ completedAt: ""
 - Jira 프로젝트가 지정되지 않으면 사용자에게 확인합니다.
 - 기존 Jira 티켓이 있는 Spec은 중복 생성하지 않습니다 (구현 추적 섹션 확인).
 - 기존 worktree가 있으면 재사용합니다.
+- Jira MCP가 연결되지 않으면 경고 로그를 출력하고 Jira 없이 진행합니다.
+- Jira 없이 진행할 경우 브랜치명은 `{spec_id_kebab}` 형식을 사용합니다.

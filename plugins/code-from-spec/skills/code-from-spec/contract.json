@@ -1,11 +1,11 @@
 {
-  "version": "1.4.0",
+  "version": "1.5.0",
   "name": "code-from-spec",
 
   "specFormat": {
     "description": "spec-from-design이 생성하는 Spec 형식. code-from-spec은 이 형식을 소비한다.",
     "idPattern": "{PREFIX}-{DOMAIN}-{NUMBER} (예: PLM-POCANCEL-001, LMS-USER-001)",
-    "types": ["usecase", "model", "service", "refactoring", "performance"],
+    "types": ["usecase", "model", "service", "refactoring", "performance", "simplification"],
     "typeClassification": "Spec 파일 내 '기본 정보' 섹션의 type 필드로 구분",
     "tcIdPattern": "TC-{DOMAIN}-{NUMBER}-{SEQ} (예: TC-POCANCEL-001-01)",
     "foundation": ["service-definition.md", "architecture-rules.md", "naming-guide.md", "infra-config.md"],
@@ -115,7 +115,10 @@
         "specMapping": {
           "usecase": "usecase Spec → Application Service / Controller",
           "model": "model Spec → Entity / Repository",
-          "service": "service Spec → Domain Service"
+          "service": "service Spec → Domain Service",
+          "refactoring": "refactoring Spec → 기존 코드 리팩터링 (외부 동작 불변)",
+          "performance": "performance Spec → 성능 최적화 코드",
+          "simplification": "simplification Spec → 대상 코드 제거/병합 + Migration 코드"
         }
       },
       {
@@ -162,7 +165,7 @@
     "sources": ["ambiguity-log", "compliance-report"],
     "target": "Spec 파일들",
     "requiresUserApproval": true,
-    "categories": ["policies", "usecase-spec", "model-spec", "service-spec", "service-definition", "architecture-rules", "naming-guide"],
+    "categories": ["policies", "usecase-spec", "model-spec", "service-spec", "simplification-spec", "service-definition", "architecture-rules", "naming-guide"],
     "ambiguityLog": {
       "file": "{impl_dir}/ambiguity-log.md",
       "format": "AMB-{nn} 형식으로 기록",
@@ -172,6 +175,11 @@
 
   "scheduling": {
     "description": "Spec 단위 작업 스케줄링 — Jira 티켓, Git worktree, 의존성 기반 실행 순서",
+    "statusFilter": {
+      "exclude": ["completed", "review-approved", "verified"],
+      "include": ["not-started", "in-progress", "review-pending"],
+      "noTrackingSection": "include"
+    },
     "jira": {
       "ticketPerSpec": true,
       "project": "{jira_project}",
@@ -192,6 +200,7 @@
       "enabled": true,
       "basePath": "{worktree_base}/",
       "branchPattern": "{jira_key}-{spec_id_kebab}",
+      "branchPatternNoJira": "{spec_id_kebab}",
       "cleanupOnMerge": true
     },
     "dependencies": {

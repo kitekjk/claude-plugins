@@ -54,10 +54,11 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 ### 사전 확인 (공통)
 
 1. Spec 디렉토리 존재 여부
-2. Docker Desktop 실행 여부
-3. Jira 프로젝트 키 확인 (없으면 사용자에게 질문)
-4. 기존 구현 디렉토리 존재 시 사용자에게 재사용/재생성 확인
-5. **실행 모드 확인** — 사용자가 명시하지 않았으면 `contract.json`의 `execution.default` 사용
+2. **Spec 상태 사전 확인** — 모든 Spec이 이미 `completed`/`review-approved`/`verified`이면 사용자에게 알리고 종료
+3. Docker Desktop 실행 여부
+4. Jira 프로젝트 키 확인 (없으면 사용자에게 질문)
+5. 기존 구현 디렉토리 존재 시 사용자에게 재사용/재생성 확인
+6. **실행 모드 확인** — 사용자가 명시하지 않았으면 `contract.json`의 `execution.default` 사용
 
 ### 스케줄링 (공통)
 

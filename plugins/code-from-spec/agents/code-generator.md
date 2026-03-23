@@ -44,7 +44,7 @@ cp {claude_md_path} ./CLAUDE.md
 - **의존**: Teammate 1 완료 후
 
 #### Teammate 3: 애플리케이션 + 인터페이스 + 인프라 모듈
-- **기반 Spec**: usecase/service Spec, policies/
+- **기반 Spec**: usecase/service/simplification Spec, policies/
 - **담당**: application/**, interfaces/**, infrastructure/**
 - **의존**: Teammate 2 완료 후
 
@@ -83,7 +83,7 @@ cp {claude_md_path} ./CLAUDE.md
 - 읽지 않기: infra-config.md
 
 **Teammate 3 (애플리케이션):**
-- 읽기: usecase/service Spec, policies/, naming-guide.md
+- 읽기: usecase/service/simplification Spec, policies/, naming-guide.md
 - 읽지 않기: infra-config.md
 
 **Teammate 4 (테스트):**

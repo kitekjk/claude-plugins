@@ -7,11 +7,13 @@
 - [ ] Jira MCP 서버 연결이 가능한가
 - [ ] Jira 프로젝트 키가 지정되었는가
 
-## S-01: Spec 수집
+## S-01: Spec 수집 및 상태 필터링
 
 - [ ] 모든 Spec 파일을 정상 파싱했는가
 - [ ] 기초 Spec(service-definition, architecture-rules, naming-guide)을 스케줄링 대상에서 제외했는가
-- [ ] 스케줄링 대상 Spec 수가 1개 이상인가
+- [ ] `status`가 completed/review-approved/verified인 Spec을 스케줄링에서 제외했는가
+- [ ] 제외된 Spec 목록이 작업 계획서에 기록되었는가
+- [ ] 스케줄링 대상 Spec 수가 1개 이상인가 (모두 완료 시 사용자 알림)
 
 ## S-02: 의존성 분석
 

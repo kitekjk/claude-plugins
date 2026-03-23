@@ -32,6 +32,9 @@ Spec 디렉토리에서 검증 대상을 추출한다.
 | usecase Spec | Application Service / Controller |
 | model Spec | Entity / Repository |
 | service Spec | Domain Service |
+| refactoring Spec | 기존 코드 리팩터링 (외부 동작 불변) |
+| performance Spec | 성능 최적화 코드 |
+| simplification Spec | 대상 코드 제거/병합 + Migration 코드 |
 | 비즈니스 규칙 | Domain/Policy 클래스 |
 | TC-ID | @Tag 테스트 |
 | 아키텍처 규칙 | 패키지 구조, import 분석 |
@@ -46,6 +49,9 @@ Spec 디렉토리에서 검증 대상을 추출한다.
 - service Spec의 도메인 서비스가 구현되었는지
 - 수정 대상 파일이 모두 생성/수정되었는지
 - 에러 응답이 정의된 대로 처리되는지
+- refactoring/simplification Spec의 Before 코드가 제거/변환되었는지
+- simplification Spec의 After 상태가 구현되고 Migration 로직이 존재하는지
+- performance Spec의 목표 지표가 달성 가능한 구조인지
 
 #### V2: 비즈니스 규칙 준수 (30점)
 - policies/의 각 규칙이 코드에 반영되었는지

@@ -8,11 +8,20 @@
 
 | 항목 | 값 |
 |------|-----|
-| 총 Spec 수 | {total_specs} |
+| 총 Spec 수 (스케줄링 대상) | {total_specs} |
+| 제외 Spec 수 (이미 완료) | {skipped_specs} |
 | 실행 Level 수 | {total_levels} |
 | 병렬 실행 가능 | {parallel_count}개 |
 | 순차 실행 필요 | {sequential_count}개 |
 | Jira 티켓 | {jira_count}개 생성 |
+
+## 제외된 Spec (이미 완료)
+
+| Spec ID | 제목 | status | 제외 사유 |
+|---------|------|--------|----------|
+| {spec_id} | {title} | {status} | {reason} |
+
+> 제외 Spec이 없으면 이 섹션을 생략합니다.
 
 ## 의존성 그래프
 
