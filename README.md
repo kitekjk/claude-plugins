@@ -1,6 +1,6 @@
-# Kay's Plugins
+# PBO Claude Plugins
 
-개인용 Claude Code 플러그인 마켓플레이스.
+무신사 PBO(Product & Brand Operations) 조직의 공용 Claude Code 플러그인 마켓플레이스.
 
 ## 설치
 
@@ -8,21 +8,21 @@
 
 **HTTPS:**
 ```bash
-/plugin marketplace add https://github.com/kitekjk/claude-plugins.git
+/plugin marketplace add https://github.com/musinsa/pbo-claude-plugins.git
 ```
 
 **SSH:**
 ```bash
-/plugin marketplace add git@github.com:kitekjk/claude-plugins.git
+/plugin marketplace add git@github.com:musinsa/pbo-claude-plugins.git
 ```
 
 ### 2. 플러그인 설치
 
 ```bash
-/plugin install doc-writing-team@kitekjk-plugins
-/plugin install spec-from-design@kitekjk-plugins
-/plugin install code-from-spec@kitekjk-plugins
-/plugin install md-to-confluence@kitekjk-plugins
+/plugin install doc-writing-team@pbo-plugins
+/plugin install spec-from-design@pbo-plugins
+/plugin install code-from-spec@pbo-plugins
+/plugin install md-to-confluence@pbo-plugins
 ```
 
 ### 3. 사용
@@ -70,10 +70,14 @@ md-to-confluence  →  Confluence wiki 발행 (독립 사용 가능)
 
 > `md-to-confluence`는 파이프라인과 무관하게 어떤 Markdown 파일이든 단독으로 Confluence에 발행할 수 있습니다.
 
+## 크레딧
+
+- `doc-writing-team`은 [musinsa/ciap-doc-writer-claude-plugin](https://github.com/musinsa/ciap-doc-writer-claude-plugin)을 기반으로 PBO 워크플로우에 맞게 확장한 플러그인입니다.
+
 ## 구조
 
 ```
-kitekjk-plugins/
+pbo-plugins/
 ├── .claude-plugin/
 │   └── marketplace.json
 ├── plugins/
@@ -103,7 +107,7 @@ kitekjk-plugins/
 │   │       ├── contract.json          # 단일 기준
 │   │       ├── specs/                 # 스케줄링, 구현, 검증, 피드백 절차
 │   │       ├── templates/             # 작업 계획서, 프롬프트, 리포트 템플릿
-│   │       └── checklists/            # 스케줄링, 구현, 검증, 피드백 체크리스트
+│   │       └── checklists/            # 스케줄링, 구현, 검증, 피드백, 리뷰 체크리스트
 │   └── md-to-confluence/
 │       ├── .claude-plugin/plugin.json
 │       ├── skills/md-to-confluence/
