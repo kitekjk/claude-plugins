@@ -1,6 +1,6 @@
 # PBO Claude Plugins
 
-무신사 PBO(Product & Brand Operations) 조직의 공용 Claude Code 플러그인 마켓플레이스.
+무신사 PBO(Platform Business Operation) 조직의 공용 Claude Code 플러그인 마켓플레이스.
 
 ## 설치
 
