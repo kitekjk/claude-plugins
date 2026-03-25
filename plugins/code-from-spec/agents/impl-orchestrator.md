@@ -34,6 +34,7 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 | 구현, implement, 개발, 코드 생성 | `implement` | `code-generator` |
 | 검증, verify, 준수도, compliance | `verify` | `spec-verifier` |
 | 피드백, feedback, Spec 수정, Spec 보강 | `feedback` | `spec-feedback` |
+| 코드 리뷰, code-review, 리뷰해줘, 리뷰 돌려줘 | `code-review` | `code-generator` (리뷰 → 수정 루프) |
 | 리뷰 반영, review-apply, PR 피드백 반영, 리뷰 적용 | `review-apply` | `code-generator` → `spec-verifier` → `spec-feedback` |
 | 전체, full, 구현+검증 | `full` | `work-scheduler` → `code-generator` → `spec-verifier` → `spec-feedback` |
 
@@ -175,6 +176,48 @@ CLAUDE.md 경로: {claude_md_path}
 ```text
 구현 디렉토리: {impl_dir}
 Spec 디렉토리: {spec_dir}
+```
+
+## code-review 워크플로우
+
+기존 코드를 리뷰 체크리스트 기반으로 리뷰하고 수정을 반복합니다. 코드가 이미 생성된 경우에 사용합니다.
+
+### 실행 흐름
+
+```text
+① 프로젝트 유형 감지
+   - build.gradle / pom.xml → Spring
+   - package.json + react → React
+   - 감지 실패 시 사용자에게 질문
+
+② 리뷰 체크리스트 로드
+   - 기본: contract.json의 codeReview.checklists에서 유형별 체크리스트
+   - 추가: 프로젝트 CLAUDE.md, AGENTS.md, .github/workflows/claude-review.yml
+   - 두 소스를 병합하여 최종 리뷰 기준 구성
+
+③ 리뷰 → 수정 루프 (최대 3회)
+   - 체크리스트 항목별로 코드 검사
+   - 위반 항목 발견 시 수정
+   - 수정 후 재리뷰
+   - 위반 0건이면 루프 종료
+   - 3회 초과 시 잔여 이슈 목록과 함께 사용자에게 보고
+
+④ 빌드 + 테스트 통과 확인
+```
+
+### 입력 정보
+
+```text
+구현 디렉토리: {impl_dir}
+Spec 디렉토리: {spec_dir}  (선택 — Spec 기준 리뷰도 함께 수행)
+```
+
+### 코드 리뷰 루프는 full 파이프라인에도 포함
+
+full 워크플로우에서는 빌드/테스트 통과 후, spec-verifier 전에 코드 리뷰 루프가 실행됩니다.
+
+```text
+code-generator → 빌드/테스트 → [코드 리뷰 루프] → spec-verifier → spec-feedback
 ```
 
 ## review-apply 워크플로우
