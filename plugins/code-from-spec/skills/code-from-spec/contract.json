@@ -1,5 +1,5 @@
 {
-  "version": "1.6.4",
+  "version": "1.6.5",
   "name": "code-from-spec",
 
   "specFormat": {
@@ -117,7 +117,13 @@
       "spring": "checklists/review-spring.md",
       "react": "checklists/review-react.md"
     },
-    "passCondition": "P1 이슈 0건 + P2 이슈 0건 (P3는 선택적. 또는 사용자가 수용 가능 판단)"
+    "passCondition": "P1 이슈 0건 + P2 이슈 0건 (P3는 선택적. 또는 사용자가 수용 가능 판단)",
+    "specGapPolicy": {
+      "description": "코드 리뷰에서 발견된 이슈가 Spec에 명시되지 않은 경우의 처리 정책",
+      "rule": "Spec에 없는 항목이 코드 리뷰에서 P1/P2로 발견되면, Spec이 불완전한 것이지 코드가 충분한 것이 아니다",
+      "action": "코드를 먼저 수정하고, 해당 항목을 Spec 보강 대상(spec-feedback)으로 전달한다",
+      "prohibited": "'Spec에 명시되지 않았으므로 준수' 라는 판단으로 수정을 거부하는 것을 금지한다"
+    }
   },
 
   "implementation": {
@@ -212,7 +218,7 @@
   },
 
   "feedback": {
-    "sources": ["ambiguity-log", "compliance-report", "pr-review"],
+    "sources": ["ambiguity-log", "compliance-report", "pr-review", "code-review-gap"],
     "target": "Spec 파일들",
     "requiresUserApproval": true,
     "categories": ["policies", "usecase-spec", "model-spec", "service-spec", "simplification-spec", "service-definition", "architecture-rules", "naming-guide"],
