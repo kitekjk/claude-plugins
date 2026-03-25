@@ -1,5 +1,5 @@
 {
-  "version": "1.6.1",
+  "version": "1.6.2",
   "name": "code-from-spec",
 
   "specFormat": {
@@ -91,16 +91,33 @@
       "react": ["package.json + react"],
       "fallback": "spring"
     },
+    "reviewSources": {
+      "description": "리뷰 기준은 3개 소스를 병합하여 구성한다",
+      "layers": [
+        {
+          "name": "code-review 스킬",
+          "source": "code-review@claude-plugins-official (활성화 시)",
+          "role": "범용 리뷰 프레임워크 (Pre-Comment Checklist, 중복 방지, 리뷰 절차)",
+          "priority": "optional — 비활성화 시 이 파일의 Pre-Comment Checklist로 대체"
+        },
+        {
+          "name": "프로젝트 유형별 체크리스트",
+          "source": "checklists/review-{type}.md",
+          "role": "기술 스택별 리뷰 항목 (Spring: JPA/캐시/레이어, React: hooks/렌더링 등)"
+        },
+        {
+          "name": "프로젝트 커스텀 규칙",
+          "source": ["프로젝트 CLAUDE.md", "프로젝트 AGENTS.md", ".github/workflows/claude-review.yml의 custom_prompt_addition"],
+          "role": "프로젝트 고유 아키텍처/컨벤션 규칙 (모듈 의존성, 특수 패턴 등)"
+        }
+      ],
+      "mergeStrategy": "3개 소스를 합집합으로 병합. 충돌 시 프로젝트 커스텀 규칙 우선."
+    },
     "checklists": {
       "spring": "checklists/review-spring.md",
       "react": "checklists/review-react.md"
     },
-    "customRuleSources": [
-      "프로젝트 CLAUDE.md",
-      "프로젝트 AGENTS.md",
-      ".github/workflows/claude-review.yml의 custom_prompt_addition"
-    ],
-    "passCondition": "리뷰 이슈 0건 (또는 사용자가 수용 가능 판단)"
+    "passCondition": "P1 이슈 0건 + P2 이슈 0건 (P3는 선택적. 또는 사용자가 수용 가능 판단)"
   },
 
   "implementation": {

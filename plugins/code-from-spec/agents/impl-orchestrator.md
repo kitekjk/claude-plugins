@@ -190,16 +190,23 @@ Spec 디렉토리: {spec_dir}
    - package.json + react → React
    - 감지 실패 시 사용자에게 질문
 
-② 리뷰 체크리스트 로드
-   - 기본: contract.json의 codeReview.checklists에서 유형별 체크리스트
-   - 추가: 프로젝트 CLAUDE.md, AGENTS.md, .github/workflows/claude-review.yml
-   - 두 소스를 병합하여 최종 리뷰 기준 구성
+② 리뷰 기준 구성 (3소스 병합)
+   소스 A: code-review 스킬 (활성화 시)
+     → 범용 리뷰 프레임워크 (Pre-Comment Checklist, 중복 방지, 리뷰 절차)
+     → 비활성화 시 review-{type}.md의 Pre-Comment Checklist로 대체
+   소스 B: review-{type}.md (Spring / React)
+     → 기술 스택별 리뷰 항목 (P1/P2/P3 분류)
+   소스 C: 프로젝트 커스텀 규칙
+     → 프로젝트 CLAUDE.md / AGENTS.md 읽기
+     → .github/workflows/claude-review.yml의 custom_prompt_addition 추출
+     → 프로젝트 고유 아키텍처/컨벤션 규칙
+   병합: 3소스 합집합. 충돌 시 프로젝트 커스텀 규칙(소스 C) 우선.
 
 ③ 리뷰 → 수정 루프 (최대 3회)
-   - 체크리스트 항목별로 코드 검사
-   - 위반 항목 발견 시 수정
+   - 병합된 기준으로 코드 검사
+   - P1/P2 위반 항목 발견 시 수정
    - 수정 후 재리뷰
-   - 위반 0건이면 루프 종료
+   - P1 + P2 이슈 0건이면 루프 종료 (P3는 선택적)
    - 3회 초과 시 잔여 이슈 목록과 함께 사용자에게 보고
 
 ④ 빌드 + 테스트 통과 확인
