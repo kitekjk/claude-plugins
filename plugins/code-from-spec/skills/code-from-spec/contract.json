@@ -1,5 +1,5 @@
 {
-  "version": "1.5.1",
+  "version": "1.5.2",
   "name": "code-from-spec",
 
   "specFormat": {
@@ -67,6 +67,13 @@
     "feedback": {
       "description": "모호점 로그 + 검증 리포트에서 Spec 수정 제안 생성 및 반영",
       "agents": ["spec-feedback"]
+    },
+    "review-apply": {
+      "description": "PR 리뷰 피드백 → 코드 수정 → 빌드/테스트 → Spec 준수도 재검증 → Spec 동기화",
+      "steps": ["review-code-fix", "build-verify", "verify-compliance", "feedback"],
+      "agents": ["code-generator", "spec-verifier", "spec-feedback"],
+      "input": "PR URL 또는 리뷰 노트 파일",
+      "triggerKeywords": ["리뷰 반영", "review-apply", "PR 피드백 반영", "리뷰 적용"]
     }
   },
 

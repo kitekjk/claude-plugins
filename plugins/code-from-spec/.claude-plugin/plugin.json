@@ -1,7 +1,7 @@
 {
   "name": "code-from-spec",
   "description": "Spec 기반 코드 구현, 준수도 검증, Spec 피드백을 자동화하는 Claude Code 플러그인. 구현 → 검증 → Spec 수정 제안.",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "author": {
     "name": "kitekjk"
   },

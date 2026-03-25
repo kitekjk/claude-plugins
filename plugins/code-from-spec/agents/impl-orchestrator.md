@@ -34,6 +34,7 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 | 구현, implement, 개발, 코드 생성 | `implement` | `code-generator` |
 | 검증, verify, 준수도, compliance | `verify` | `spec-verifier` |
 | 피드백, feedback, Spec 수정, Spec 보강 | `feedback` | `spec-feedback` |
+| 리뷰 반영, review-apply, PR 피드백 반영, 리뷰 적용 | `review-apply` | `code-generator` → `spec-verifier` → `spec-feedback` |
 | 전체, full, 구현+검증 | `full` | `work-scheduler` → `code-generator` → `spec-verifier` → `spec-feedback` |
 
 ## 디렉토리 구조 확인
@@ -174,6 +175,51 @@ CLAUDE.md 경로: {claude_md_path}
 ```text
 구현 디렉토리: {impl_dir}
 Spec 디렉토리: {spec_dir}
+```
+
+## review-apply 워크플로우
+
+PR 리뷰 피드백을 받아 코드 수정 → 재검증 → Spec 동기화를 한 사이클로 처리합니다.
+
+### 사전 확인
+
+1. PR URL 또는 리뷰 노트 파일 확인 (필수)
+2. 대상 worktree/브랜치 확인
+3. Spec 디렉토리 확인
+
+### 실행 흐름
+
+```text
+① PR 리뷰 피드백 수집
+   - PR URL → GitHub API로 리뷰 코멘트 + requested changes 추출
+   - 또는 리뷰 노트 파일에서 변경 요청 추출
+
+② 코드 수정 (code-generator)
+   - 리뷰 피드백을 기반으로 해당 worktree에서 코드 수정
+   - 수정 시 Spec 기본 흐름과의 차이를 ambiguity-log에 기록
+
+③ 빌드 + 테스트 통과 확인
+
+④ Spec 준수도 재검증 (spec-verifier)
+   - 수정된 코드가 Spec을 여전히 따르는지 확인
+   - 리뷰로 인해 Spec과 달라진 부분을 Spec갭으로 플래그
+
+⑤ Spec 동기화 (spec-feedback)
+   - PR 리뷰 소스 + 재검증 리포트를 함께 사용
+   - Spec 수정 제안 생성 → 사용자 승인 → Spec 반영
+
+⑥ PR 업데이트
+   - 코드 수정 커밋 + 푸시
+   - Spec 변경이 있으면 Spec 커밋도 포함
+```
+
+### 입력 정보
+
+```text
+PR 소스: {pr_url 또는 리뷰 노트 파일 경로}
+Worktree/브랜치: {대상 worktree 경로 또는 브랜치명}
+Spec 디렉토리: {spec_dir}
+구현 디렉토리: {impl_dir}
 ```
 
 ## feedback 워크플로우

@@ -1,6 +1,6 @@
 ---
 name: code-from-spec
-description: Spec 기반 코드 구현, Spec 준수도 검증, PR 리뷰 피드백을 Spec에 반영합니다. Spec으로 코드를 생성하거나, 구현이 Spec을 잘 따르는지 검증하거나, PR 리뷰 결과를 Spec에 업데이트하려면 사용하세요.
+description: Spec 기반 코드 구현, Spec 준수도 검증, PR 리뷰 피드백 반영(코드 수정 + Spec 동기화)을 수행합니다. Spec으로 코드를 생성하거나, 구현이 Spec을 잘 따르는지 검증하거나, PR 리뷰를 코드와 Spec에 반영하려면 사용하세요.
 ---
 
 # code-from-spec
@@ -56,7 +56,8 @@ spec-feedback (모호점 + 갭 → Spec 수정 제안)
 | 스케줄, schedule | Spec 의존성 분석 + Jira 티켓 + worktree 구성 |
 | 구현, implement | Spec 기반 프로젝트 구현 (모호점 로그 포함) |
 | 검증, verify | 기존 구현의 Spec 준수도 검증 |
-| 피드백, feedback, PR 리뷰 반영 | 모호점 + 미준수 + PR 리뷰에서 Spec 수정 제안 |
+| 피드백, feedback | 모호점 + 미준수 + PR 리뷰에서 Spec 수정 제안 |
+| 리뷰 반영, review-apply, PR 피드백 반영 | PR 리뷰 → 코드 수정 → 재검증 → Spec 동기화 |
 
 ## 4영역 검증 체계
 
@@ -94,8 +95,10 @@ spec-feedback (모호점 + 갭 → Spec 수정 제안)
 "review-gate 모드로 구현해줘"                      # 구현 (review-gate 명시)
 "구현이 Spec을 잘 따르는지 검증해줘"               # 검증
 "모호한 부분을 피드백해서 Spec을 보강해줘"          # 피드백
-"PR 리뷰 반영해서 Spec 업데이트해줘"                # 피드백 (PR 리뷰 소스)
-"이 PR 리뷰 내용을 Spec에 반영해줘 {PR_URL}"       # 피드백 (PR URL 지정)
+"PR 리뷰 반영해서 Spec 업데이트해줘"                # 피드백 (Spec만 수정)
+"이 PR 리뷰 내용을 Spec에 반영해줘 {PR_URL}"       # 피드백 (PR URL → Spec만 수정)
+"이 PR 리뷰 반영해줘 {PR_URL}"                     # review-apply (코드 수정 + Spec 동기화)
+"리뷰 적용하고 Spec도 맞춰줘"                       # review-apply
 "Spec 기반으로 구현하고 준수도도 확인해줘"          # 전체 (auto)
 "리뷰 포함해서 전체 파이프라인 실행해줘"            # 전체 (review-gate)
 ```
