@@ -1,5 +1,5 @@
 {
-  "version": "1.6.2",
+  "version": "1.6.3",
   "name": "code-from-spec",
 
   "specFormat": {
@@ -75,8 +75,8 @@
       "triggerKeywords": ["코드 리뷰", "code-review", "리뷰해줘", "리뷰 돌려줘"]
     },
     "review-apply": {
-      "description": "PR 리뷰 피드백 → 코드 수정 → 빌드/테스트 → Spec 준수도 재검증 → Spec 동기화",
-      "steps": ["review-code-fix", "build-verify", "verify-compliance", "feedback"],
+      "description": "PR 리뷰 피드백 → 코드 수정 → 코드 리뷰 루프 → 빌드/테스트 → Spec 준수도 재검증 → Spec 동기화",
+      "steps": ["review-code-fix", "code-review-loop", "build-verify", "verify-compliance", "feedback"],
       "agents": ["code-generator", "spec-verifier", "spec-feedback"],
       "input": "PR URL 또는 리뷰 노트 파일",
       "triggerKeywords": ["리뷰 반영", "review-apply", "PR 피드백 반영", "리뷰 적용"]
