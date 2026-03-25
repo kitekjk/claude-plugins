@@ -19,13 +19,23 @@
 ### 2. 플러그인 설치
 
 ```bash
-/plugin install doc-writing-team@pbo-plugins
-/plugin install spec-from-design@pbo-plugins
-/plugin install code-from-spec@pbo-plugins
-/plugin install md-to-confluence@pbo-plugins
+claude plugin install doc-writing-team@pbo-plugins
+claude plugin install spec-from-design@pbo-plugins
+claude plugin install code-from-spec@pbo-plugins
+claude plugin install md-to-confluence@pbo-plugins
 ```
 
-### 3. 사용
+### 3. 업데이트
+
+```bash
+claude plugin marketplace update pbo-plugins
+claude plugin update doc-writing-team@pbo-plugins
+claude plugin update spec-from-design@pbo-plugins
+claude plugin update code-from-spec@pbo-plugins
+claude plugin update md-to-confluence@pbo-plugins
+```
+
+### 4. 사용
 
 Claude Code에서 자연어로 요청하면 스킬이 자동 트리거됩니다:
 
