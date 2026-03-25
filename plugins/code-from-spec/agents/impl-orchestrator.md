@@ -184,7 +184,10 @@ Spec 디렉토리: {spec_dir}
 모호점 로그: {impl_dir}/ambiguity-log.md
 검증 리포트: reports/compliance-{date}.md
 Spec 디렉토리: {spec_dir}
+PR 리뷰 소스: {pr_url 또는 리뷰 노트 파일 경로}  (사용자가 제공한 경우)
 ```
+
+사용자가 PR URL 또는 리뷰 노트 파일을 함께 제공하면 PR 리뷰 피드백도 소스에 포함합니다. 제공하지 않으면 기존 2개 소스(ambiguity-log + compliance-report)만 사용합니다.
 
 ## 완료 응답
 

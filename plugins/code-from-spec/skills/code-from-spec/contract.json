@@ -1,5 +1,5 @@
 {
-  "version": "1.5.0",
+  "version": "1.5.1",
   "name": "code-from-spec",
 
   "specFormat": {
@@ -162,7 +162,7 @@
   },
 
   "feedback": {
-    "sources": ["ambiguity-log", "compliance-report"],
+    "sources": ["ambiguity-log", "compliance-report", "pr-review"],
     "target": "Spec 파일들",
     "requiresUserApproval": true,
     "categories": ["policies", "usecase-spec", "model-spec", "service-spec", "simplification-spec", "service-definition", "architecture-rules", "naming-guide"],
@@ -170,6 +170,12 @@
       "file": "{impl_dir}/ambiguity-log.md",
       "format": "AMB-{nn} 형식으로 기록",
       "generatedBy": "code-generator"
+    },
+    "prReview": {
+      "source": "PR 리뷰 코멘트 (GitHub/GitLab)",
+      "input": "PR URL 또는 로컬 리뷰 노트 파일",
+      "extractTarget": "리뷰로 인해 코드가 변경된 항목 중 Spec과 달라진 부분",
+      "format": "REV-{nn} 형식으로 기록"
     }
   },
 

@@ -14,6 +14,7 @@
 |------|-----|
 | 모호점 로그 (AMB) | {amb_count} |
 | 검증 Spec 갭 | {gap_count} |
+| PR 리뷰 피드백 (REV) | {rev_count} |
 | 총 피드백 항목 | {total_count} |
 | 승인된 항목 | {approved_count} |
 | 반영된 항목 | {applied_count} |
@@ -33,7 +34,7 @@
 
 ### 항목 #{n}
 
-- **소스**: {ambiguity-log AMB-{nn} / compliance-report V{n}}
+- **소스**: {ambiguity-log AMB-{nn} / compliance-report V{n} / pr-review REV-{nn}}
 - **카테고리**: {카테고리}
 - **Spec 파일**: {spec_file_path}
 - **섹션**: {section_name}
