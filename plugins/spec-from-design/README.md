@@ -120,16 +120,19 @@ spec-orchestrator (조율자)
 ## 출력
 
 ```
-docs/
-├── service-definition.md      # 서비스 정의
-├── architecture-rules.md      # 아키텍처 규칙
-├── naming-guide.md            # 네이밍 가이드
-├── infra-config.md            # 인프라 설정
-├── policies/                  # 비즈니스 정책
+{doc_root}/                          # docs/ 또는 documents/ (자동 감지)
+├── foundation/                      # Foundation 문서
+│   ├── service-definition.md        # 서비스 정의
+│   ├── architecture-rules.md        # 아키텍처 규칙
+│   ├── naming-guide.md              # 네이밍 가이드
+│   └── infra-config.md              # 인프라 설정
+├── policies/                        # 비즈니스 정책
 │   └── POLICY-{DOMAIN}-{NNN}.md
-└── specs/                     # Spec 파일 (1 UC = 1 파일)
+└── specs/                           # Spec 파일 (1 UC = 1 파일)
     └── SPEC-{PREFIX}-{DOMAIN}-{NNN}-{name}.md
 ```
+
+> `{doc_root}`는 프로젝트에서 `docs/` 또는 `documents/` 디렉토리를 자동 감지합니다. 둘 다 없으면 `docs/`를 기본값으로 사용합니다.
 
 ## 사용 예시
 

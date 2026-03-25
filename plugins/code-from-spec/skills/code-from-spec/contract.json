@@ -1,5 +1,5 @@
 {
-  "version": "1.6.6",
+  "version": "1.6.7",
   "name": "code-from-spec",
 
   "specFormat": {
@@ -9,7 +9,7 @@
     "typeClassification": "Spec 파일 내 '기본 정보' 섹션의 type 필드로 구분",
     "tcIdPattern": "TC-{DOMAIN}-{NUMBER}-{SEQ} (예: TC-POCANCEL-001-01)",
     "foundation": ["service-definition.md", "architecture-rules.md", "naming-guide.md", "infra-config.md"],
-    "foundationLocation": "{doc_root}/ (specs 디렉토리 상위)",
+    "foundationLocation": "{doc_root}/foundation/",
     "policyLocation": "{doc_root}/policies/",
     "specLocation": "{doc_root}/specs/",
     "dependsOn": {
@@ -292,7 +292,7 @@
   "paths": {
     "specDir": "{spec_project}/{doc_root}/specs/",
     "policyDir": "{spec_project}/{doc_root}/policies/",
-    "foundationDir": "{spec_project}/{doc_root}/",
+    "foundationDir": "{spec_project}/{doc_root}/foundation/",
     "implDir": "{target_dir}/",
     "reportDir": "reports/",
     "complianceReport": "reports/compliance-{date}.md",

@@ -73,9 +73,9 @@ HLD KDD(핵심 설계 판단)와 LLD 설계 판단에서 도메인 레벨의 재
 
 ## 출력 경로
 
-- 정책 파일: `{storagePaths.policies}` (기본: `docs/policies/`)
-- infra-config.md: `{storagePaths.foundation}` (기본: `docs/`)
-- init-data.md: `{storagePaths.foundation}` (기본: `docs/`)
+- 정책 파일: `{storagePaths.policies}` (기본: `{doc_root}/policies/`)
+- infra-config.md: `{storagePaths.foundation}` (기본: `{doc_root}/foundation/`)
+- init-data.md: `{storagePaths.foundation}` (기본: `{doc_root}/foundation/`)
 
 contract.json의 `storagePaths.pathFlexibility`가 true이면 orchestrator가 지정한 경로를 사용합니다.
 

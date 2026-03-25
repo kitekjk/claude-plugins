@@ -1,5 +1,5 @@
 {
-  "version": "2.0.8",
+  "version": "2.0.9",
   "modes": {
     "existing-project": "코드에서 아키텍처 추출 (build files, package structure, naming conventions)",
     "new-project": "preset 사용 (기본: ddd-clean-kotlin)"
@@ -48,9 +48,10 @@
     "specPrefix": "SPEC-{PREFIX}-{DOMAIN}-{number}-{name}"
   },
   "storagePaths": {
-    "specs": "docs/specs/",
-    "policies": "docs/policies/",
-    "foundation": "docs/",
+    "specs": "{doc_root}/specs/",
+    "policies": "{doc_root}/policies/",
+    "foundation": "{doc_root}/foundation/",
+    "doc_root_candidates": ["docs", "documents"],
     "pathFlexibility": true
   },
   "specTypes": ["usecase", "refactoring", "performance", "simplification", "model", "service"],
