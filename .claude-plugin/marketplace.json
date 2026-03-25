@@ -22,7 +22,7 @@
       "name": "spec-from-design",
       "source": "./plugins/spec-from-design",
       "description": "HLD/LLD 설계 문서 및 개발요청서에서 코드 생성 가능한 Spec을 추출하는 멀티 에이전트 플러그인. 10개 에이전트 파이프라인, 진입점 기반 식별, 품질 게이트.",
-      "version": "2.0.7",
+      "version": "2.0.8",
       "author": {
         "name": "kitekjk"
       },
@@ -33,7 +33,7 @@
       "name": "code-from-spec",
       "source": "./plugins/code-from-spec",
       "description": "Spec 기반 코드 구현, 준수도 검증, Spec 피드백. Jira + worktree + 의존성 스케줄링. auto/review-gate 실행 모드. Spec = SSOT.",
-      "version": "1.6.5",
+      "version": "1.6.6",
       "author": {
         "name": "kitekjk"
       },
