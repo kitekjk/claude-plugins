@@ -1,6 +1,6 @@
 ---
 name: code-from-spec
-description: Spec 기반 코드 구현과 Spec 준수도 검증을 수행합니다. Spec으로 코드를 생성하거나, 구현이 Spec을 잘 따르는지 검증하려면 사용하세요.
+description: Spec 기반 코드 구현, Spec 준수도 검증, PR 리뷰 피드백을 Spec에 반영합니다. Spec으로 코드를 생성하거나, 구현이 Spec을 잘 따르는지 검증하거나, PR 리뷰 결과를 Spec에 업데이트하려면 사용하세요.
 ---
 
 # code-from-spec
