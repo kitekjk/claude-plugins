@@ -33,7 +33,7 @@
       "name": "code-from-spec",
       "source": "./plugins/code-from-spec",
       "description": "Spec 기반 코드 구현, 준수도 검증, Spec 피드백. Jira + worktree + 의존성 스케줄링. auto/review-gate 실행 모드. Spec = SSOT.",
-      "version": "1.6.13",
+      "version": "1.6.14",
       "author": {
         "name": "musinsa/pbo"
       },
