@@ -95,40 +95,47 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 
 ### auto 모드 — 연속 구현
 
-1. **구현** (실행 Level 순)
-   - work-scheduler가 반환한 worktree 목록에서 각 Spec의 worktree 경로를 확인합니다.
-   - Level 0: 독립 Spec들을 병렬 구현 — 각 Spec마다 해당 worktree 경로를 code-generator에 전달
-   - Level 1+: 의존 Spec들을 순차적으로 구현 — 동일하게 해당 worktree 경로 전달
-   - 각 Spec 완료 시 구현 추적 섹션 업데이트 + Jira 상태 전이
-   - 빌드 + 테스트 통과 확인
+각 Spec 단위로 `구현 → 리뷰 → 검증 → 피드백`을 한 사이클로 처리합니다. 전체를 다 구현한 후 검증하지 않습니다.
 
-   **code-generator 호출 형식 (worktree 사용 시)**:
-   ```text
-   Spec 파일: {spec_file_path}
-   Worktree 경로: {worktree_path}   ← work-scheduler가 반환한 해당 Spec의 worktree 절대경로
-   CLAUDE.md 경로: {claude_md_path}
-   ```
+**Spec별 사이클**:
+```text
+① code-generator — 코드 생성
+② 빌드 + 테스트 통과 (최대 3회)
+③ 코드 리뷰 루프 (최대 3회)
+④ spec-verifier — 준수도 검증 (V1~V4 점수)
+⑤ spec-feedback — Spec 동기화 (모호점 + 갭 → Spec 수정 제안)
+⑥ 구현 추적 업데이트 + Jira 상태 전이
+```
 
-2. **Spec 준수도 검증**
-   - `spec-verifier`에게 구현 디렉토리와 Spec 경로 전달
-   - 준수도 리포트 수신
-   - 검증 완료 시 Spec 추적 상태를 `verified`로 업데이트
+**Level별 실행 전략**:
+- Level 0: 독립 Spec들을 **병렬**로 각각 ①~⑥ 사이클 실행
+- Level 1+: 의존 Spec들을 **순차적**으로 각각 ①~⑥ 사이클 실행
+- 한 Spec의 사이클이 ④에서 D등급(70점 미만)이면 즉시 사용자에게 보고 (다음 Spec 진행 여부 확인)
 
-3. **Spec 피드백**
-   - `spec-feedback`에게 모호점 로그, 검증 리포트, Spec 경로 전달
-   - 피드백 항목을 사용자에게 제시
-   - 사용자 승인 후 Spec 반영
+**code-generator 호출 형식 (worktree 사용 시)**:
+```text
+Spec 파일: {spec_file_path}
+Worktree 경로: {worktree_path}   ← work-scheduler가 반환한 해당 Spec의 worktree 절대경로
+CLAUDE.md 경로: {claude_md_path}
+```
 
-4. **결과 보고**
+**결과 보고** — 전체 Level 완료 후 종합 리포트 출력
 
 ---
 
 ### review-gate 모드 — Level별 리뷰 게이트
 
-1. **Level N 구현**
-   - work-scheduler가 반환한 worktree 목록에서 각 Spec의 worktree 경로를 확인합니다.
-   - 해당 Level의 Spec들을 병렬 구현 — 각 Spec마다 해당 worktree 경로를 code-generator에 전달
-   - 빌드 + 테스트 통과 확인
+auto 모드와 동일하게 **각 Spec 단위로 사이클**을 실행하되, Level 완료 시 리뷰 게이트를 추가합니다.
+
+1. **Level N 구현** — 각 Spec별 사이클 실행
+   - 해당 Level의 Spec들을 병렬로 각각 ①~⑤ 사이클 실행:
+     ```text
+     ① code-generator — 코드 생성
+     ② 빌드 + 테스트 통과 (최대 3회)
+     ③ 코드 리뷰 루프 (최대 3회)
+     ④ spec-verifier — 준수도 검증
+     ⑤ spec-feedback — Spec 동기화
+     ```
    - 각 Spec 완료 시 구현 추적 상태를 `completed`로 업데이트
 
    **code-generator 호출 형식**:
@@ -139,12 +146,12 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
    ```
 
 2. **1-Level lookahead** (선택적)
-   - Level N+1 Spec 중 Level N과 `shared_files` 겹침이 **없는** Spec만 선행 구현
+   - Level N+1 Spec 중 Level N과 `shared_files` 겹침이 **없는** Spec만 선행 구현 (동일 사이클 적용)
    - 선행 구현된 Spec의 상태는 `completed`로 표시하되, 리뷰 대기에 포함하지 않음
 
 3. **리뷰 체크포인트** ⏸
    - Level N의 각 worktree에서 PR 생성
-   - 리뷰 리포트 출력 (구현 요약, 변경 파일 목록, Spec 대비 구현 현황)
+   - 리뷰 리포트 출력 (구현 요약, 변경 파일 목록, Spec 대비 구현 현황, **준수도 점수**)
    - Spec 추적 상태를 `review-pending`으로 업데이트
    - Jira 상태를 `In Review`로 전이
    - 사용자에게 리뷰 요청 메시지 출력 후 **대기**
@@ -153,6 +160,7 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
    ⏸ Level {N} 리뷰 체크포인트
    ─────────────────────────────
    구현 완료 Spec: {spec_list}
+   준수도: {각 Spec별 점수}
    PR: {pr_links}
 
    리뷰 후 다음 중 하나로 응답해주세요:
@@ -162,16 +170,12 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 
 4. **리뷰 응답 처리**
    - `approved`: Spec 추적 상태를 `review-approved`로 업데이트 → 다음 Level 진행
-   - 수정 피드백: 해당 worktree에서 수정 반영 → PR 업데이트 → 다시 리뷰 대기
+   - 수정 피드백: 해당 worktree에서 수정 반영 → **코드 리뷰 루프 + spec-verifier 재실행** → PR 업데이트 → 다시 리뷰 대기
    - 수정 시 하위 Level에 영향 분석:
      - 수정된 파일이 하위 Spec의 `shared_files`에 포함되면 → lookahead로 선행 구현된 코드 무효화 경고
      - 인터페이스/시그니처 변경 시 → 영향받는 하위 Spec 목록 출력
 
 5. **반복** — 모든 Level 완료까지 1~4 반복
-
-6. **Spec 준수도 검증** — 전체 완료 후 실행 (auto 모드와 동일)
-
-7. **Spec 피드백** — auto 모드와 동일
 
 8. **결과 보고**
 
