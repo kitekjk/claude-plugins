@@ -6,3 +6,4 @@ confluence-output/
 *.confluence.html
 images/
 .confluence-mapping.json
+.claude/settings.local.json
