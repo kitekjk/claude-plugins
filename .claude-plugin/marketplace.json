@@ -11,7 +11,7 @@
       "name": "doc-writing-team",
       "source": "./plugins/doc-writing-team",
       "description": "ADR/HLD/LLD 설계 문서를 멀티 에이전트 품질 루프로 작성. Spec 도출 가능 수준 보장.",
-      "version": "3.1.0",
+      "version": "3.2.0",
       "author": {
         "name": "musinsa/pbo"
       },
