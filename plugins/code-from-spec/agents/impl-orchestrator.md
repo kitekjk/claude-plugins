@@ -91,10 +91,18 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 ### auto 모드 — 연속 구현
 
 1. **구현** (실행 Level 순)
-   - Level 0: 독립 Spec들을 병렬 구현 (각 worktree에서)
-   - Level 1+: 의존 Spec들을 순차적으로 구현
+   - work-scheduler가 반환한 worktree 목록에서 각 Spec의 worktree 경로를 확인합니다.
+   - Level 0: 독립 Spec들을 병렬 구현 — 각 Spec마다 해당 worktree 경로를 code-generator에 전달
+   - Level 1+: 의존 Spec들을 순차적으로 구현 — 동일하게 해당 worktree 경로 전달
    - 각 Spec 완료 시 구현 추적 섹션 업데이트 + Jira 상태 전이
    - 빌드 + 테스트 통과 확인
+
+   **code-generator 호출 형식 (worktree 사용 시)**:
+   ```text
+   Spec 파일: {spec_file_path}
+   Worktree 경로: {worktree_path}   ← work-scheduler가 반환한 해당 Spec의 worktree 절대경로
+   CLAUDE.md 경로: {claude_md_path}
+   ```
 
 2. **Spec 준수도 검증**
    - `spec-verifier`에게 구현 디렉토리와 Spec 경로 전달
@@ -113,9 +121,17 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 ### review-gate 모드 — Level별 리뷰 게이트
 
 1. **Level N 구현**
-   - 해당 Level의 Spec들을 병렬 구현 (각 worktree에서)
+   - work-scheduler가 반환한 worktree 목록에서 각 Spec의 worktree 경로를 확인합니다.
+   - 해당 Level의 Spec들을 병렬 구현 — 각 Spec마다 해당 worktree 경로를 code-generator에 전달
    - 빌드 + 테스트 통과 확인
    - 각 Spec 완료 시 구현 추적 상태를 `completed`로 업데이트
+
+   **code-generator 호출 형식**:
+   ```text
+   Spec 파일: {spec_file_path}
+   Worktree 경로: {worktree_path}   ← work-scheduler가 반환한 해당 Spec의 worktree 절대경로
+   CLAUDE.md 경로: {claude_md_path}
+   ```
 
 2. **1-Level lookahead** (선택적)
    - Level N+1 Spec 중 Level N과 `shared_files` 겹침이 **없는** Spec만 선행 구현

@@ -17,17 +17,37 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 
 Spec 문서만으로 프로젝트를 처음부터 생성합니다.
 
+## 입력
+
+```text
+Spec 파일: {spec_file_path}          # 단일 Spec 파일 경로 (worktree 모드)
+  또는
+Spec 디렉토리: {spec_dir}            # Spec 디렉토리 경로 (일반 모드)
+Worktree 경로: {worktree_path}       # worktree 절대경로 (work-scheduler가 생성한 경우 필수)
+  또는
+출력 디렉토리: {target_dir}          # worktree 미사용 시 출력 경로
+CLAUDE.md 경로: {claude_md_path}
+```
+
+> **worktree 경로가 제공된 경우**: `{target_dir}` 대신 `{worktree_path}`를 작업 기준 디렉토리로 사용합니다.
+> 이후 모든 파일 Read/Write/Bash 작업은 `{worktree_path}` 기준 절대경로로 수행합니다.
+> `cd`로 이동하지 않고, 경로를 명시적으로 지정합니다.
+
 ## 생성 절차
 
-### 1단계: 빈 프로젝트 준비
+### 1단계: 작업 디렉토리 확정 및 Spec 복사
 
 ```bash
-mkdir -p {target_dir}
-cd {target_dir}
-mkdir -p docs/specs
-cp -r {spec_dir}/* docs/specs/
-cp {claude_md_path} ./CLAUDE.md
+# worktree 경로가 있으면 그것을 사용, 없으면 target_dir 생성
+WORK_DIR={worktree_path 또는 target_dir}
+mkdir -p ${WORK_DIR}/docs/specs
+
+# Spec 파일 복사
+cp {spec_file_path 또는 spec_dir/*} ${WORK_DIR}/docs/specs/
+cp {claude_md_path} ${WORK_DIR}/CLAUDE.md
 ```
+
+이후 모든 Teammate에게 `WORK_DIR` 절대경로를 명시적으로 전달합니다.
 
 ### 2단계: Agent Teams로 구현
 
@@ -117,9 +137,12 @@ cp {claude_md_path} ./CLAUDE.md
 
 ## worktree 모드
 
-`work-scheduler`가 worktree를 구성한 경우:
+`work-scheduler`가 worktree를 구성한 경우, impl-orchestrator가 `Worktree 경로`를 명시적으로 전달합니다.
 
-1. 지정된 worktree 경로에서 구현합니다.
+1. **`{worktree_path}`를 작업 기준 디렉토리로 사용합니다.**
+   - 모든 Read/Write/Edit/Bash 작업에 `{worktree_path}` 기준 절대경로를 사용합니다.
+   - `cd {worktree_path}`로 이동하지 않고, 경로를 명시적으로 지정합니다.
+   - Teammate에게도 `WORK_DIR={worktree_path}` 절대경로를 전달합니다.
 2. 구현 완료 후 Spec 파일의 구현 추적 섹션을 업데이트합니다:
    - `status`: `in-progress` → `completed`
    - `commit`: 최종 커밋 SHA
