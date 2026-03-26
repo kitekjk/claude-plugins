@@ -99,14 +99,20 @@ tools: Read, Write, Edit, Glob, Grep, Task, Bash
 
 **Spec별 사이클**:
 ```text
-① code-generator — 코드 생성
-② 빌드 + 테스트 통과 (최대 3회)
-③ 코드 리뷰 루프 (최대 3회)
-④ spec-verifier — 준수도 검증 (V1~V4 점수)
-⑤ 검증 결과 승인 게이트 ⏸ (아래 참조)
-⑥ spec-feedback — Spec 동기화 (승인된 항목만 반영)
-⑦ 구현 추적 업데이트 + Jira 상태 전이
+① code-generator — 코드 + 테스트 생성 (TC-ID 전수 커버리지 필수)
+② 빌드 + 전체 테스트 통과 (최대 3회)
+③ TC-ID 커버리지 게이트 — 누락 시 ① 재실행 (진행 불가)
+④ 코드 리뷰 루프 (최대 3회)
+⑤ spec-verifier — 준수도 검증 (V1~V4 점수)
+⑥ 검증 결과 승인 게이트 ⏸ (아래 참조)
+⑦ spec-feedback — Spec 동기화 (승인된 항목만 반영)
+⑧ 구현 추적 업데이트 + Jira 상태 전이
 ```
+
+**③ TC-ID 커버리지 게이트** — Spec의 모든 TC-ID가 테스트 코드에 @Tag로 존재하는지 확인한다.
+- 누락 TC-ID가 있으면 code-generator의 Teammate 4를 재실행 (최대 2회)
+- 2회 후에도 누락 시 사용자에게 보고하고 진행 여부 확인
+- **이 게이트를 통과하지 못하면 ④ 코드 리뷰로 넘어가지 않는다**
 
 **⑤ 검증 결과 승인 게이트** ⏸ — spec-verifier 완료 후 반드시 사용자에게 보고하고 승인을 받는다.
 
@@ -150,14 +156,15 @@ CLAUDE.md 경로: {claude_md_path}
 auto 모드와 동일하게 **각 Spec 단위로 사이클**을 실행하되, Level 완료 시 리뷰 게이트를 추가합니다.
 
 1. **Level N 구현** — 각 Spec별 사이클 실행
-   - 해당 Level의 Spec들을 병렬로 각각 ①~④ 사이클 실행 후 ⑤ 승인 게이트:
+   - 해당 Level의 Spec들을 병렬로 각각 ①~⑤ 사이클 실행 후 ⑥ 승인 게이트:
      ```text
-     ① code-generator — 코드 생성
-     ② 빌드 + 테스트 통과 (최대 3회)
-     ③ 코드 리뷰 루프 (최대 3회)
-     ④ spec-verifier — 준수도 검증
-     ⑤ 검증 결과 승인 게이트 ⏸ (auto 모드와 동일)
-     ⑥ spec-feedback — Spec 동기화 (승인된 항목만)
+     ① code-generator — 코드 + 테스트 생성 (TC-ID 전수 커버리지 필수)
+     ② 빌드 + 전체 테스트 통과 (최대 3회)
+     ③ TC-ID 커버리지 게이트 — 누락 시 ① 재실행 (진행 불가)
+     ④ 코드 리뷰 루프 (최대 3회)
+     ⑤ spec-verifier — 준수도 검증
+     ⑥ 검증 결과 승인 게이트 ⏸ (auto 모드와 동일)
+     ⑦ spec-feedback — Spec 동기화 (승인된 항목만)
      ```
    - 각 Spec 완료 시 구현 추적 상태를 `completed`로 업데이트
 

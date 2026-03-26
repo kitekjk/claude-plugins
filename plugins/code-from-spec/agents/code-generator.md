@@ -53,6 +53,10 @@ cp {claude_md_path} ${WORK_DIR}/CLAUDE.md
 
 4명의 Teammate로 구성하여 순차적으로 구현합니다.
 
+> **절대 규칙**: Teammate 4(테스트)는 선택이 아니라 **필수**입니다.
+> 컨텍스트가 부족하더라도 Teammate 4를 건너뛰지 않습니다.
+> 프로덕션 코드만 있고 테스트가 없으면 **미완료**입니다.
+
 #### Teammate 1: 프로젝트 구조 + 인프라
 - **기반 Spec**: architecture-rules.md, infra-config.md, naming-guide.md
 - **담당**: build.gradle.kts, settings.gradle.kts, docker-compose.yml, application.yml
@@ -68,13 +72,14 @@ cp {claude_md_path} ${WORK_DIR}/CLAUDE.md
 - **담당**: application/**, interfaces/**, infrastructure/**
 - **의존**: Teammate 2 완료 후
 
-#### Teammate 4: 테스트 코드
+#### Teammate 4: 테스트 코드 (필수 — 스킵 금지)
 - **기반 Spec**: 각 Spec의 "## 테스트 시나리오" (TC-ID, @Tag 필수)
 - **담당**: src/test/** 만
 - **의존**: Teammate 1, 2, 3 완료 후
-- **완료 조건**: 전체 테스트 통과
+- **완료 조건**: 전체 테스트 통과 + **Spec의 모든 TC-ID에 대한 테스트 존재**
+- **지시**: Spec의 `## 테스트 시나리오` 섹션을 읽고, 각 TC-ID에 대한 테스트를 반드시 작성한다. Given-When-Then 시나리오를 코드로 변환하고, `@Tag("{TC-ID}")` 어노테이션을 필수로 부여한다.
 
-### 3단계: 빌드 검증
+### 3단계: 빌드 + 테스트 검증
 
 ```bash
 ./gradlew build
@@ -83,12 +88,26 @@ cp {claude_md_path} ${WORK_DIR}/CLAUDE.md
 
 실패 시 Agent Teams에게 수정 지시 (최대 3회).
 
-### 4단계: 완료 확인
+### 4단계: TC-ID 커버리지 게이트 (필수)
+
+Spec의 모든 TC-ID가 테스트 코드에 `@Tag`로 존재하는지 확인합니다.
+
+```text
+확인 방법: Spec에서 TC-ID 목록 추출 → 테스트 코드에서 @Tag 검색 → 매핑 대조
+```
+
+- **누락 TC-ID가 있으면**: Teammate 4를 재실행하여 누락 테스트 추가 (최대 2회)
+- **2회 재시도 후에도 누락 시**: 누락 목록을 impl-orchestrator에 보고 (진행 불가)
+- **전수 커버리지 달성 시**: 다음 단계로 진행
+
+> **이 게이트를 통과하지 못하면 code-generator의 작업은 미완료입니다.**
+
+### 5단계: 완료 확인
 
 체크리스트 기준으로 최종 확인:
-- 빌드 성공
-- 전체 테스트 통과
-- Spec의 모든 TC-ID가 @Tag로 테스트 코드에 존재
+- [ ] 빌드 성공
+- [ ] 전체 테스트 통과
+- [ ] Spec의 **모든** TC-ID가 @Tag로 테스트 코드에 존재 (4단계 게이트 통과)
 
 > **중요**: code-generator의 역할은 여기까지입니다.
 > 코드 리뷰 루프(최대 3회)는 **impl-orchestrator가 이후에 실행**합니다.
