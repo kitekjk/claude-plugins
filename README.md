@@ -61,7 +61,7 @@ README.md를 wiki에 발행해줘
 |---------|------|------|
 | [doc-writing-team](./plugins/doc-writing-team) | v3.2.0 | ADR/HLD/LLD 설계 문서 작성 — 멀티 에이전트 품질 루프, Spec 도출 가능 수준 보장, HLD→LLD 추적성 |
 | [spec-from-design](./plugins/spec-from-design) | v2.0.9 | HLD/LLD/Dev Request → Spec 추출 — 11개 에이전트 파이프라인, 진입점 기반 UC 식별, 7 Spec 유형, 추적성 검증 게이트, 100점 품질 게이트, 프리셋 시스템 |
-| [code-from-spec](./plugins/code-from-spec) | v1.6.11 | Spec → 코드 구현 + 준수도 검증 + Spec 피드백 — auto/review-gate 실행 모드, Jira 티켓 + Git worktree + 의존성 스케줄링, 완료 Spec 자동 스킵, Spec = SSOT |
+| [code-from-spec](./plugins/code-from-spec) | v1.6.12 | Spec → 코드 구현 + 준수도 검증 + Spec 피드백 — auto/review-gate 실행 모드, Jira 티켓 + Git worktree + 의존성 스케줄링, 완료 Spec 자동 스킵, Spec = SSOT |
 | [md-to-confluence](./plugins/md-to-confluence) | v0.2.0 | 임의의 Markdown 파일을 Confluence wiki에 발행 (Mermaid→이미지 포함, 독립 사용 가능) |
 
 ### 워크플로우 연계

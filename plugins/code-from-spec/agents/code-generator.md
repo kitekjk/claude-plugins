@@ -90,6 +90,10 @@ cp {claude_md_path} ${WORK_DIR}/CLAUDE.md
 - 전체 테스트 통과
 - Spec의 모든 TC-ID가 @Tag로 테스트 코드에 존재
 
+> **중요**: code-generator의 역할은 여기까지입니다.
+> 코드 리뷰 루프(최대 3회)는 **impl-orchestrator가 이후에 실행**합니다.
+> code-generator가 자체적으로 커밋하거나 "완료"를 선언하지 않습니다.
+
 ## Teammate별 컨텍스트 범위
 
 각 Teammate가 로드하는 파일 범위를 제한하여 컨텍스트 윈도우를 효율적으로 사용합니다.
