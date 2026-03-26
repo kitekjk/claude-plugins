@@ -75,19 +75,31 @@ Level 2: Level 0, 1에 의존하는 Spec들
 
 ### 4단계: Git worktree 구성
 
-각 Spec에 대해 Git worktree를 생성합니다.
+각 Spec에 대해 Git worktree를 생성합니다. **base 브랜치는 의존성 여부에 따라 결정합니다.**
+
+**base 브랜치 결정 규칙:**
+
+| 조건 | base 브랜치 |
+|------|------------|
+| `dependsOn: []` (Level 0) | `main` |
+| 의존 Spec이 1개 | 해당 선행 Spec의 브랜치 (구현 추적 섹션 `branch` 필드) |
+| 의존 Spec이 여럿 | `shared_files` 겹침이 가장 많은 선행 Spec의 브랜치 (동률이면 사용자 확인) |
 
 ```bash
-# 브랜치 생성
+# Level 0 — main에서 분기
 git branch {jira_key}-{spec_id_kebab} main
+git worktree add {worktree_base}/{jira_key}-{spec_id_kebab} {jira_key}-{spec_id_kebab}
 
-# worktree 생성
+# Level 1+ — 선행 Spec 브랜치에서 분기
+BASE_BRANCH={선행-spec-branch명}  # 선행 Spec 파일의 구현 추적 섹션 branch 필드에서 읽음
+git branch {jira_key}-{spec_id_kebab} ${BASE_BRANCH}
 git worktree add {worktree_base}/{jira_key}-{spec_id_kebab} {jira_key}-{spec_id_kebab}
 ```
 
 - 브랜치명은 `{jira_key}-{spec_id_kebab}` 형식입니다.
 - worktree 경로는 `{worktree_base}/{브랜치명}/`입니다.
 - worktree 기본 경로가 지정되지 않으면 사용자에게 확인합니다.
+- 선행 Spec 브랜치가 아직 생성되지 않은 경우 (순서 오류) 사용자에게 보고하고 중단합니다.
 
 ### 5단계: Spec에 구현 추적 섹션 추가
 

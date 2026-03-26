@@ -99,12 +99,28 @@ POST /rest/api/2/issue
 
 1. 기존 worktree를 확인합니다 (`git worktree list`).
 2. 이미 존재하면 재사용합니다.
-3. 새 worktree를 생성합니다:
+3. 새 worktree를 생성합니다. **base 브랜치는 의존성 여부에 따라 결정합니다.**
+
+**base 브랜치 결정 규칙:**
+
+| 조건 | base 브랜치 |
+|------|------------|
+| `dependsOn: []` (Level 0) | `main` |
+| 의존 Spec이 1개 | 해당 선행 Spec의 브랜치 |
+| 의존 Spec이 여럿 | `shared_files` 겹침이 가장 많은 선행 Spec의 브랜치 (동률이면 사용자 확인) |
 
 ```bash
+# Level 0 (의존성 없음)
 git branch {jira_key}-{spec_id_kebab} main
 git worktree add {worktree_base}/{jira_key}-{spec_id_kebab} {jira_key}-{spec_id_kebab}
+
+# Level 1+ (의존성 있음) — 선행 Spec 브랜치에서 분기
+BASE_BRANCH={선행-spec의-branch명}   # 구현 추적 섹션의 branch 필드에서 읽음
+git branch {jira_key}-{spec_id_kebab} ${BASE_BRANCH}
+git worktree add {worktree_base}/{jira_key}-{spec_id_kebab} {jira_key}-{spec_id_kebab}
 ```
+
+**선행 Spec 브랜치명 조회:** 선행 Spec 파일의 `## 구현 추적` 섹션 → `branch` 필드에서 읽습니다.
 
 ## Phase 6: 실행 모드 결정
 
