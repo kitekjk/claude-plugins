@@ -9,14 +9,14 @@
 
 ## 핵심 계약
 
-- 스케줄링: Spec 의존성 분석 + Jira 티켓 + Git worktree + 실행 순서
+- 스케줄링: Spec 의존성 분석 + Jira 티켓 + Git 브랜치 + 실행 순서
 - 빌드 검증: 빌드 성공 + 테스트 통과 + TC-ID 대응
 - 모호점 로그: 구현 중 임의 판단 항목을 ambiguity-log.md에 기록
 - 준수도 검증: 4영역, 100점 만점 + Spec 갭 플래그
 - Spec 피드백: 모호점 + 갭 + PR 리뷰에서 수정 제안, 사용자 승인 필수
 - 코드 리뷰 루프: 프로젝트 유형별 체크리스트 + 프로젝트 커스텀 규칙으로 리뷰 → 수정 반복 (최대 3회)
 - review-apply: PR 리뷰 → 코드 수정 → 재검증 → Spec 동기화 한 사이클
-- 통합: 모든 Spec worktree를 로컬 integration branch에 머지 → 전체 테스트 → push 확인
+- 통합: 모든 Spec 브랜치를 로컬 integration branch에 머지 → 전체 테스트 → push 확인
 - 구현 추적: Spec 파일에 Jira/PR/commit 기록 (Spec = SSOT)
 - 리포트 저장: `reports/` 디렉토리
 

@@ -2,7 +2,7 @@
 
 ## 목적
 
-Spec 파일들의 의존성을 분석하고, Jira 티켓 생성 + Git worktree 구성 + 실행 순서 결정을 수행합니다.
+Spec 파일들의 의존성을 분석하고, Jira 티켓 생성 + Git 브랜치 생성 + 실행 순서 결정을 수행합니다.
 
 ## 사전 조건
 
@@ -93,15 +93,15 @@ POST /rest/api/2/issue
 2. 연결 실패 시 `[WARN] Jira MCP 연결 불가 — Jira 없이 진행` 로그를 출력합니다.
 3. 구현 추적 섹션의 `jiraTicket` 필드는 빈 값으로 유지합니다.
 4. 브랜치명은 `{spec_id_kebab}` 형식으로 대체합니다 (Jira 키 없이).
-5. 나머지 Phase (worktree, 작업 계획서)는 정상 진행합니다.
+5. 나머지 Phase (브랜치 생성, 작업 계획서)는 정상 진행합니다.
 
-## Phase 5: Git worktree 구성
+## Phase 5: Git 브랜치 생성
 
-각 Spec에 대해:
+각 Spec에 대해 브랜치를 생성합니다. **worktree는 생성하지 않습니다** — 에이전트 디스패칭 시 SDK의 `isolation: "worktree"`가 프로세스 수준 격리를 제공합니다.
 
-1. 기존 worktree를 확인합니다 (`git worktree list`).
+1. 기존 브랜치를 확인합니다 (`git branch --list`).
 2. 이미 존재하면 재사용합니다.
-3. 새 worktree를 생성합니다. **base 브랜치는 의존성 여부에 따라 결정합니다.**
+3. 새 브랜치를 생성합니다. **base 브랜치는 의존성 여부에 따라 결정합니다.**
 
 **base 브랜치 결정 규칙:**
 
@@ -114,12 +114,10 @@ POST /rest/api/2/issue
 ```bash
 # Level 0 (의존성 없음)
 git branch {jira_key}-{spec_id_kebab} main
-git worktree add {worktree_base}/{jira_key}-{spec_id_kebab} {jira_key}-{spec_id_kebab}
 
 # Level 1+ (의존성 있음) — 선행 Spec 브랜치에서 분기
 BASE_BRANCH={선행-spec의-branch명}   # 구현 추적 섹션의 branch 필드에서 읽음
 git branch {jira_key}-{spec_id_kebab} ${BASE_BRANCH}
-git worktree add {worktree_base}/{jira_key}-{spec_id_kebab} {jira_key}-{spec_id_kebab}
 ```
 
 **선행 Spec 브랜치명 조회:** 선행 Spec 파일의 `## 구현 추적` 섹션 → `branch` 필드에서 읽습니다.
@@ -175,7 +173,7 @@ reviewedAt: ""
 - Spec 목록 + 실행 Level
 - 의존성 그래프 (Mermaid)
 - Jira 티켓 매핑 테이블
-- worktree 경로 매핑 테이블
+- 브랜치 매핑 테이블
 - 예상 실행 순서
 - (review-gate 모드) 리뷰 체크포인트 목록 + lookahead 대상 Spec 표시
 
@@ -196,7 +194,7 @@ reviewedAt: ""
 스케줄링 완료 후:
 
 **auto 모드:**
-- `implement` 워크플로우가 실행 Level 순서대로 각 worktree에서 구현을 시작합니다.
+- `implement` 워크플로우가 실행 Level 순서대로 각 브랜치에서 구현을 시작합니다 (에이전트는 `isolation: "worktree"`로 격리).
 
 **review-gate 모드:**
 - Level 0 구현 시작
@@ -209,15 +207,13 @@ reviewedAt: ""
 - `verify` 워크플로우 완료 시 `verified`로 업데이트합니다.
 - PR 생성 시 `pr` 필드를 업데이트합니다.
 
-## Worktree 정리
+## 브랜치 정리
 
-PR이 머지된 후 worktree를 정리합니다:
+PR이 머지된 후 브랜치를 정리합니다:
 
-1. `git worktree list`로 활성 worktree를 확인합니다.
-2. 해당 Spec의 구현 추적 `status`가 `verified`이고 PR이 머지된 경우:
+1. 해당 Spec의 구현 추적 `status`가 `verified`이고 PR이 머지된 경우:
    ```bash
-   git worktree remove {worktree_path}
    git branch -d {branch_name}
    ```
-3. 정리는 다음 `schedule` 또는 `full` 워크플로우 실행 시 자동으로 수행합니다.
-4. 사용자가 명시적으로 "worktree 정리" 요청 시에도 수행합니다.
+2. 정리는 다음 `schedule` 또는 `full` 워크플로우 실행 시 자동으로 수행합니다.
+3. 사용자가 명시적으로 "브랜치 정리" 요청 시에도 수행합니다.

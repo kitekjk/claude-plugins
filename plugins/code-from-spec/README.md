@@ -6,7 +6,7 @@ Spec 문서를 기반으로 코드를 구현하고, **Spec 준수도 점수**를
 
 ```
 impl-orchestrator (조율자)
-├── work-scheduler      Spec 의존성 분석 → Jira 티켓 → Git worktree
+├── work-scheduler      Spec 의존성 분석 → Jira 티켓 → Git 브랜치
 ├── code-generator      Spec → 코드 구현 (Agent Teams 4명)
 ├── spec-verifier       코드 → Spec 준수도 검증 (100점)
 └── spec-feedback       모호점 + 갭 + PR 리뷰 → Spec 수정 제안
@@ -22,7 +22,7 @@ impl-orchestrator (조율자)
  │  ① work-scheduler                                   │
  │     Spec 의존성 분석 → 토폴로지 정렬 → Level 결정   │
  │     Jira 티켓 생성 (Spec 1개 = 티켓 1개)             │
- │     Git worktree 구성 (Spec 1개 = 브랜치 1개)        │
+ │     Git 브랜치 생성 (Spec 1개 = 브랜치 1개)           │
  │     → 작업 계획서 출력                               │
  └──────────────────────┬──────────────────────────────┘
                         │
@@ -93,7 +93,7 @@ impl-orchestrator (조율자)
 | 워크플로우 | 트리거 프롬프트 | 하는 일 |
 |-----------|----------------|---------|
 | `full` | "전체 파이프라인 실행해줘" | 위 전부 한 번에 |
-| `schedule` | "작업 계획 세워줘" | 의존성 분석 + Jira + worktree |
+| `schedule` | "작업 계획 세워줘" | 의존성 분석 + Jira + 브랜치 |
 | `implement` | "구현해줘" | Spec → 코드 생성 |
 | `code-review` | "코드 리뷰해줘" | 체크리스트 리뷰 → 수정 루프 |
 | `verify` | "검증해줘" | Spec 준수도 100점 평가 |

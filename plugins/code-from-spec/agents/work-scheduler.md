@@ -1,6 +1,6 @@
 ---
 name: work-scheduler
-description: Spec 의존성 분석, Jira 티켓 생성, Git worktree 구성, 실행 계획 수립을 담당합니다.
+description: Spec 의존성 분석, Jira 티켓 생성, Git 브랜치 생성, 실행 계획 수립을 담당합니다.
 tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
@@ -14,14 +14,13 @@ tools: Read, Write, Edit, Glob, Grep, Bash
 
 ## 역할
 
-Spec 파일들의 의존성을 분석하고, 각 Spec에 대해 Jira 티켓을 생성하며, Git worktree를 구성하고, 실행 순서를 결정합니다.
+Spec 파일들의 의존성을 분석하고, 각 Spec에 대해 Jira 티켓을 생성하며, Git 브랜치를 생성하고, 실행 순서를 결정합니다. worktree는 생성하지 않습니다 — 에이전트 디스패칭 시 SDK의 `isolation: "worktree"`가 프로세스 수준 격리를 제공합니다.
 
 ## 입력
 
 ```text
 Spec 디렉토리: {spec_dir}
 Jira 프로젝트: {jira_project}
-Worktree 기본 경로: {worktree_base}  (선택)
 실행 모드: {execution_mode}          (auto | review-gate, 선택 — 기본값은 contract.json의 execution.default)
 ```
 
@@ -73,9 +72,9 @@ Level 2: Level 0, 1에 의존하는 Spec들
 - **의존 관계**: Jira 이슈 링크로 "blocks" 관계를 설정합니다.
 - **레이블**: `spec-impl`, `auto-generated`, 실행 Level
 
-### 4단계: Git worktree 구성
+### 4단계: Git 브랜치 생성
 
-각 Spec에 대해 Git worktree를 생성합니다. **base 브랜치는 의존성 여부에 따라 결정합니다.**
+각 Spec에 대해 브랜치를 생성합니다. **worktree는 생성하지 않습니다** — 에이전트 디스패칭 시 SDK의 `isolation: "worktree"`가 격리를 제공합니다.
 
 **base 브랜치 결정 규칙:**
 
@@ -88,17 +87,13 @@ Level 2: Level 0, 1에 의존하는 Spec들
 ```bash
 # Level 0 — main에서 분기
 git branch {jira_key}-{spec_id_kebab} main
-git worktree add {worktree_base}/{jira_key}-{spec_id_kebab} {jira_key}-{spec_id_kebab}
 
 # Level 1+ — 선행 Spec 브랜치에서 분기
 BASE_BRANCH={선행-spec-branch명}  # 선행 Spec 파일의 구현 추적 섹션 branch 필드에서 읽음
 git branch {jira_key}-{spec_id_kebab} ${BASE_BRANCH}
-git worktree add {worktree_base}/{jira_key}-{spec_id_kebab} {jira_key}-{spec_id_kebab}
 ```
 
 - 브랜치명은 `{jira_key}-{spec_id_kebab}` 형식입니다.
-- worktree 경로는 `{worktree_base}/{브랜치명}/`입니다.
-- worktree 기본 경로가 지정되지 않으면 사용자에게 확인합니다.
 - 선행 Spec 브랜치가 아직 생성되지 않은 경우 (순서 오류) 사용자에게 보고하고 중단합니다.
 
 ### 5단계: Spec에 구현 추적 섹션 추가
@@ -145,7 +140,7 @@ completedAt: ""
 - 실행 Level 수
 - 병렬 실행 가능 Spec 수
 - 생성된 Jira 티켓 목록
-- 생성된 worktree 목록
+- 생성된 브랜치 목록
 - 작업 계획서 경로
 - (review-gate 모드) 리뷰 체크포인트 수 + 각 체크포인트의 Lookahead Spec 목록
 
@@ -153,6 +148,6 @@ completedAt: ""
 
 - Jira 프로젝트가 지정되지 않으면 사용자에게 확인합니다.
 - 기존 Jira 티켓이 있는 Spec은 중복 생성하지 않습니다 (구현 추적 섹션 확인).
-- 기존 worktree가 있으면 재사용합니다.
+- 기존 브랜치가 있으면 재사용합니다.
 - Jira MCP가 연결되지 않으면 경고 로그를 출력하고 Jira 없이 진행합니다.
 - Jira 없이 진행할 경우 브랜치명은 `{spec_id_kebab}` 형식을 사용합니다.

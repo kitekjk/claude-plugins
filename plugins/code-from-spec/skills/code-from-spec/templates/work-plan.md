@@ -35,15 +35,15 @@ graph TD
 
 ### Level 0 (독립 Spec — 병렬 실행)
 
-| Spec ID | 제목 | Jira | 브랜치 | Worktree |
-|---------|------|------|--------|----------|
-| {spec_id} | {title} | {jira_key} | {branch} | {worktree_path} |
+| Spec ID | 제목 | Jira | 브랜치 |
+|---------|------|------|--------|
+| {spec_id} | {title} | {jira_key} | {branch} |
 
 ### Level 1 (Level 0 의존)
 
-| Spec ID | 제목 | 의존 대상 | Jira | 브랜치 | Worktree |
-|---------|------|-----------|------|--------|----------|
-| {spec_id} | {title} | {depends_on} | {jira_key} | {branch} | {worktree_path} |
+| Spec ID | 제목 | 의존 대상 | Jira | 브랜치 |
+|---------|------|-----------|------|--------|
+| {spec_id} | {title} | {depends_on} | {jira_key} | {branch} |
 
 ### Level N ...
 
@@ -53,11 +53,11 @@ graph TD
 |---------|----------|------|-----------|
 | {spec_id} | {jira_key} | To Do | {level} |
 
-## Worktree 매핑
+## 브랜치 매핑
 
-| 브랜치 | 경로 | Spec ID |
-|--------|------|---------|
-| {branch} | {worktree_path} | {spec_id} |
+| 브랜치 | Spec ID | 격리 방식 |
+|--------|---------|----------|
+| {branch} | {spec_id} | SDK isolation: "worktree" |
 
 ## 실행 지침
 

@@ -17,7 +17,7 @@ description: Spec 기반 코드 구현, 코드 리뷰(체크리스트 기반 리
 
 ```text
 impl-orchestrator
-├── work-scheduler     # Spec 의존성 분석 + Jira 티켓 + Git worktree + 실행 계획
+├── work-scheduler     # Spec 의존성 분석 + Jira 티켓 + Git 브랜치 + 실행 계획
 ├── code-generator     # Spec → 코드 구현 (Agent Teams) + 모호점 로그
 ├── spec-verifier      # 구현 → Spec 준수도 검증 + Spec 갭 플래그
 └── spec-feedback      # 모호점 + 갭 → Spec 수정 제안
@@ -31,10 +31,10 @@ impl-orchestrator
 Spec
  │
  ▼
-work-scheduler (의존성 분석 + Jira 티켓 + worktree 구성)
+work-scheduler (의존성 분석 + Jira 티켓 + 브랜치 생성)
  │
  ▼
-code-generator (Agent Teams 4명 + 모호점 로그) ← worktree별 병렬/순차
+code-generator (Agent Teams 4명 + 모호점 로그) ← isolation: "worktree"로 병렬/순차
  │
  ▼
 빌드 + 테스트 통과
@@ -59,13 +59,13 @@ integrate (통합 브랜치 생성 → Level 순서 머지 → 전체 테스트 
 
 | 커맨드 | 설명 |
 |--------|------|
-| 스케줄, schedule | Spec 의존성 분석 + Jira 티켓 + worktree 구성 |
+| 스케줄, schedule | Spec 의존성 분석 + Jira 티켓 + 브랜치 생성 |
 | 구현, implement | Spec 기반 프로젝트 구현 (모호점 로그 포함) |
 | 검증, verify | 기존 구현의 Spec 준수도 검증 |
 | 코드 리뷰, code-review, 리뷰해줘 | 체크리스트 기반 코드 리뷰 → 수정 루프 (코드가 이미 있는 경우) |
 | 피드백, feedback | 모호점 + 미준수 + PR 리뷰에서 Spec 수정 제안 |
 | 리뷰 반영, review-apply, PR 피드백 반영 | PR 리뷰 → 코드 수정 → 재검증 → Spec 동기화 |
-| 통합, integrate, integration, 통합 테스트 | worktree 브랜치 통합 → 전체 테스트 → push 확인 |
+| 통합, integrate, integration, 통합 테스트 | Spec 브랜치 통합 → 전체 테스트 → push 확인 |
 
 ## 4영역 검증 체계
 
