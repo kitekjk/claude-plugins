@@ -50,6 +50,9 @@ spec-feedback (모호점 + 갭 → Spec 수정 제안)
  │
  ▼
 사용자 승인 → Spec 반영 + 구현 추적 업데이트
+ │
+ ▼
+integrate (통합 브랜치 생성 → Level 순서 머지 → 전체 테스트 → push 확인)
 ```
 
 ### 개별 워크플로우
@@ -62,6 +65,7 @@ spec-feedback (모호점 + 갭 → Spec 수정 제안)
 | 코드 리뷰, code-review, 리뷰해줘 | 체크리스트 기반 코드 리뷰 → 수정 루프 (코드가 이미 있는 경우) |
 | 피드백, feedback | 모호점 + 미준수 + PR 리뷰에서 Spec 수정 제안 |
 | 리뷰 반영, review-apply, PR 피드백 반영 | PR 리뷰 → 코드 수정 → 재검증 → Spec 동기화 |
+| 통합, integrate, integration, 통합 테스트 | worktree 브랜치 통합 → 전체 테스트 → push 확인 |
 
 ## 4영역 검증 체계
 
@@ -105,6 +109,8 @@ spec-feedback (모호점 + 갭 → Spec 수정 제안)
 "리뷰 적용하고 Spec도 맞춰줘"                       # review-apply
 "이 코드 리뷰해줘"                                   # code-review (기존 코드 리뷰)
 "코드 리뷰 돌려줘"                                   # code-review
+"구현한 것들 통합해줘"                                # integrate
+"develop 브랜치로 통합 테스트 해줘"                   # integrate (base branch 지정)
 "Spec 기반으로 구현하고 준수도도 확인해줘"          # 전체 (auto)
 "리뷰 포함해서 전체 파이프라인 실행해줘"            # 전체 (review-gate)
 ```

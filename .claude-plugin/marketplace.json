@@ -22,7 +22,7 @@
       "name": "spec-from-design",
       "source": "./plugins/spec-from-design",
       "description": "HLD/LLD 설계 문서 및 개발요청서에서 코드 생성 가능한 Spec을 추출하는 멀티 에이전트 플러그인. 10개 에이전트 파이프라인, 진입점 기반 식별, 품질 게이트.",
-      "version": "2.0.9",
+      "version": "2.0.10",
       "author": {
         "name": "musinsa/pbo"
       },
@@ -33,7 +33,7 @@
       "name": "code-from-spec",
       "source": "./plugins/code-from-spec",
       "description": "Spec 기반 코드 구현, 준수도 검증, Spec 피드백. Jira + worktree + 의존성 스케줄링. auto/review-gate 실행 모드. Spec = SSOT.",
-      "version": "1.6.15",
+      "version": "1.7.0",
       "author": {
         "name": "musinsa/pbo"
       },
@@ -50,6 +50,17 @@
       },
       "category": "documentation",
       "tags": ["markdown", "confluence", "wiki", "mermaid", "hld", "lld"]
+    },
+    {
+      "name": "procedural-skill-reviewer",
+      "source": "./plugins/procedural-skill-reviewer",
+      "description": "절차형 스킬/에이전트의 4요소(Context, Invariant, Verification, Success Criteria) 누락을 자동 검출하는 리뷰 플러그인",
+      "version": "1.0.0",
+      "author": {
+        "name": "musinsa/pbo"
+      },
+      "category": "quality",
+      "tags": ["procedure", "review", "4-element", "context", "invariant", "verification", "success-criteria", "korean"]
     }
   ]
 }

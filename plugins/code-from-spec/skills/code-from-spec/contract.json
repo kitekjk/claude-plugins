@@ -1,5 +1,5 @@
 {
-  "version": "1.6.15",
+  "version": "1.7.0",
   "name": "code-from-spec",
 
   "specFormat": {
@@ -26,7 +26,7 @@
   "execution": {
     "modes": {
       "auto": {
-        "description": "전체 Level을 연속 구현. 개발자 리뷰 없이 AI가 전부 처리한다.",
+        "description": "전체 Level을 연속 구현. Level별 개발자 리뷰 게이트 없이 AI가 전부 처리한다. 코드 리뷰 루프(AI 자체 리뷰)는 모든 모드에서 필수 실행된다.",
         "reviewGate": false
       },
       "review-gate": {
@@ -48,8 +48,8 @@
 
   "workflows": {
     "full": {
-      "description": "스케줄링 + Spec 기반 구현 + 빌드/테스트 + Spec 준수도 검증 + Spec 피드백",
-      "steps": ["schedule", "implement", "build-verify", "code-review-loop", "verify-compliance", "feedback"],
+      "description": "스케줄링 + Spec별 사이클(구현 → 빌드/테스트 → TC-ID 게이트 → 코드 리뷰 루프 → 준수도 검증 → 피드백) + 통합. steps는 요약이며 Spec별 상세 사이클은 impl-orchestrator.md 참조.",
+      "steps": ["schedule", "implement", "build-verify", "code-review-loop", "verify-compliance", "feedback", "integrate"],
       "agents": ["work-scheduler", "code-generator", "spec-verifier", "spec-feedback"]
     },
     "schedule": {
@@ -74,6 +74,12 @@
       "agents": ["code-generator"],
       "triggerKeywords": ["코드 리뷰", "code-review", "리뷰해줘", "리뷰 돌려줘"]
     },
+    "integrate": {
+      "description": "모든 Spec worktree 브랜치를 로컬 통합 브랜치에 머지 → 전체 테스트 → push 여부 확인",
+      "steps": ["ask-base-branch", "create-integration-branch", "merge-by-level", "run-tests", "report", "ask-push"],
+      "agents": [],
+      "triggerKeywords": ["통합", "integrate", "integration", "통합 테스트", "통합 브랜치"]
+    },
     "review-apply": {
       "description": "PR 리뷰 피드백 → 코드 수정 → 코드 리뷰 루프 → 빌드/테스트 → Spec 준수도 재검증 → Spec 동기화",
       "steps": ["review-code-fix", "code-review-loop", "build-verify", "verify-compliance", "feedback"],
@@ -84,7 +90,7 @@
   },
 
   "codeReview": {
-    "description": "코드 리뷰 루프 — 리뷰 → 수정 반복 후 PR 생성 전 품질 확보",
+    "description": "코드 리뷰 루프 — 리뷰 → 수정 반복 후 PR 생성 전 품질 확보. maxIterations는 Spec 단위로 적용된다. Spec A에서 3회 소진해도 Spec B는 별도로 3회 사용 가능하다.",
     "maxIterations": 3,
     "projectTypeDetection": {
       "spring": ["build.gradle", "build.gradle.kts", "pom.xml"],
@@ -117,7 +123,7 @@
       "spring": "checklists/review-spring.md",
       "react": "checklists/review-react.md"
     },
-    "passCondition": "P1 이슈 0건 + P2 이슈 0건 (P3는 선택적. 또는 사용자가 수용 가능 판단)",
+    "passCondition": "P1 이슈 0건 + P2 이슈 0건. P3는 선택적 수정. 사용자가 P1/P2 잔존을 수용하려면 명시적으로 '리뷰 통과' 지시해야 한다. AI가 자체적으로 사용자 수용을 가정하는 것을 금지한다.",
     "specGapPolicy": {
       "description": "코드 리뷰에서 발견된 이슈가 Spec에 명시되지 않은 경우의 처리 정책",
       "rule": "Spec에 없는 항목이 코드 리뷰에서 P1/P2로 발견되면, Spec이 불완전한 것이지 코드가 충분한 것이 아니다",
@@ -232,6 +238,38 @@
       "input": "PR URL 또는 로컬 리뷰 노트 파일",
       "extractTarget": "리뷰로 인해 코드가 변경된 항목 중 Spec과 달라진 부분",
       "format": "REV-{nn} 형식으로 기록"
+    }
+  },
+
+  "integration": {
+    "description": "모든 Spec worktree 구현 완료 후, 로컬 통합 브랜치를 생성하여 전체 테스트를 실행하고, 사용자가 원격 push하여 dev 배포할 수 있도록 하는 워크플로우",
+    "branchPattern": "integration/{baseBranch}/{timestamp}",
+    "timestampFormat": "YYYYMMDD-HHmmss",
+    "baseBranch": {
+      "source": "사용자 지정 (기본값 없음 — 반드시 사용자에게 확인)",
+      "prompt": "통합 대상 브랜치를 지정해주세요 (예: main, develop)"
+    },
+    "mergeOrder": "topological-sort. 같은 Level 내 머지 순서는 Spec ID의 알파벳 순서를 따른다.",
+    "onConflict": {
+      "action": "abort-and-report",
+      "reason": "의존성 순서대로 머지하므로 충돌은 의존성 기술 오류를 의미한다"
+    },
+    "testExecution": {
+      "strategy": "auto",
+      "description": "프로젝트 가이드 문서(CLAUDE.md, build 설정 등)에서 테스트 명령을 읽어 자동 실행"
+    },
+    "onTestFailure": {
+      "action": "analyze-and-report",
+      "description": "실패 원인 분석 후 관련 Spec/worktree를 식별하여 사용자에게 안내"
+    },
+    "pushPolicy": {
+      "action": "ask-user",
+      "prompt": "테스트 통과했습니다. {integrationBranch}를 원격에 push할까요?",
+      "timeout": "사용자 응답을 무기한 대기한다. 자동 push하지 않는다. 타임아웃에 의한 자동 push를 금지한다."
+    },
+    "trigger": {
+      "auto": "full 워크플로우의 마지막 단계로 자동 실행",
+      "manual": "integrate, 통합, integration 키워드로 별도 실행 가능"
     }
   },
 

@@ -45,6 +45,23 @@ LLD의 클래스/컴포넌트 설계 섹션에서 **모든 구현 클래스**를
 - **해당**: 외부 시스템, 사용자, 스케줄러 등으로부터 직접 요청을 수신하는 클래스
 - **비해당**: 다른 클래스에서 호출되는 내부 서비스, 도메인 모델, 유틸리티
 
+#### 진입점 분류 테이블
+
+| 유형 | 판정 | 사유 |
+|------|------|------|
+| REST Controller | 해당 | 외부 HTTP 요청 수신 |
+| gRPC Service | 해당 | 외부 RPC 요청 수신 |
+| @Scheduled | 해당 | 스케줄러로부터 직접 트리거 |
+| @KafkaListener / @RabbitListener | 해당 | 외부 메시지 큐로부터 직접 수신 |
+| @EventListener (Spring ApplicationEvent) | 비해당 | 애플리케이션 내부 이벤트 |
+| 다른 Service에서 호출되는 Service | 비해당 | 간접 호출 |
+| Domain Model / Entity | 비해당 | 데이터 모델 |
+| Repository | 비해당 | 데이터 접근 계층 |
+| Utility / Helper | 비해당 | 범용 도구 |
+| 판단 불가 | 해당으로 분류 | 누락보다 중복이 안전함. identification-verifier에서 제거 가능 |
+
+**Invariant**: 판단이 모호한 경우 '해당'으로 분류한다. 누락보다 중복 식별이 안전하다.
+
 ### Step 4: UC 식별 목록 추가
 
 진입점에 해당하는 클래스를 UC 식별 목록에 추가합니다:
@@ -67,6 +84,9 @@ LLD의 클래스/컴포넌트 설계 섹션에서 **모든 구현 클래스**를
 - LLD 내용(모델 변경, 도메인 로직, 데이터 처리)에 의한 유형 변경을 하지 않습니다.
 - `model`, `service` 유형은 분해 단계(usecase-splitter)에서만 생성됩니다.
 - `refactoring`, `performance`, `simplification` 유형은 LLD에서 명시적으로 해당 유형으로 분류한 항목만 적용합니다.
+  - "명시적"이란: LLD 문서에서 해당 항목의 제목, 유형 필드, 또는 첫 문장에 'refactoring', 'performance', 'simplification' 단어가 직접 사용된 경우를 말한다.
+  - 설명 본문에서 '성능 개선', '리팩터링 필요' 등의 맥락적 언급은 명시적 분류가 아니다.
+  - **Invariant**: 유형 판단이 모호하면 usecase로 분류한다. 다른 유형으로의 임의 변경을 금지한다.
 
 이 규칙은 contract.json의 `classificationFlow.phase1`에 정의되어 있습니다: "모든 진입점 → usecase 유형".
 

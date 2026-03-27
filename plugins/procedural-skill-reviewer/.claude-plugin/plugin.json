@@ -1,0 +1,14 @@
+{
+  "name": "procedural-skill-reviewer",
+  "description": "절차형 스킬/에이전트의 4요소(Context, Invariant, Verification, Success Criteria) 누락을 자동 검출하는 리뷰 플러그인",
+  "version": "1.0.0",
+  "author": {
+    "name": "musinsa/pbo"
+  },
+  "license": "MIT",
+  "keywords": ["procedure", "review", "4-element", "context", "invariant", "verification", "success-criteria", "korean"],
+  "skills": "./skills/",
+  "agents": [
+    "./agents/procedure-reviewer.md"
+  ]
+}

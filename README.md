@@ -23,6 +23,7 @@ claude plugin install doc-writing-team@pbo-plugins
 claude plugin install spec-from-design@pbo-plugins
 claude plugin install code-from-spec@pbo-plugins
 claude plugin install md-to-confluence@pbo-plugins
+claude plugin install procedural-skill-reviewer@pbo-plugins
 ```
 
 ### 3. 업데이트
@@ -33,6 +34,7 @@ claude plugin update doc-writing-team@pbo-plugins
 claude plugin update spec-from-design@pbo-plugins
 claude plugin update code-from-spec@pbo-plugins
 claude plugin update md-to-confluence@pbo-plugins
+claude plugin update procedural-skill-reviewer@pbo-plugins
 ```
 
 ### 4. 사용
@@ -53,6 +55,10 @@ Claude Code에서 자연어로 요청하면 스킬이 자동 트리거됩니다:
 # Confluence 발행 (어떤 MD 파일이든 가능)
 이 HLD.md를 Confluence에 올려줘
 README.md를 wiki에 발행해줘
+
+# 절차형 스킬/에이전트 리뷰
+이 플러그인의 절차를 리뷰해줘
+code-from-spec 4요소 검증해줘
 ```
 
 ## 플러그인 목록
@@ -60,9 +66,10 @@ README.md를 wiki에 발행해줘
 | 플러그인 | 버전 | 설명 |
 |---------|------|------|
 | [doc-writing-team](./plugins/doc-writing-team) | v3.2.0 | ADR/HLD/LLD 설계 문서 작성 — 멀티 에이전트 품질 루프, Spec 도출 가능 수준 보장, HLD→LLD 추적성 |
-| [spec-from-design](./plugins/spec-from-design) | v2.0.9 | HLD/LLD/Dev Request → Spec 추출 — 11개 에이전트 파이프라인, 진입점 기반 UC 식별, 7 Spec 유형, 추적성 검증 게이트, 100점 품질 게이트, 프리셋 시스템 |
-| [code-from-spec](./plugins/code-from-spec) | v1.6.15 | Spec → 코드 구현 + 준수도 검증 + Spec 피드백 — auto/review-gate 실행 모드, Jira 티켓 + Git worktree + 의존성 스케줄링, 완료 Spec 자동 스킵, Spec = SSOT |
+| [spec-from-design](./plugins/spec-from-design) | v2.0.10 | HLD/LLD/Dev Request → Spec 추출 — 11개 에이전트 파이프라인, 진입점 기반 UC 식별, 7 Spec 유형, 추적성 검증 게이트, 100점 품질 게이트, 프리셋 시스템 |
+| [code-from-spec](./plugins/code-from-spec) | v1.7.0 | Spec → 코드 구현 + 준수도 검증 + Spec 피드백 — auto/review-gate 실행 모드, Jira 티켓 + Git worktree + 의존성 스케줄링, 완료 Spec 자동 스킵, Spec = SSOT |
 | [md-to-confluence](./plugins/md-to-confluence) | v0.2.0 | 임의의 Markdown 파일을 Confluence wiki에 발행 (Mermaid→이미지 포함, 독립 사용 가능) |
+| [procedural-skill-reviewer](./plugins/procedural-skill-reviewer) | v1.0.0 | 절차형 스킬/에이전트의 4요소(Context, Invariant, Verification, Success Criteria) 누락 자동 검출 |
 
 ### 워크플로우 연계
 
@@ -76,9 +83,12 @@ spec-from-design  →  Use Case / API / Policy / Test Spec 도출
 code-from-spec         →  Jira + worktree + Spec → 코드 구현 + 준수도 검증
 
 md-to-confluence  →  Confluence wiki 발행 (독립 사용 가능)
+
+procedural-skill-reviewer  →  절차형 스킬/에이전트 4요소 누락 검출 (독립 사용 가능)
 ```
 
 > `md-to-confluence`는 파이프라인과 무관하게 어떤 Markdown 파일이든 단독으로 Confluence에 발행할 수 있습니다.
+> `procedural-skill-reviewer`는 파이프라인과 무관하게 어떤 절차형 스킬/에이전트든 단독으로 4요소 누락을 검출할 수 있습니다.
 
 ## 크레딧
 
@@ -118,10 +128,15 @@ pbo-plugins/
 │   │       ├── specs/                 # 스케줄링, 구현, 검증, 피드백 절차
 │   │       ├── templates/             # 작업 계획서, 프롬프트, 리포트 템플릿
 │   │       └── checklists/            # 스케줄링, 구현, 검증, 피드백, 리뷰 체크리스트
-│   └── md-to-confluence/
+│   ├── md-to-confluence/
+│   │   ├── .claude-plugin/plugin.json
+│   │   ├── skills/md-to-confluence/
+│   │   └── README.md
+│   └── procedural-skill-reviewer/
 │       ├── .claude-plugin/plugin.json
-│       ├── skills/md-to-confluence/
-│       └── README.md
+│       ├── agents/                    # 1 agent (procedure-reviewer)
+│       └── skills/review-procedure/
+│           └── SKILL.md              # 4요소 검출 스킬 진입점
 ├── LICENSE
 └── README.md
 ```

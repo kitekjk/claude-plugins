@@ -95,14 +95,19 @@ writer 호출 시 반드시 다음을 전달합니다:
 - **fail**: ② usecase-identifier를 피드백과 함께 재실행
   - 피드백 형식: 누락된 클래스 목록, 중복 매핑 목록, 제외 사유 불명확 항목
   - 최대 2회 재시도 (총 3회 시도)
-  - 재시도 초과 시 → 사용자에게 판단 요청
+  - 재시도 초과 시 → 파이프라인 즉시 중단. 사용자가 명시적으로 '계속' 지시할 때만 재개. 자동 재개 금지.
+  - **Invariant**: 게이트 실패 상태에서 다음 에이전트를 호출하는 것은 금지한다
+  - **Verification**: identification-verifier의 반환값이 pass가 아니면 policy-extractor를 호출하지 않는다
 
 ### ⑨ spec-traceability-verifier 게이트
 
 - **pass**: ⑩ spec-reviewer로 진행
 - **warn**: ⑩ spec-reviewer로 진행 (경고를 reviewer에 전달, Q6에서 감점 가능)
-- **fail**: ⑤ usecase-writer를 피드백과 함께 재실행
-  - KDD → Policy 누락인 경우: ④ policy-extractor를 먼저 재실행
+- **fail**: 누락 원인에 따라 재실행 대상을 결정
+  - 누락 항목이 policies/ 파일에 매핑되는 경우 → ④ policy-extractor 먼저 재실행 후 ⑤ usecase-writer 재실행
+  - 누락 항목이 Spec 본문에 매핑되는 경우 → ⑤ usecase-writer 재실행
+  - 판단이 어려운 경우 → 두 에이전트 모두 재실행 (④ policy-extractor → ⑤ usecase-writer 순서)
+  - **Invariant**: ambiguous한 경우 에이전트를 스킵하지 않고, 양쪽 모두 재실행한다
   - 피드백 형식: FR 매핑 테이블, 누락 항목 목록, 수정 제안
   - 최대 2회 재시도 (총 3회 시도)
   - 재시도 초과 시 → 사용자에게 판단 요청
@@ -110,7 +115,9 @@ writer 호출 시 반드시 다음을 전달합니다:
 ### ⑩ spec-reviewer 게이트
 
 - **pass** (90점 이상): 파이프라인 완료
-- **fail** (90점 미만 또는 auto-FAIL): ⑤ usecase-writer를 피드백과 함께 재실행
+- **fail** (90점 미만 또는 auto-FAIL): 원인에 따라 재실행 대상을 결정
+  - auto-FAIL 원인이 입력 데이터(Foundation 문서)에 있으면 → 사용자에게 입력 수정 요청 후 파이프라인 재시작
+  - auto-FAIL 원인이 Spec 작성 품질에 있으면 → ⑤ usecase-writer 재실행
   - 피드백 형식: 감점 카테고리별 상세 사유, auto-FAIL 위반 항목
   - 최대 2회 재시도 (총 3회 시도)
   - 재시도 초과 시 → 사용자에게 판단 요청
@@ -119,9 +126,14 @@ writer 호출 시 반드시 다음을 전달합니다:
 
 ## 6. 조건부 실행
 
-- ⑦ usecase-splitter: ⑥ scope-evaluator에서 `split-needed` 판정이 있을 때만 실행. 없으면 스킵.
-- ④ policy-extractor: `full` 또는 `lld-only` 모드에서 HLD KDD가 없으면 LLD 설계 판단만 추출.
-- ⑨ spec-traceability-verifier: `lld-only` 또는 `request-only` 모드에서는 HLD 관련 검증(TR-H)을 스킵.
+- ⑦ usecase-splitter: scope-evaluator가 1개 이상의 Spec에 split-needed를 판정한 경우, 해당 Spec들에 대해서만 usecase-splitter를 실행한다. split-needed가 0개이면 usecase-splitter를 실행하지 않는다.
+  - **Verification**: splitter 실행 후, 원본 Spec이 축소되고 model/service Spec으로 대체되었는지 확인한다
+- ④ policy-extractor: 입력 상태에 따라 추출 범위를 결정한다:
+  - HLD 파일이 존재하고 KDD 섹션이 있으면 → KDD + LLD 설계 판단 모두 추출
+  - HLD 파일이 존재하지만 KDD 섹션이 없으면 → LLD 설계 판단만 추출
+  - HLD 파일이 없으면 → LLD 설계 판단만 추출
+  - request-only 모드 → HLD/LLD 모두 없으므로 개발요청서에서 정책 추출
+- ⑨ spec-traceability-verifier: HLD 파일이 존재하면 모드와 무관하게 HLD 관련 검증(TR-H)을 실행한다. lld-only/request-only 모드에서 TR-H를 스킵하는 조건은 HLD 파일이 물리적으로 존재하지 않는 경우에만 적용된다.
 
 ## 7. 참조 파일
 

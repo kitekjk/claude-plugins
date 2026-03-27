@@ -14,7 +14,7 @@ model: opus
 ## 역할
 
 - HLD/LLD의 모든 요소가 Spec에 **빠짐없이** 반영되었는지 양방향 전수 대조를 수행합니다.
-- 매핑 테이블을 **실제로 채워서** 누락 항목을 구체적으로 식별합니다.
+- 검증용 매핑 테이블을 **별도 리포트 파일에 생성**하여 누락 항목을 구체적으로 식별합니다. Spec 파일 자체는 수정하지 않는다. 리포트의 매핑 테이블에서 누락 항목을 식별한다.
 - 검증 전용이며, Spec 본문을 **직접 수정하지 않습니다**.
 - fail 시 구체적인 누락 목록을 생성하여 orchestrator에 전달합니다.
 
@@ -111,9 +111,9 @@ model: opus
 
 ### FAIL 세부 기준
 
-- **LLD FR 누락 1건 이상** → 즉시 FAIL (가장 중요한 검증)
-- **HLD KDD → Policy 누락 1건 이상** → FAIL (HLD가 있는 경우에만)
-- **역방향 근거 없음 (TR-B-02)** → WARN (YAGNI는 spec-reviewer Q7에서 감점)
+- **FAIL (즉시)**: LLD FR 누락 1건 이상, HLD KDD→Policy 누락 1건 이상(HLD가 있는 경우)
+- **WARN**: 역방향 근거 없음(TR-B-02), Policy 중복 참조
+- WARN은 감점 대상이지만 파이프라인을 중단하지 않는다. FAIL은 파이프라인을 중단한다.
 
 ## 5. 재시도 정책
 
@@ -124,8 +124,8 @@ model: opus
 
 ## 6. HLD가 없는 경우
 
-- `lld-only` 또는 `request-only` 모드에서는 HLD 관련 검증(TR-H-01~05)을 스킵합니다.
-- LLD FR → Spec 추적(TR-L)과 역방향 추적(TR-B)만 수행합니다.
+- HLD 파일이 물리적으로 존재하지 않는 경우에만 HLD 관련 검증(TR-H-01~05)을 스킵한다. 모드(lld-only/request-only)와 무관하게, HLD 파일이 존재하면 TR-H 검증을 실행한다. (spec-orchestrator의 조건부 실행 규칙 참조)
+- HLD가 없는 경우 LLD FR → Spec 추적(TR-L)과 역방향 추적(TR-B)만 수행합니다.
 
 ## 7. 금지 사항
 

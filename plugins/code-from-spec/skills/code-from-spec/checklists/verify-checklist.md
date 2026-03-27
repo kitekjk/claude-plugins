@@ -11,7 +11,7 @@
 
 ### V-01: 기능 구현 완결성 (40점)
 - [ ] 모든 Spec에서 Spec ID와 type 추출 (기본 정보 섹션)
-- [ ] usecase Spec의 기본 흐름에 대응하는 Application Service/Controller 확인
+- [ ] usecase Spec의 기본 흐름에 대응하는 Application Service/Controller 확인. '기본 흐름'은 Spec의 '기본 흐름' 섹션에 기술된 모든 단계를 말한다. happy path뿐 아니라 대안 흐름/예외 흐름이 기본 흐름에 포함되어 있으면 해당 흐름도 확인 대상이다.
 - [ ] model Spec의 엔티티/리포지토리가 코드에 존재하는지 확인
 - [ ] service Spec의 도메인 서비스 메서드가 구현되었는지 확인
 - [ ] 각 Spec의 "수정 대상 파일"이 모두 생성/수정되었는지 확인
@@ -36,7 +36,7 @@
 ### V-04: 테스트 커버리지 (15점)
 - [ ] Spec의 모든 TC-ID가 @Tag로 존재
 - [ ] 전체 테스트 실행 + 통과 확인
-- [ ] Given-When-Then 시나리오 반영 확인
+- [ ] Given-When-Then 시나리오 반영 확인. '반영 확인'이란: 테스트 코드에 Given-When-Then 구조가 존재하고, Given이 Spec의 사전 조건을, When이 트리거를, Then이 기대 결과를 각각 구현하고 있는지 확인하는 것이다.
 - [ ] 누락 TC-ID 목록 기록
 
 ## 리포트 검증

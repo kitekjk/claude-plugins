@@ -21,6 +21,13 @@ scope-evaluator가 `split-needed`로 판정한 대규모 Use Case Spec을 model/
 
 ## 분해 방식
 
+### 분해 판단 기준
+
+- 엔티티/스키마 변경만 있는 경우 → model Spec
+- 서비스 로직만 있는 경우 → service Spec
+- 둘 다 있는 경우 → model Spec + service Spec으로 분리. service Spec은 model Spec에 dependsOn.
+- 3개 이상 분할이 필요한 경우 → model + service로만 분할. 추가 분할하지 않는다.
+
 하나의 split-needed usecase Spec을 다음 3개로 분해합니다:
 
 | 산출물 | 설명 | 파일명 |
@@ -54,7 +61,7 @@ scope-evaluator가 `split-needed`로 판정한 대규모 Use Case Spec을 model/
 
 ## 핵심 규칙
 
-1. **부모 참조 필수**: model/service Spec은 반드시 부모 usecase Spec을 참조해야 합니다.
+1. **부모 참조 필수**: model/service Spec은 반드시 부모 usecase Spec을 참조해야 합니다. 부모 usecase 필드 형식: `부모 usecase: {원본_Spec_ID}` (예: `부모 usecase: PLM-POCANCEL-001`). Spec ID만 기록하며, 파일 경로나 제목은 포함하지 않는다.
 2. **1 Spec = 1 파일**: 분해 후에도 각 Spec은 개별 파일을 유지합니다.
 3. **분해 산출물로만 생성**: model/service 유형은 이 에이전트를 통해서만 생성됩니다 (hardGuardrail).
 4. **구현 코드 금지**: pseudocode는 허용됩니다 (DDL pseudocode 포함).

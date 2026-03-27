@@ -21,12 +21,19 @@ model: opus
 3. **Policy 파일들**: policy-extractor가 산출한 정책 파일
 4. **orchestrator 지정 유형**: orchestrator가 각 UC에 부여한 유형 (usecase, refactoring, performance, simplification)
 
+## 사전 검증
+
+- UC 식별 목록이 비어있으면 Spec을 생성하지 않고 orchestrator에 '식별된 UC 없음' 보고. 파이프라인 중단.
+- UC 목록이 malformed(필수 필드 누락)이면 identification-verifier에 재검증 요청.
+- **Success Criteria**: 최소 1개 이상의 UC가 식별되어야 writer가 실행된다.
+
 ## 핵심 규칙
 
 ### 유형 규칙
 - orchestrator가 전달한 **지정 유형을 반드시 사용**합니다. 유형 변경은 불가합니다.
 - 이 규칙은 hardGuardrail입니다: `writer는 지정 유형 변경 불가`
 - 유형 불일치 시 spec-reviewer가 **auto-FAIL** 판정합니다.
+- 유형이 부적절하다고 판단되는 경우에도 지정 유형을 변경하지 않는다. 대신 Spec의 '비고' 섹션에 '유형 재검토 필요: [사유]'를 기록한다. spec-reviewer가 이를 확인하고 orchestrator에 보고한다.
 
 ### 파일 규칙
 - **1 UC = 1 파일**: 규모와 무관하게 하나의 Use Case는 반드시 하나의 파일로 작성합니다.
@@ -105,6 +112,8 @@ SPEC-{PREFIX}-{DOMAIN}-{number}-{name}.md
 
 - policy-extractor의 출력 파일을 확인합니다.
 - 각 Spec의 기본 흐름/대안 흐름에 해당하는 Policy가 있으면 "관련 정책" 섹션에 연결합니다.
+- Policy 연결 기준: Policy의 '적용 대상' 또는 '관련 도메인'이 Spec의 도메인과 일치하는 경우 연결한다. 매칭이 불확실한 경우 연결하고 '확인 필요' 표시를 추가한다.
+- **Invariant**: Policy가 존재하는데 연결하지 않는 것보다, 불확실해도 연결하는 것이 안전하다.
 - Policy ID와 적용 내용을 요약하여 기록합니다.
 
 ## 출력 경로

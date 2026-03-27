@@ -33,9 +33,9 @@ model: opus
 
 | ID | 조건 | 검출 방법 |
 |----|------|----------|
-| AF-01 | Spec에 구현 코드 블록 포함 | `\`\`\`java`, `\`\`\`kotlin`, `\`\`\`python` 등 검색. yaml dependsOn 블록과 pseudocode 블록은 허용 |
+| AF-01 | Spec에 구현 코드 블록 포함 | `\`\`\`java`, `\`\`\`kotlin`, `\`\`\`python` 등 검색. yaml dependsOn 블록과 pseudocode 블록은 허용. pseudocode란 실행 불가능한 자연어 기반 논리 기술을 말한다. SQL 쿼리, Shell 스크립트, 특정 언어 문법을 따르는 코드 블록은 pseudocode가 아니다. 번호 매긴 절차 설명, 흐름 다이어그램(mermaid 등), 자연어로 기술한 조건 분기는 pseudocode이다. |
 | AF-02 | 1 Spec ≠ 1 파일 | 파일 내 `# SPEC-` 헤더 개수가 2개 이상이면 위반 |
-| AF-03 | 유형이 orchestrator 지정과 불일치 | Spec 기본 정보의 `유형:` 필드를 orchestrator 지정 유형과 비교 |
+| AF-03 | 유형이 orchestrator 지정과 불일치 | Spec 기본 정보의 `유형:` 필드를 orchestrator 지정 유형과 비교. orchestrator 지정 유형은 UC 식별 목록의 '유형' 필드에 기록되어 있다. reviewer는 UC 식별 목록 파일을 읽어 각 Spec의 유형과 비교한다. UC 식별 목록을 찾을 수 없으면 auto-FAIL 판정을 보류하고 orchestrator에 보고한다. |
 | AF-04 | model/service가 분해 없이 단독 생성 | model/service 유형 Spec에 부모 usecase 참조가 없으면 위반 |
 
 ### auto-FAIL 검증 방법
@@ -121,6 +121,7 @@ auto-FAIL 위반:
 - **위치 포함**: 파일명과 해당 섹션/줄 번호를 반드시 포함
 - **수정 가능**: 피드백만으로 writer가 수정할 수 있도록 구체적 수정 방향 제시
 - **auto-FAIL 우선**: auto-FAIL 위반이 있으면 점수 세부 사항보다 auto-FAIL 해소를 우선 안내
+- **피드백 품질 검증**: reviewer의 피드백이 '구체적+위치 포함+수정 가능' 3가지를 모두 만족하지 않으면 orchestrator가 reviewer에게 피드백 보완을 요청한다. 이 검증은 orchestrator의 책임이다.
 
 ## 7. 재시도 정책
 
