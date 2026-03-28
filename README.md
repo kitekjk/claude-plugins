@@ -1,6 +1,6 @@
-# PBO Claude Plugins
+# Kay Claude Plugins
 
-무신사 PBO(Platform Business Operation) 조직의 공용 Claude Code 플러그인 마켓플레이스.
+Kay의 공용 Claude Code 플러그인 마켓플레이스.
 
 ## 설치
 
@@ -8,33 +8,33 @@
 
 **HTTPS:**
 ```bash
-/plugin marketplace add https://github.com/musinsa/pbo-claude-plugins.git
+/plugin marketplace add https://github.com/kay/kay-plugins.git
 ```
 
 **SSH:**
 ```bash
-/plugin marketplace add git@github.com:musinsa/pbo-claude-plugins.git
+/plugin marketplace add git@github.com:kay/kay-plugins.git
 ```
 
 ### 2. 플러그인 설치
 
 ```bash
-claude plugin install doc-writing-team@pbo-plugins
-claude plugin install spec-from-design@pbo-plugins
-claude plugin install code-from-spec@pbo-plugins
-claude plugin install md-to-confluence@pbo-plugins
-claude plugin install procedural-skill-reviewer@pbo-plugins
+claude plugin install doc-writing-team@kay-plugins
+claude plugin install spec-from-design@kay-plugins
+claude plugin install code-from-spec@kay-plugins
+claude plugin install md-to-confluence@kay-plugins
+claude plugin install procedural-skill-reviewer@kay-plugins
 ```
 
 ### 3. 업데이트
 
 ```bash
-claude plugin marketplace update pbo-plugins
-claude plugin update doc-writing-team@pbo-plugins
-claude plugin update spec-from-design@pbo-plugins
-claude plugin update code-from-spec@pbo-plugins
-claude plugin update md-to-confluence@pbo-plugins
-claude plugin update procedural-skill-reviewer@pbo-plugins
+claude plugin marketplace update kay-plugins
+claude plugin update doc-writing-team@kay-plugins
+claude plugin update spec-from-design@kay-plugins
+claude plugin update code-from-spec@kay-plugins
+claude plugin update md-to-confluence@kay-plugins
+claude plugin update procedural-skill-reviewer@kay-plugins
 ```
 
 ### 4. 사용
@@ -92,12 +92,12 @@ procedural-skill-reviewer  →  절차형 스킬/에이전트 4요소 누락 검
 
 ## 크레딧
 
-- `doc-writing-team`은 [musinsa/ciap-doc-writer-claude-plugin](https://github.com/musinsa/ciap-doc-writer-claude-plugin)을 기반으로 PBO 워크플로우에 맞게 확장한 플러그인입니다.
+- `doc-writing-team`은 [ciap-doc-writer-claude-plugin](https://github.com/musinsa/ciap-doc-writer-claude-plugin)을 기반으로 Kay 워크플로우에 맞게 확장한 플러그인입니다.
 
 ## 구조
 
 ```
-pbo-plugins/
+kay-plugins/
 ├── .claude-plugin/
 │   └── marketplace.json
 ├── plugins/

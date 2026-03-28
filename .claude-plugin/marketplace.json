@@ -1,10 +1,10 @@
 {
-  "name": "pbo-plugins",
+  "name": "kay-plugins",
   "owner": {
-    "name": "musinsa/pbo"
+    "name": "kay"
   },
   "metadata": {
-    "description": "무신사 PBO 조직의 공용 Claude Code 플러그인 — 설계 문서 작성, Spec 도출, Spec 기반 구현/검증, Confluence 발행 워크플로우 자동화"
+    "description": "Kay의 공용 Claude Code 플러그인 — 설계 문서 작성, Spec 도출, Spec 기반 구현/검증, Confluence 발행 워크플로우 자동화"
   },
   "plugins": [
     {
@@ -13,7 +13,7 @@
       "description": "ADR/HLD/LLD 설계 문서를 멀티 에이전트 품질 루프로 작성. Spec 도출 가능 수준 보장.",
       "version": "3.2.0",
       "author": {
-        "name": "musinsa/pbo"
+        "name": "kay"
       },
       "category": "documentation",
       "tags": ["adr", "hld", "lld", "design-document", "spec-derivable", "korean"]
@@ -24,7 +24,7 @@
       "description": "HLD/LLD 설계 문서 및 개발요청서에서 코드 생성 가능한 Spec을 추출하는 멀티 에이전트 플러그인. 10개 에이전트 파이프라인, 진입점 기반 식별, 품질 게이트.",
       "version": "2.0.10",
       "author": {
-        "name": "musinsa/pbo"
+        "name": "kay"
       },
       "category": "documentation",
       "tags": ["spec", "hld", "lld", "design-to-spec", "ddd", "clean-architecture", "korean"]
@@ -35,7 +35,7 @@
       "description": "Spec 기반 코드 구현, 준수도 검증, Spec 피드백. Jira + SDK isolation + 의존성 스케줄링. auto/review-gate 실행 모드. Spec = SSOT.",
       "version": "1.7.1",
       "author": {
-        "name": "musinsa/pbo"
+        "name": "kay"
       },
       "category": "development",
       "tags": ["spec", "implementation", "code-generation", "verification", "compliance", "jira", "worktree", "scheduling", "korean"]
@@ -46,7 +46,7 @@
       "description": "Markdown 설계문서(HLD, LLD)를 Confluence wiki에 발행. Mermaid를 Macro Pack 매크로로 변환. 제로 의존성 Python 스크립트.",
       "version": "0.2.0",
       "author": {
-        "name": "musinsa/pbo"
+        "name": "kay"
       },
       "category": "documentation",
       "tags": ["markdown", "confluence", "wiki", "mermaid", "hld", "lld"]
@@ -57,7 +57,7 @@
       "description": "절차형 스킬/에이전트의 4요소(Context, Invariant, Verification, Success Criteria) 누락을 자동 검출하는 리뷰 플러그인",
       "version": "1.0.0",
       "author": {
-        "name": "musinsa/pbo"
+        "name": "kay"
       },
       "category": "quality",
       "tags": ["procedure", "review", "4-element", "context", "invariant", "verification", "success-criteria", "korean"]
